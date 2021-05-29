@@ -20,3 +20,4 @@ export async function startEventLog(dir) {
       .catch(err => console.error(`Could not append stats: ${err.toString}`))
   })
 }
+
