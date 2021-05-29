@@ -1,0 +1,13 @@
+{
+  "name": "portal",
+  "version": "1.0.0",
+  "description": "p2p folder syncing",
+  "main": "index.js",
+  "author": "jackyzha0 <j.zhao2k19@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "chokidar": "^3.5.1",
+    "parse-gitignore": "^1.0.1"
+  }
+}
