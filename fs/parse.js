@@ -9,3 +9,4 @@ export const readGitIgnore = (providedPath) => {
   filePaths.push('.git')
   return filePaths
 }
+

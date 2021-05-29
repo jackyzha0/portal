@@ -8,6 +8,9 @@
   "type": "module",
   "dependencies": {
     "chokidar": "^3.5.1",
-    "parse-gitignore": "^1.0.1"
+    "hyperbee": "^1.5.5",
+    "hyperspace": "^3.19.0",
+    "parse-gitignore": "^1.0.1",
+    "yargs": "^17.0.1"
   }
 }
