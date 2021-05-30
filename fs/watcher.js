@@ -4,15 +4,12 @@ import { readGitIgnore } from "./parse.js"
 
 export const registerWatcher = (dir, onChangeCallback) => {
   console.log('starting file watcher...')
-  const registry = {}
   const watcher = chokidar.watch(dir, {
     ignored: readGitIgnore(dir), // ignore dotfiles
     persistent: true,
-    ignoreInitial: true,
   })
 
   const notify = (path, status, isDir = false) => {
-    registry[path] = { status, isDir }
     onChangeCallback({ path, status, isDir })
   }
 
@@ -26,5 +23,5 @@ export const registerWatcher = (dir, onChangeCallback) => {
     .on('error', error => console.log(`Watcher error: ${error}`))
 
   const stop = () => watcher.close().then(() => console.log('closed'));
-  return { stop, registry }
+  return { stop  }
 }
