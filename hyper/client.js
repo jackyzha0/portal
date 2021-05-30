@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Client } from 'hyperspace'
-import {Registry} from "./registry.js";
+import {Registry} from "../fs/registry.js";
 
 export async function startClient(key) {
   const { corestore, replicate } = new Client()

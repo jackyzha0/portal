@@ -1,6 +1,6 @@
 import { Client } from 'hyperspace'
 import {registerWatcher} from "../fs/watcher.js";
-import {Registry} from "./registry.js";
+import {Registry} from "../fs/registry.js";
 
 export async function startHost(dir) {
   const client = new Client()
