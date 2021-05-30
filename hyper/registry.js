@@ -97,7 +97,7 @@ export class Registry {
     return this.find(pathSegments)?.leaf ?? false
   }
 
-  parseEvt({ targetPath, status, isDir }) {
+  parseEvt({ path: targetPath, status, isDir }) {
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
       case 'add':
@@ -114,13 +114,3 @@ export class Registry {
     }
   }
 }
-
-const registry = new Registry()
-registry.insert("/asdfasdf.dat".split(path.sep))
-registry.insert("/nested/deep/random.dat".split(path.sep))
-registry.insert("/nested/deep/random2.dat".split(path.sep))
-registry.insert("/abc/test.txt".split(path.sep))
-
-registry.remove("/nested".split(path.sep), true)
-
-console.log(registry.toString())

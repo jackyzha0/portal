@@ -1,5 +1,6 @@
 import { Client } from 'hyperspace'
 import {registerWatcher} from "../fs/watcher.js";
+import {Registry} from "./registry.js";
 
 export async function startHost(dir) {
   const client = new Client()
@@ -14,7 +15,12 @@ export async function startHost(dir) {
   // publish
   await client.replicate(eventBus)
 
+  // create internal registry
+  const registry = new Registry()
   registerWatcher(dir, data => {
+    registry.parseEvt(data)
+    console.log('-------- update --------')
+    console.log(registry.toString())
     eventBus
       .append(JSON.stringify(data))
       .catch(err => console.error(`Could not append stats: ${err.toString}`))
