@@ -66,13 +66,21 @@ export class Registry {
     cur.isDir = isDir
   }
 
-  remove(pathSegments) {
-    if (this.contains(pathSegments)) {
-      const node = this.find(pathSegments)
+  // removes an entry from the registry
+  // does nothing if node/dir is not present
+  remove(pathSegments, isDir = false) {
+    const node = this.find(pathSegments)
 
+    // only remove if node is present
+    // and is a directory remove on a directory
+    if (node && (isDir ? node.isDir : !node.isDir)) {
+      const parent = node.parent
+      delete parent.children[node.key]
     }
   }
 
+  // attempts to return entry with given path segments
+  // returns false if not present
   find(pathSegments) {
     let cur = this.root
     pathSegments.forEach(segment => {
@@ -84,6 +92,7 @@ export class Registry {
     return cur
   }
 
+  // returns whether path segment is a leaf in the registry
   contains(pathSegments) {
     return this.find(pathSegments)?.leaf ?? false
   }
@@ -95,8 +104,12 @@ export class Registry {
         this.insert(pathSegments, isDir)
         break
       case 'modify':
+        // replace
+        // does nothing right now, but might want to
+        // add a value prop to trienode later
         break
       case 'delete':
+        this.remove(pathSegments, isDir)
         break
     }
   }
@@ -107,5 +120,7 @@ registry.insert("/asdfasdf.dat".split(path.sep))
 registry.insert("/nested/deep/random.dat".split(path.sep))
 registry.insert("/nested/deep/random2.dat".split(path.sep))
 registry.insert("/abc/test.txt".split(path.sep))
+
+registry.remove("/nested".split(path.sep), true)
 
 console.log(registry.toString())
