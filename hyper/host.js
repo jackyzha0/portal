@@ -1,7 +1,7 @@
 import { Client } from 'hyperspace'
 import {registerWatcher} from "../fs/watcher.js";
 
-export async function startEventLog(dir) {
+export async function startHost(dir) {
   const client = new Client()
   const store = client.corestore()
 
