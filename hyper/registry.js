@@ -1,11 +1,12 @@
 import path from 'path'
 
 class TrieNode {
-  constructor(key) {
+  constructor(key, isDir = false) {
     this.key = key
     this.parent = null
     this.children = {}
     this.leaf = false
+    this.isDir = isDir
   }
 
   getPath() {
@@ -25,11 +26,32 @@ export class Registry {
     this.root = new TrieNode(null)
   }
 
-  upsert(pathSegments) {
+  toString() {
+    const output = []
+    const toStringRecur = (indent, node) => {
+      if (!node) {
+        return
+      }
+
+      const padding = " ".repeat(indent)
+      output.push(`${padding}${node.key}${node.isDir ? '/' : ''}`)
+      Object.values(node.children).forEach(child => {
+        toStringRecur(indent + 2, child)
+      })
+    }
+
+    // ignore root node
+    Object.values(this.root.children).forEach(child => {
+      toStringRecur(0, child)
+    })
+    return output.join("\n")
+  }
+
+  insert(pathSegments, isDir = false) {
     let cur = this.root
     pathSegments.forEach((segment, i) => {
       if (!cur.children[segment]) {
-        cur.children[segment] = new TrieNode(segment)
+        cur.children[segment] = new TrieNode(segment, true)
         cur.children[segment].parent = cur
       }
 
@@ -39,32 +61,51 @@ export class Registry {
         cur.leaf = true
       }
     })
+
+    // set whether leaf node is directory or not
+    cur.isDir = isDir
   }
 
-  contains(pathSegments) {
+  remove(pathSegments) {
+    if (this.contains(pathSegments)) {
+      const node = this.find(pathSegments)
+
+    }
+  }
+
+  find(pathSegments) {
     let cur = this.root
-    pathSegments.forEach((segment, i) => {
+    pathSegments.forEach(segment => {
       if (!cur.children[segment]) {
         return false
       }
       cur = cur.children[segment]
     })
-    return cur.leaf
+    return cur
   }
 
-  // parseEvt({ targetPath, status, isDir }) {
-  //   const pathSegments = targetPath.split(path.sep)
-  //   switch (status) {
-  //
-  //   }
-  // }
+  contains(pathSegments) {
+    return this.find(pathSegments)?.leaf ?? false
+  }
+
+  parseEvt({ targetPath, status, isDir }) {
+    const pathSegments = targetPath.split(path.sep)
+    switch (status) {
+      case 'add':
+        this.insert(pathSegments, isDir)
+        break
+      case 'modify':
+        break
+      case 'delete':
+        break
+    }
+  }
 }
 
 const registry = new Registry()
-registry.upsert("/test".split(path.sep))
-registry.upsert("/test/abc.dat".split(path.sep))
-registry.upsert("/cde.dat".split(path.sep))
+registry.insert("/asdfasdf.dat".split(path.sep))
+registry.insert("/nested/deep/random.dat".split(path.sep))
+registry.insert("/nested/deep/random2.dat".split(path.sep))
+registry.insert("/abc/test.txt".split(path.sep))
 
-console.log(registry.contains("/test".split(path.sep)))
-console.log(registry.contains("/asdfasdf".split(path.sep)))
-console.log(registry.contains("/test/abc.dat".split(path.sep)))
+console.log(registry.toString())
