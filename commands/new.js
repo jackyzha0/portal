@@ -9,31 +9,33 @@ import FileTree from "../components/FileTree";
 
 const Host = ({dir}) => {
   const [registryTree, setRegistryTree] = useState([])
-  const { ready, registry, eventBus, replicate } = useHyper()
-  const [loaded, setLoaded] = useState(false)
+  const { hyper, error, loading } = useHyper(
+    undefined,
+    ({registry, eventBus}) => {
+    registerWatcher(dir, data => {
+      registry.parseEvt(data)
+      setRegistryTree(registry.getTree())
+      eventBus
+        .append(JSON.stringify(data))
+        .catch(err => console.error(`Could not append stats: ${err.toString}`))
+    })
+  })
 
-  // publish
-  useEffect(() => {
-    replicate(eventBus)
-      .then(() => {
-        registerWatcher(dir, data => {
-          registry.parseEvt(data)
-          setRegistryTree(registry.getTree())
-          eventBus
-            .append(JSON.stringify(data))
-            .catch(err => console.error(`Could not append stats: ${err.toString}`))
-        })
-      })
-  }, [])
-
-  if (!ready) {
+  if (loading) {
     return <Text>Establishing connection to hypercore...</Text>
+  }
+
+  if (error) {
+    return <Text>
+      <Text color="red">Error connecting to hypercore: </Text>
+      <Text>{error}</Text>
+    </Text>
   }
 
   return (
     <>
-      <Title text="portal" sessionId={eventBus.key.toString('hex')}/>
-      <FileTree registry={registryTree}>
+      <Title text="portal" sessionId={hyper.eventBus.key.toString('hex')}/>
+      <FileTree registry={registryTree}/>
     </>
   )
 }

@@ -21,10 +21,12 @@
 		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
 		"ink-spinner": "^4.0.2",
+		"nanoid": "^3.1.23",
 		"parse-gitignore": "^1.0.1",
 		"pastel": "^1.1.1",
 		"prop-types": "^15.7.2",
-		"react": "^17.0.2"
+		"react": "^17.0.2",
+		"react-async-hook": "^3.6.2"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.14.3",

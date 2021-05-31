@@ -1,51 +1,64 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import useHyper from "../hyper/useHyper.js";
 import Title from '../components/Title'
 import PropTypes from "prop-types";
+import FileTree from "../components/FileTree";
+import {Text} from "ink";
 
 const Client = ({ sessionId }) => {
-  const { ready, registry, eventBus, replicate } = useHyper(sessionId)
-  const process = (data) => {
-    registry.parseEvt(JSON.parse(data))
-  }
+  const [registryTree, setRegistryTree] = useState([])
+  const { hyper, error, loading } = useHyper(sessionId, ({registry, eventBus}) => {
+    const process = (data) => {
+      registry.parseEvt(JSON.parse(data))
+    }
 
-  useEffect(() => {
     // sync down and preload
-    console.log('replicating from main host')
-    replicate(eventBus)
-      .then(() => eventBus.download())
+    eventBus.download()
+
+    // reconstruct file registry from event stream
+    const dataPromises = []
+    for (let i = 0; i < eventBus.length; i++) {
+      dataPromises.push(eventBus.get(i))
+    }
+    Promise.all(dataPromises)
+      .then(data => data.forEach(process))
       .then(() => {
-        // reconstruct file registry from event stream
-        const dataPromises = []
-        for (let i = 0; i < eventBus.length; i++) {
-          dataPromises.push(eventBus.get(i))
-        }
-        return Promise.all(dataPromises).then(
-          data => data.forEach(process)
-        )
-      })
-      .then(() => console.log(registry.toString()))
-      .then(() => {
-        // setup listeners
+        // setup registry tree
+        setRegistryTree(registry.getTree())
 
         // if we get a new block
         eventBus.on('append', async () => {
           const data = await eventBus.get(eventBus.length - 1)
           process(data)
-          console.log('-------- update --------')
-          console.log(registry.toString())
+          setRegistryTree(registry.getTree())
         })
 
         eventBus.on('close', () => {
           console.log('stream closed')
         })
       })
-  }, [])
+  })
 
   // TODO: handle more feed events here
   // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
 
-  return <Title text="portal" />
+  if (loading) {
+    return <Text>Establishing connection to hypercore...</Text>
+  }
+
+  if (error) {
+    return <Text>
+      <Text color="red">Error connecting to hypercore: </Text>
+      <Text>{error}</Text>
+    </Text>
+  }
+
+  return (
+    <>
+      <Title text="portal" sessionId={sessionId}/>
+      <FileTree registry={registryTree}/>
+    </>
+  )
 }
 
 Client.propTypes = {

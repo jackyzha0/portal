@@ -1,18 +1,43 @@
-import {useEffect, useState} from "react";
-import { Client } from 'hyperspace'
-import {Registry} from "../fs/registry.js";
+import {Registry} from "../fs/registry.js"
+import {Server, Client} from 'hyperspace'
+import { useAsync } from 'react-async-hook'
+import { nanoid } from 'nanoid'
 
-export default (key) => {
-  const [ready, setReady] = useState(false)
+export default (key, onFinishCallback = () => {}) => {
+  const asyncHyper = useAsync(async () => {
+    // setup hyperspace client
+    let client
+    let server
+    try {
+      // use existing daemon if exists
+      client = new Client()
+      await client.ready()
+    } catch (e) {
+      // no daemon, start it in-process
+      server = new Server()
+      await server.ready()
 
-  // persist these vars
-  const { corestore, replicate } = useState(new Client())[0]
-  const store = useState(corestore())[0]
-  const eventBus = useState(key ?
-    store.get({ key: key, valueEncoding: 'json' }) :
-    store.get({ name: 'eventBus', valueEncoding: 'json' }))[0]
-  const registry = useState(new Registry())[0]
+      client = new Client()
+      await client.ready()
+    }
 
-  eventBus?.ready().then(() => setReady(true))
-  return { ready, store, registry, eventBus, replicate }
+    const store = client.corestore()
+    const eventBus = key ?
+      store.get({ key: key, valueEncoding: 'json' }) :
+      store.get({ name: nanoid(), valueEncoding: 'json' })
+    const registry = new Registry()
+    await eventBus.ready()
+
+    // replicate
+    await client.replicate(eventBus)
+
+    onFinishCallback({ registry, eventBus })
+    return { store, registry, eventBus }
+  }, [])
+
+  return {
+    hyper: asyncHyper.result,
+    error: asyncHyper.error?.message,
+    loading: asyncHyper.loading,
+  }
 }

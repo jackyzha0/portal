@@ -4,8 +4,12 @@ import path from 'path'
 import parse from 'parse-gitignore'
 
 export const readGitIgnore = (providedPath) => {
-  const resolved = path.resolve(providedPath)
-  const filePaths = parse(fs.readFileSync(`${resolved}/.gitignore`))
-  filePaths.push('.git')
-  return filePaths
+  const filePaths = ['.git']
+  try {
+    const resolved = path.resolve(providedPath)
+    filePaths.push(...parse(fs.readFileSync(`${resolved}/.gitignore`)))
+    return filePaths
+  } catch {
+    return filePaths
+  }
 }

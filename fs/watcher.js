@@ -2,7 +2,7 @@
 import chokidar from 'chokidar'
 import { readGitIgnore } from "./parse.js"
 
-export const registerWatcher = (dir, onChangeCallback, onReadyCallback) => {
+export const registerWatcher = (dir, onChangeCallback, onReadyCallback = () => {}) => {
   const watcher = chokidar.watch(dir, {
     ignored: readGitIgnore(dir), // ignore dotfiles
     persistent: true,

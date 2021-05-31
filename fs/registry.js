@@ -33,9 +33,8 @@ export class Registry {
         return
       }
 
-      const padding = " ".repeat(indent)
       output.push({
-        padding: padding,
+        padding: indent,
         name: node.key,
         isDir: node.isDir,
       })
