@@ -1,4 +1,5 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import { Client } from 'hyperspace'
 import {Registry} from "../fs/registry.js";
 
 export default (key) => {
@@ -12,5 +13,6 @@ export default (key) => {
     store.get({ name: 'eventBus', valueEncoding: 'json' }))[0]
   const registry = useState(new Registry())[0]
 
+  eventBus?.ready().then(() => setReady(true))
   return { ready, store, registry, eventBus, replicate }
 }

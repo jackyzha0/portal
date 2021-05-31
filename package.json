@@ -5,8 +5,12 @@
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
 	"license": "MIT",
-	"bin": "index.js",
-	"type": "module",
+	"bin": "./build/cli.js",
+	"scripts": {
+		"build": "pastel build",
+		"dev": "pastel dev",
+		"prepare": "pastel build"
+	},
 	"engines": {
 		"node": ">=10"
 	},
@@ -16,11 +20,14 @@
 		"hyperspace": "^3.19.0",
 		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
+		"ink-spinner": "^4.0.2",
 		"parse-gitignore": "^1.0.1",
-		"react": "^17.0.2",
-		"yargs": "^17.0.1"
+		"pastel": "^1.1.1",
+		"prop-types": "^15.7.2",
+		"react": "^17.0.2"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.14.3",
 		"@babel/preset-env": "^7.14.4",
 		"@babel/preset-react": "^7.13.13",
 		"@babel/register": "^7.13.16"

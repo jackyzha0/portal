@@ -26,7 +26,7 @@ export class Registry {
     this.root = new TrieNode(null)
   }
 
-  toString() {
+  getTree() {
     const output = []
     const toStringRecur = (indent, node) => {
       if (!node) {
@@ -34,7 +34,11 @@ export class Registry {
       }
 
       const padding = " ".repeat(indent)
-      output.push(`${padding}${node.key}${node.isDir ? '/' : ''}`)
+      output.push({
+        padding: padding,
+        name: node.key,
+        isDir: node.isDir,
+      })
       Object.values(node.children).forEach(child => {
         toStringRecur(indent + 2, child)
       })
@@ -44,7 +48,7 @@ export class Registry {
     Object.values(this.root.children).forEach(child => {
       toStringRecur(0, child)
     })
-    return output.join("\n")
+    return output
   }
 
   insert(pathSegments, isDir = false) {

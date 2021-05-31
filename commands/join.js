@@ -1,9 +1,10 @@
-import {useEffect, useState} from "react";
-import useHyper from "../../hyper/useHyper.js";
+import React, {useEffect} from "react";
+import useHyper from "../hyper/useHyper.js";
 import Title from '../components/Title'
+import PropTypes from "prop-types";
 
-export default ({ key }) => {
-  const { ready, registry, eventBus, replicate } = useHyper(key)
+const Client = ({ sessionId }) => {
+  const { ready, registry, eventBus, replicate } = useHyper(sessionId)
   const process = (data) => {
     registry.parseEvt(JSON.parse(data))
   }
@@ -46,3 +47,10 @@ export default ({ key }) => {
 
   return <Title text="portal" />
 }
+
+Client.propTypes = {
+  sessionId: PropTypes.string.isRequired,
+};
+
+Client.positionalArgs = ['sessionId'];
+export default Client
