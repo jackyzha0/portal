@@ -1,15 +1,11 @@
-import {startHost} from "./hyper/host.js"
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import {startClient} from "./hyper/client.js"
+import {render} from "ink";
+import React from "react";
+import importJsx from "import-jsx";
 const argv = yargs(hideBin(process.argv)).argv
 
-const STATS_CORE_KEY = argv.key
-
-if (STATS_CORE_KEY) {
-  // start client
-  await startClient(STATS_CORE_KEY)
-} else {
-  // start server
-  await startHost(argv.dir ?? ".")
-}
+const clientUrl = './cli/clients/Client'
+const hostUrl = './cli/clients/Host'
+const client = importJsx(argv.key ? clientUrl : hostUrl)
+render(React.createElement(client, argv));
