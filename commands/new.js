@@ -35,7 +35,7 @@ const Host = ({dir}) => {
 
   return (
     <>
-      <Title text="portal" sessionId={hyper.eventBus.key.toString('hex')}/>
+      <Title sessionId={hyper.eventBus.key.toString('hex')}/>
       <Box marginX={1}>
         {initialScanComplete ?
           <FileTree registry={registryTree}/> :

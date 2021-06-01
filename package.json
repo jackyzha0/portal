@@ -1,7 +1,7 @@
 {
 	"name": "portal",
 	"version": "1.0.0",
-	"description": "p2p folder syncing",
+	"description": "A two-way p2p folder syncing tool build on top of the hypercore protocol",
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
 	"license": "MIT",

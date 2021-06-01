@@ -56,7 +56,7 @@ const Client = ({ sessionId }) => {
 
   return (
     <>
-      <Title text="portal" sessionId={sessionId}/>
+      <Title sessionId={sessionId}/>
       <FileTree registry={registryTree}/>
     </>
   )
