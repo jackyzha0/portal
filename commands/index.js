@@ -3,6 +3,7 @@ import Title, {TitleCard} from '../components/Title';
 import {version, description} from '../package.json';
 import {Box, Newline, Text} from "ink";
 
+/// Displays help info
 const Hello = () => <Box flexDirection="column">
   <TitleCard />
   <Box
@@ -21,7 +22,7 @@ const Hello = () => <Box flexDirection="column">
     </Text>
     <Newline/>
     <Text dimColor>
-      <Text color="cyan" bold>portal --help </Text>
+      <Text color="cyan" bold>portal [command] --help </Text>
       for more information
     </Text>
   </Box>

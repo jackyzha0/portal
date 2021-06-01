@@ -6,6 +6,7 @@ import FileTree from "../components/FileTree";
 import {Text} from "ink";
 import Loader from "../components/Loader";
 
+/// Joins an existing portal using a given `sessionId`
 const Client = ({ sessionId }) => {
   const [registryTree, setRegistryTree] = useState([])
   const { hyper, error, loading } = useHyper(sessionId, ({registry, eventBus}) => {

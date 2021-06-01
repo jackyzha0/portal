@@ -7,6 +7,8 @@ import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Loader from "../components/Loader";
 
+/// Creates a new portal in the given directory.
+/// If no directory is provided, uses current working directory
 const Host = ({dir}) => {
   const [registryTree, setRegistryTree] = useState([])
   const [initialScanComplete, setInitialScanComplete] = useState(false)
