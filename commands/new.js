@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {registerWatcher} from "../fs/watcher.js";
 import useHyper from "../hyper/useHyper.js";
-import Title from '../components/Title'
+import {SessionInfo, TitleCard} from '../components/Title'
 import {Box, Text} from "ink";
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
@@ -37,12 +37,13 @@ const Host = ({dir}) => {
 
   return (
     <>
-      <Title sessionId={hyper.eventBus.key.toString('hex')}/>
-      <Box marginX={1}>
+      <TitleCard />
+      <Box marginX={1} flexDirection="column">
         {initialScanComplete ?
           <FileTree registry={registryTree}/> :
           <Loader status={`Scanning directory... ${registryTree.length} files found`} />
         }
+        <SessionInfo sessionId={hyper.eventBus.key.toString('hex')}/>
       </Box>
     </>
   )

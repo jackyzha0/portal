@@ -13,10 +13,7 @@ export const TitleCard = () => <Box
   >two-way P2P folder syncing</Text>
 </Box>
 
-export default ({sessionId}) => <Box flexDirection="column">
-  <TitleCard />
-  <Box margin={1}>
-    <Text bold>Session ID: </Text>
-    <Text>{sessionId}</Text>
-  </Box>
+export const SessionInfo = ({sessionId}) => <Box>
+  <Text bold>Session ID: </Text>
+  <Text>{sessionId}</Text>
 </Box>

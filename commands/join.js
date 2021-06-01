@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import useHyper from "../hyper/useHyper.js";
-import Title from '../components/Title'
+import {SessionInfo, TitleCard} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import {Text} from "ink";
@@ -57,8 +57,9 @@ const Client = ({ sessionId }) => {
 
   return (
     <>
-      <Title sessionId={sessionId}/>
+      <TitleCard/>
       <FileTree registry={registryTree}/>
+      <SessionInfo sessionId={sessionId}/>
     </>
   )
 }
