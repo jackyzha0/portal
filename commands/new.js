@@ -6,9 +6,11 @@ import Title from '../components/Title'
 import {Box, Text} from "ink";
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
+import Loader from "../components/Loader";
 
 const Host = ({dir}) => {
   const [registryTree, setRegistryTree] = useState([])
+  const [initialScanComplete, setInitialScanComplete] = useState(false)
   const { hyper, error, loading } = useHyper(
     undefined,
     ({registry, eventBus}) => {
@@ -18,11 +20,11 @@ const Host = ({dir}) => {
       eventBus
         .append(JSON.stringify(data))
         .catch(err => console.error(`Could not append stats: ${err.toString}`))
-    })
+    }, () => setInitialScanComplete(true))
   })
 
   if (loading) {
-    return <Text>Establishing connection to hypercore...</Text>
+    return <Loader>Establishing connection</Loader>
   }
 
   if (error) {
@@ -35,7 +37,12 @@ const Host = ({dir}) => {
   return (
     <>
       <Title text="portal" sessionId={hyper.eventBus.key.toString('hex')}/>
-      <FileTree registry={registryTree}/>
+      <Box marginX={1}>
+        {initialScanComplete ?
+          <FileTree registry={registryTree}/> :
+          <Loader status={`Scanning directory... ${registryTree.length} files found`} />
+        }
+      </Box>
     </>
   )
 }

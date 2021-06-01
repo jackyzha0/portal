@@ -4,6 +4,7 @@ import Title from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import {Text} from "ink";
+import Loader from "../components/Loader";
 
 const Client = ({ sessionId }) => {
   const [registryTree, setRegistryTree] = useState([])
@@ -43,7 +44,7 @@ const Client = ({ sessionId }) => {
   // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
 
   if (loading) {
-    return <Text>Establishing connection to hypercore...</Text>
+    return <Loader>Establishing connection</Loader>
   }
 
   if (error) {

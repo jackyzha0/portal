@@ -2,7 +2,7 @@ import React from 'react'
 import {Box, Text} from "ink";
 
 export default ({registry}) => {
-  return <Box flexDirection="column" marginX={1}>
+  return <Box flexDirection="column">
     <Text bold>Files (tracking {registry.length})</Text>
     {registry.length !== 0 ? registry.map(file => (
       <Box paddingLeft={file.padding} key={file.name}>
