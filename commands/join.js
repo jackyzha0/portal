@@ -44,7 +44,7 @@ const Client = ({ sessionId }) => {
   // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
 
   if (loading) {
-    return <Loader>Establishing connection</Loader>
+    return <Loader status="Initializing Hyperspace..." />
   }
 
   if (error) {

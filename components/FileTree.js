@@ -3,7 +3,7 @@ import {Box, Text} from "ink";
 
 export default ({registry}) => {
   return <Box flexDirection="column">
-    <Text bold>Files (tracking {registry.length})</Text>
+    <Text bold>Files</Text>
     {registry.length !== 0 ? registry.map(file => (
       <Box paddingLeft={file.padding} key={file.name}>
         <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
@@ -11,5 +11,8 @@ export default ({registry}) => {
         </Text>
       </Box>
     )) : <Text color="yellow">Waiting for remote files...</Text>}
+    <Box marginTop={1}>
+      <Text bold>Tracking {registry.length} files</Text>
+    </Box>
   </Box>
 }

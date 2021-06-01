@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {registerWatcher} from "../fs/watcher.js";
 import useHyper from "../hyper/useHyper.js";
-import {useEffect} from "react";
 import Title from '../components/Title'
 import {Box, Text} from "ink";
 import PropTypes from "prop-types";
@@ -24,7 +23,7 @@ const Host = ({dir}) => {
   })
 
   if (loading) {
-    return <Loader>Establishing connection</Loader>
+    return <Loader status="Initializing Hyperspace..." />
   }
 
   if (error) {

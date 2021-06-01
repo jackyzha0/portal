@@ -22,5 +22,5 @@ export const registerWatcher = (dir, onChangeCallback, onReadyCallback = () => {
     .on('error', error => console.log(`Watcher error: ${error}`))
 
   const stop = () => watcher.close().then(() => console.log('closed'));
-  return { stop  }
+  return { stop }
 }
