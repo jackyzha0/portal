@@ -37,11 +37,11 @@ const Client = ({ sessionId }) => {
         eventBus.on('close', () => {
           console.log('stream closed')
         })
+
+        // TODO: handle more feed events here
+        // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
       })
   })
-
-  // TODO: handle more feed events here
-  // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
 
   if (loading) {
     return <Loader status="Initializing Hyperspace..." />

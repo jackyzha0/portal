@@ -31,8 +31,8 @@ export const readGitIgnore = (providedPath) => {
     const ignoredFiles = getAllGitIgnores(providedPath)
       .map(gitIgnore => {
         const fullPath = path.join(resolved, gitIgnore.path)
-        return [...parse(fs.readFileSync(fullPath)), '.git']
-          .map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
+        const allIgnored = [...parse(fs.readFileSync(fullPath)), '.git']
+        return allIgnored.map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
       })
       .flat()
     filePaths.push(...ignoredFiles)

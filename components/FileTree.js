@@ -12,7 +12,7 @@ export default ({registry}) => {
       </Box>
     )) : <Text color="yellow">Waiting for remote files...</Text>}
     <Box marginTop={1}>
-      <Text bold>Tracking {registry.length} files</Text>
+      <Text bold>Watching {registry.length} files</Text>
     </Box>
   </Box>
 }
