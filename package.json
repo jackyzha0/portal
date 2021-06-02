@@ -11,12 +11,16 @@
 		"dev": "pastel dev",
 		"prepare": "pastel build"
 	},
+	"files": [
+		"build"
+	],
 	"engines": {
 		"node": ">=10"
 	},
 	"dependencies": {
 		"chokidar": "^3.5.1",
 		"hyperbee": "^1.5.5",
+		"hyperdrive": "^10.20.0",
 		"hyperspace": "^3.19.0",
 		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
@@ -27,17 +31,5 @@
 		"prop-types": "^15.7.2",
 		"react": "^17.0.2",
 		"react-async-hook": "^3.6.2"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.14.3",
-		"@babel/preset-env": "^7.14.4",
-		"@babel/preset-react": "^7.13.13",
-		"@babel/register": "^7.13.16"
-	},
-	"babel": {
-		"presets": [
-			"@babel/preset-env",
-			"@babel/preset-react"
-		]
 	}
 }

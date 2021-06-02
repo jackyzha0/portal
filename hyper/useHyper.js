@@ -1,5 +1,6 @@
 import {Registry} from "../fs/registry.js"
 import {Server, Client} from 'hyperspace'
+import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
@@ -22,17 +23,22 @@ export default (key, onFinishCallback = () => {}) => {
     }
 
     const store = client.corestore()
+
+    // initialize eventBus
     const eventBus = key ?
       store.get({ key: key, valueEncoding: 'json' }) :
       store.get({ name: nanoid(), valueEncoding: 'json' })
-    const registry = new Registry()
     await eventBus.ready()
+
+    // initialize hyperdrive
+    const drive = new Hyperdrive(store, key ? Buffer.from(key, 'hex') : null)
+    const registry = new Registry(drive)
 
     // replicate
     await client.replicate(eventBus)
 
     onFinishCallback({ registry, eventBus })
-    return { store, registry, eventBus }
+    return { store, registry, eventBus, drive }
   }, [])
 
   return {

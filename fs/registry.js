@@ -1,10 +1,20 @@
 import path from 'path'
+import {read} from './io'
 
+export const STATUS = Object.freeze({
+  unsynced: "unsynced",
+  error: "error",
+  synced: "synced",
+})
+
+// integrate with
+// https://hypercore-protocol.org/guides/walkthroughs/sharing-files-with-hyperdrive/
 class TrieNode {
   constructor(key, isDir = false) {
     this.key = key
     this.parent = null
     this.children = {}
+    this.status = STATUS.unsynced
     this.leaf = false
     this.isDir = isDir
   }
@@ -12,18 +22,59 @@ class TrieNode {
   getPath() {
     const output = []
     let cur = this
-    while (cur !== null) {
+    while (cur.parent !== null) {
       output.unshift(cur.key)
       cur = cur.parent
     }
     return output
   }
+
+  getChildren() {
+    return Object.values(this.children)
+  }
+
+  sync() {
+    // dont sync already synced files
+    if (this.status === STATUS.synced) {
+      return this.status
+    }
+
+    // if folder, sync all files
+    if (this.isDir) {
+      const statuses = this.getChildren().map(child => child.sync())
+
+      // if all children are synced, we are synced
+      if (statuses.every(status => status === STATUS.synced)) {
+        this.status = STATUS.synced
+      } else {
+        this.status = STATUS.error
+      }
+      return this.status
+    }
+
+    // single file, just sync
+    const path = this.getPath()
+    return read(path)
+      .then(buf => this.drive.promises.writeFile(path, buf))
+      .then(() => this.status = STATUS.synced)
+      .catch(() => this.status = STATUS.error)
+      .finally(() => this.status)
+  }
 }
 
 // actually just a trie
 export class Registry {
-  constructor() {
+  constructor(drive) {
     this.root = new TrieNode(null)
+    this.drive = drive
+  }
+
+  sync() {
+    return this.root.getChildren().map(child => child.sync())
+  }
+
+  size() {
+    return this.getTree().length
   }
 
   getTree() {
@@ -37,6 +88,7 @@ export class Registry {
         padding: indent,
         name: node.key,
         isDir: node.isDir,
+        status: node.status,
       })
       Object.values(node.children).forEach(child => {
         toStringRecur(indent + 2, child)

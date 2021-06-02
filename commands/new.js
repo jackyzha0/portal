@@ -21,7 +21,10 @@ const Host = ({dir}) => {
       eventBus
         .append(JSON.stringify(data))
         .catch(err => console.error(`Could not append stats: ${err.toString}`))
-    }, () => setInitialScanComplete(true))
+    }, () => {
+      registry.sync()
+      setInitialScanComplete(true)
+    })
   })
 
   if (loading) {
