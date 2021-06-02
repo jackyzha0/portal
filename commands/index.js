@@ -1,5 +1,5 @@
 import React from 'react';
-import Title, {TitleCard} from '../components/Title';
+import {TitleCard} from '../components/Title';
 import {version, description} from '../package.json';
 import {Box, Newline, Text} from "ink";
 

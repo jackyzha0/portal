@@ -9,18 +9,18 @@ import Loader from "../components/Loader";
 /// Joins an existing portal using a given `sessionId`
 const Client = ({ sessionId }) => {
   const [registryTree, setRegistryTree] = useState([])
-  const { hyper, error, loading } = useHyper(sessionId, ({registry, eventBus}) => {
+  const { hyper, error, loading } = useHyper(sessionId, ({registry, eventLog}) => {
     const process = (data) => {
       registry.parseEvt(JSON.parse(data))
     }
 
     // sync down and preload
-    eventBus.download()
+    eventLog.download()
 
     // reconstruct file registry from event stream
     const dataPromises = []
-    for (let i = 0; i < eventBus.length; i++) {
-      dataPromises.push(eventBus.get(i))
+    for (let i = 0; i < eventLog.length; i++) {
+      dataPromises.push(eventLog.get(i))
     }
     Promise.all(dataPromises)
       .then(data => data.forEach(process))
@@ -29,13 +29,13 @@ const Client = ({ sessionId }) => {
         setRegistryTree(registry.getTree())
 
         // if we get a new block
-        eventBus.on('append', async () => {
-          const data = await eventBus.get(eventBus.length - 1)
+        eventLog.on('append', async () => {
+          const data = await eventLog.get(eventLog.length - 1)
           process(data)
           setRegistryTree(registry.getTree())
         })
 
-        eventBus.on('close', () => {
+        eventLog.on('close', () => {
           console.log('stream closed')
         })
 

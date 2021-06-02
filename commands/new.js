@@ -14,11 +14,11 @@ const Host = ({dir}) => {
   const [initialScanComplete, setInitialScanComplete] = useState(false)
   const { hyper, error, loading } = useHyper(
     undefined,
-    ({registry, eventBus}) => {
+    ({registry, eventLog}) => {
     registerWatcher(dir, data => {
       registry.parseEvt(data)
       setRegistryTree(registry.getTree())
-      eventBus
+      eventLog
         .append(JSON.stringify(data))
         .catch(err => console.error(`Could not append stats: ${err.toString}`))
     }, () => {
@@ -46,7 +46,7 @@ const Host = ({dir}) => {
           <FileTree registry={registryTree}/> :
           <Loader status={`Scanning directory... ${registryTree.length} files found`} />
         }
-        <SessionInfo sessionId={hyper.eventBus.key.toString('hex')}/>
+        <SessionInfo sessionId={hyper.eventLog.key.toString('hex')}/>
       </Box>
     </>
   )

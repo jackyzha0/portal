@@ -24,21 +24,21 @@ export default (key, onFinishCallback = () => {}) => {
 
     const store = client.corestore()
 
-    // initialize eventBus
-    const eventBus = key ?
+    // initialize eventLog
+    const eventLog = key ?
       store.get({ key: key, valueEncoding: 'json' }) :
       store.get({ name: nanoid(), valueEncoding: 'json' })
-    await eventBus.ready()
+    await eventLog.ready()
 
     // initialize hyperdrive
     const drive = new Hyperdrive(store, key ? Buffer.from(key, 'hex') : null)
     const registry = new Registry(drive)
 
     // replicate
-    await client.replicate(eventBus)
+    await client.replicate(eventLog)
 
-    onFinishCallback({ registry, eventBus })
-    return { store, registry, eventBus, drive }
+    onFinishCallback({ registry, eventLog })
+    return { store, registry, eventLog, drive }
   }, [])
 
   return {

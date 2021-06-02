@@ -19,10 +19,7 @@ export default ({registry}) => <Box flexDirection="column" marginTop={1}>
   <Text bold>Files</Text>
   {registry.length !== 0 ? registry.map(file => (
     <Box key={file.name}>
-      {file.status === STATUS.unsynced ?
-        <Loader color="yellow"/> :
-        <Text color="green">✔</Text>
-      }
+      <StatusIndicator status={file.status} />
       <Box paddingLeft={file.padding + 2}>
         <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
           {file.name}
