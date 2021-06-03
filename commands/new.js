@@ -1,30 +1,36 @@
-import React, {useState} from 'react';
-import {registerWatcher} from "../fs/watcher.js";
-import useHyper from "../hyper/useHyper.js";
+import React, {useEffect, useState} from 'react';
+import useHyper from "../hooks/useHyper.js";
 import {SessionInfo, TitleCard} from '../components/Title'
 import {Box, Text} from "ink";
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Loader from "../components/Loader";
+import useConstant from "../hooks/useConstant";
+import {Registry} from "../fs/registry";
+import Errors from "../components/Errors";
 
 /// Creates a new portal in the given directory.
 /// If no directory is provided, uses current working directory
 const Host = ({dir}) => {
-  const [registryTree, setRegistryTree] = useState([])
+  const [errors, setErrors] = useState([])
+  const addError = (err) => setErrors(errors => [...errors, err])
+
+  const localRegistry = useConstant(() => new Registry(addError))
   const [initialScanComplete, setInitialScanComplete] = useState(false)
-  const { hyper, error, loading } = useHyper(
-    undefined,
-    ({registry, eventLog}) => {
-    registerWatcher(dir, data => {
-      registry.parseEvt(data)
-      setRegistryTree(registry.getTree())
-      eventLog
-        .append(JSON.stringify(data))
-        .catch(err => console.error(`Could not append stats: ${err.toString}`))
-    }, () => {
-      registry.sync()
-      setInitialScanComplete(true)
-    })
+  const { hyper, error, loading } = useHyper(undefined, ({eventLog, drive}) => {
+    localRegistry.setDrive(drive)
+    localRegistry.watch(
+      dir,
+      (data) => {
+        eventLog
+          .append(JSON.stringify(data))
+          .catch(err => console.error(`Could not append event: ${err.toString()}`))
+      },
+      () => {
+        localRegistry.sync()
+        setInitialScanComplete(true)
+      },
+    )
   })
 
   if (loading) {
@@ -43,10 +49,11 @@ const Host = ({dir}) => {
       <TitleCard />
       <Box marginX={1} flexDirection="column">
         {initialScanComplete ?
-          <FileTree registry={registryTree}/> :
-          <Loader status={`Scanning directory... ${registryTree.length} files found`} />
+          <FileTree registry={localRegistry.getTree()}/> :
+          <Loader status={`Scanning directory... ${localRegistry.size()} files found`} />
         }
         <SessionInfo sessionId={hyper.eventLog.key.toString('hex')}/>
+        <Errors errors={errors}/>
       </Box>
     </>
   )

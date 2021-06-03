@@ -4,7 +4,7 @@ import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
-export default (key, onFinishCallback = () => {}) => {
+export default (key, onReady) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
     let client
@@ -32,13 +32,15 @@ export default (key, onFinishCallback = () => {}) => {
 
     // initialize hyperdrive
     const drive = new Hyperdrive(store, key ? Buffer.from(key, 'hex') : null)
-    const registry = new Registry(drive)
+    await drive.ready()
+
+    const remoteRegistry = new Registry(drive)
 
     // replicate
     await client.replicate(eventLog)
-
-    onFinishCallback({ registry, eventLog })
-    return { store, registry, eventLog, drive }
+    const hyper = { store, remoteRegistry, eventLog, drive }
+    onReady(hyper)
+    return hyper
   }, [])
 
   return {

@@ -1,5 +1,6 @@
 import path from 'path'
 import {read} from './io'
+import {registerWatcher} from "./watcher";
 
 export const STATUS = Object.freeze({
   unsynced: "unsynced",
@@ -15,7 +16,6 @@ class TrieNode {
     this.parent = null
     this.children = {}
     this.status = STATUS.unsynced
-    this.leaf = false
     this.isDir = isDir
   }
 
@@ -33,7 +33,7 @@ class TrieNode {
     return Object.values(this.children)
   }
 
-  sync() {
+  sync(drive, errCb) {
     // dont sync already synced files
     if (this.status === STATUS.synced) {
       return this.status
@@ -41,36 +41,41 @@ class TrieNode {
 
     // if folder, sync all files
     if (this.isDir) {
-      const statuses = this.getChildren().map(child => child.sync())
-
-      // if all children are synced, we are synced
-      if (statuses.every(status => status === STATUS.synced)) {
-        this.status = STATUS.synced
-      } else {
-        this.status = STATUS.error
-      }
-      return this.status
+      const statusPromises = this.getChildren().map(child => child.sync(drive, errCb))
+      return Promise.all(statusPromises).then(statuses => {
+        // if all children are synced, we are synced
+        if (statuses.every(status => status === STATUS.synced)) {
+          this.status = STATUS.synced
+        } else {
+          this.status = STATUS.error
+        }
+        return this.status
+      })
     }
 
     // single file, just sync
-    const path = this.getPath()
+    const path = this.getPath().join("/")
     return read(path)
       .then(buf => this.drive.promises.writeFile(path, buf))
       .then(() => this.status = STATUS.synced)
-      .catch(() => this.status = STATUS.error)
+      .catch((err) => {
+        this.status = STATUS.error
+        errCb(err.toString())
+      })
       .finally(() => this.status)
   }
 }
 
 // actually just a trie
 export class Registry {
-  constructor(drive) {
+  constructor(errorCallback) {
     this.root = new TrieNode(null)
-    this.drive = drive
+    this.drive = undefined
+    this.errorCallback = errorCallback
   }
 
   sync() {
-    return this.root.getChildren().map(child => child.sync())
+    return this.root.getChildren().map(child => child.sync(this.drive, this.errorCallback))
   }
 
   size() {
@@ -147,11 +152,6 @@ export class Registry {
     return cur
   }
 
-  // returns whether path segment is a leaf in the registry
-  contains(pathSegments) {
-    return this.find(pathSegments)?.leaf ?? false
-  }
-
   parseEvt({ path: targetPath, status, isDir }) {
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
@@ -167,5 +167,16 @@ export class Registry {
         this.remove(pathSegments, isDir)
         break
     }
+  }
+
+  setDrive(drive) {
+    this.drive = drive
+  }
+
+  watch(dir, onChange, onReady) {
+    registerWatcher(dir, data => {
+      this.parseEvt(data)
+      onChange(data)
+    }, onReady)
   }
 }

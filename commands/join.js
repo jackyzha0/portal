@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import useHyper from "../hyper/useHyper.js";
+import useHyper from "../hooks/useHyper.js";
 import {SessionInfo, TitleCard} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
