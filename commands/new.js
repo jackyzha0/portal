@@ -16,6 +16,7 @@ const Host = ({dir}) => {
   const addError = (err) => setErrors(errors => [...errors, err])
 
   const localRegistry = useConstant(() => new Registry(addError))
+  const [localRegistryStringRep, setLocalRegistryStringRep] = useState(localRegistry.getTree())
   const [initialScanComplete, setInitialScanComplete] = useState(false)
   const { hyper, error, loading } = useHyper(undefined, ({eventLog, drive}) => {
     localRegistry.setDrive(drive)
@@ -27,7 +28,7 @@ const Host = ({dir}) => {
           .catch(err => console.error(`Could not append event: ${err.toString()}`))
       },
       () => {
-        localRegistry.sync()
+        localRegistry.sync().then((tree) => setLocalRegistryStringRep(tree))
         setInitialScanComplete(true)
       },
     )
@@ -49,7 +50,7 @@ const Host = ({dir}) => {
       <TitleCard />
       <Box marginX={1} flexDirection="column">
         {initialScanComplete ?
-          <FileTree registry={localRegistry.getTree()}/> :
+          <FileTree registry={localRegistryStringRep}/> :
           <Loader status={`Scanning directory... ${localRegistry.size()} files found`} />
         }
         <SessionInfo sessionId={hyper.eventLog.key.toString('hex')}/>

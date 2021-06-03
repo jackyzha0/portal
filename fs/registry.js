@@ -55,9 +55,8 @@ class TrieNode {
 
     // single file, just sync
     const path = this.getPath().join("/")
-    console.log(drive)
     return read(path)
-      .then(buf => this.drive.promises.writeFile(path, buf))
+      .then(buf => drive.promises.writeFile(path, buf))
       .then(() => this.status = STATUS.synced)
       .catch((err) => {
         this.status = STATUS.error
@@ -76,7 +75,11 @@ export class Registry {
   }
 
   sync() {
-    return this.root.getChildren().map(child => child.sync(this.drive, this.errorCallback))
+    const promises = this
+      .root
+      .getChildren()
+      .map(child => child.sync(this.drive, this.errorCallback))
+    return Promise.all(promises).then(() => this.getTree())
   }
 
   size() {

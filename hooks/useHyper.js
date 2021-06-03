@@ -32,7 +32,8 @@ export default (key, onReady) => {
 
     // initialize hyperdrive
     const drive = new Hyperdrive(store, key ? Buffer.from(key, 'hex') : null)
-    await drive.ready()
+    await drive.promises.ready()
+    await client.replicate(drive.metadata)
 
     const remoteRegistry = new Registry(drive)
 
