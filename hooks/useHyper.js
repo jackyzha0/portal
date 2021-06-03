@@ -4,7 +4,7 @@ import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
-export default (key, onReady) => {
+export default (key, onReady, errCb) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
     let client
@@ -31,29 +31,33 @@ export default (key, onReady) => {
     await eventLog.ready()
 
     // initialize hyperdrive
-    const drive = new Hyperdrive(store, null)
-    // let drive
-    // if (!key) {
-    //   // new drive
-    //   drive = new Hyperdrive(store, null)
-    //   await drive.promises.ready()
-    //
-    //   // fetch drive metadata and write to genesis block
-    //
-    //
-    //   await client.replicate(drive.metadata)
-    // } else {
-    //   // if key exists, read genesis block and set drive info
-    // }
-    // const hypercoreKey = key ?
-    //   Buffer.from(key, 'hex') :
-    //   eventLog.key
-    // const
-    //
-    //
-    // // create remote registry
-    // const remoteRegistry = new Registry()
-    // remoteRegistry.drive = drive
+    let drive
+    if (!key) {
+      // new drive
+      drive = new Hyperdrive(store, null)
+      await drive.promises.ready()
+
+      // fetch drive metadata and write to genesis block
+      eventLog.append(JSON.stringify({
+        status: 'genesis',
+        key: drive.metadata.key,
+      }))
+    } else {
+      // if key exists, read genesis block and set drive info
+      eventLog.download()
+      const genesisBlock = await eventLog.get(0)
+      const driveKey = JSON.parse(genesisBlock).key
+      drive = new Hyperdrive(store, Buffer.from(driveKey, 'hex'))
+      await drive.promises.ready()
+    }
+
+    await client.replicate(drive.metadata)
+
+    // create remote registry
+    const remoteRegistry = new Registry(
+      (err) => errCb(`[remote]: ${err.toString()}`)
+    )
+    remoteRegistry.setDrive(drive)
 
     // replicate
     await client.replicate(eventLog)

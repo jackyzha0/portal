@@ -18,7 +18,10 @@ const Host = ({dir}) => {
   const addError = (err) => setErrors(errors => [...errors, err])
 
   // registry entries
-  const localRegistry = useConstant(() => new Registry(addError))
+  const localRegistry = useConstant(() => new Registry(
+    addError,
+    () => localRegistry.sync().then(setLocalRegistryTree),
+  ))
   const [localRegistryTree, setLocalRegistryTree] = useState([])
 
   const { hyper, error, loading } = useHyper(undefined, ({eventLog, drive}) => {
@@ -34,7 +37,6 @@ const Host = ({dir}) => {
       },
       () => {
         // when finished initial scan, sync all to remote
-        localRegistry.sync().then((tree) => setLocalRegistryTree(tree))
         setInitialScanComplete(true)
       },
     )

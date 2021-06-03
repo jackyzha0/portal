@@ -10,25 +10,30 @@ export const STATUS = Object.freeze({
 
 // single file/folder node
 class TrieNode {
-  constructor(key, isDir = false) {
+  constructor(registry, key, isDir = false) {
     this.key = key
     this.parent = null
     this.children = {}
+    this.registry = registry
     this.status = STATUS.unsynced
     this.isDir = isDir
   }
 
-  // return full path to this node
-  getPath() {
+  traverse() {
     const output = []
     let cur = this
 
     // skip root placeholder node
     while (cur.parent !== null) {
-      output.unshift(cur.key)
+      output.unshift(cur)
       cur = cur.parent
     }
     return output
+  }
+
+  // return full path to this node
+  getPath() {
+    return this.traverse().map(node => node.key)
   }
 
   // return array of all children
@@ -43,15 +48,10 @@ class TrieNode {
 
   // recursively syncs current node and children
   // to given drive instance
-  sync(drive, errCb) {
-    // dont sync already synced files
-    if (this.status === STATUS.synced) {
-      return Promise.resolve(this.status)
-    }
-
+  sync() {
     // if folder, sync all files
     if (this.isDir) {
-      const statusPromises = this.getChildren().map(child => child.sync(drive, errCb))
+      const statusPromises = this.getChildren().map(child => child.sync())
       return Promise.all(statusPromises).then(statuses => {
         // if all children are synced, we are synced
         if (statuses.every(status => status === STATUS.synced)) {
@@ -63,25 +63,34 @@ class TrieNode {
       })
     }
 
+    // dont sync already synced files
+    if (this.status === STATUS.synced) {
+      return Promise.resolve(this.status)
+    }
+
     // single file, just sync
     const path = this.getPath().join("/")
     return read(path)
-      .then(buf => drive.promises.writeFile(path, buf))
+      .then(buf => this.registry.drive.promises.writeFile(path, buf))
       .then(() => this.status = STATUS.synced)
       .catch((err) => {
         this.status = STATUS.error
-        errCb(`[sync]: ${err.toString()}`)
+        this.registry.errorCallback(`[sync]: ${err.toString()}`)
       })
-      .finally(() => this.status)
+      .finally(() => {
+        this.registry.onChange()
+        return this.status
+      })
   }
 }
 
 // actually just a trie
 export class Registry {
-  constructor(errorCallback) {
-    this.root = new TrieNode(null)
+  constructor(errorCallback, onChangeCallback) {
+    this.root = new TrieNode(this, null)
     this.drive = undefined
     this.errorCallback = errorCallback
+    this.onChange = onChangeCallback
   }
 
   // sync all nodes to drive
@@ -89,7 +98,7 @@ export class Registry {
     const promises = this
       .root
       .getChildren()
-      .map(child => child.sync(this.drive, this.errorCallback))
+      .map(child => child.sync())
     return Promise.all(promises).then(() => this.getTree())
   }
 
@@ -112,13 +121,13 @@ export class Registry {
         isDir: node.isDir,
         status: node.status,
       })
-      Object.values(node.children).forEach(child => {
+      node.getChildren().forEach(child => {
         toStringRecur(indent + 2, child)
       })
     }
 
     // ignore root node
-    Object.values(this.root.children).forEach(child => {
+    this.root.getChildren().forEach(child => {
       toStringRecur(0, child)
     })
     return output
@@ -129,7 +138,7 @@ export class Registry {
     let cur = this.root
     pathSegments.forEach(segment => {
       if (!cur.children[segment]) {
-        cur.children[segment] = new TrieNode(segment, true)
+        cur.children[segment] = new TrieNode(this, segment, true)
         cur.children[segment].parent = cur
       }
       cur = cur.children[segment]
@@ -190,6 +199,7 @@ export class Registry {
     registerWatcher(dir, data => {
       this.parseEvt(data)
       onChange(data)
+      this.onChange()
     }, onReady)
   }
 }

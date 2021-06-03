@@ -1,7 +1,7 @@
 import React from 'react'
 import {Box, Text} from "ink";
-import Loader from "./Loader";
 import {STATUS} from "../fs/registry";
+import Loader from "./Loader";
 
 const StatusIndicator = ({status}) => {
   switch (status) {
@@ -31,7 +31,7 @@ export default ({registry}) => {
     )) : <Text color="yellow">Waiting for remote files...</Text>}
     <Box marginTop={1}>
       <Text bold>
-        <Loader color="yellow"/> Watching {registry.length} files ({synced}/{registry.length} synced)
+        Watching {registry.length} files ({synced}/{registry.length} synced)
       </Text>
     </Box>
   </Box>

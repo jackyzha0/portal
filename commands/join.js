@@ -37,7 +37,6 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
       setRemoteRegistryTree(remoteRegistry.getTree())
     }
 
-    eventLog.download()
     // reconstruct file registry from event stream
     const dataPromises = []
     for (let i = 0; i < eventLog.length; i++) {
