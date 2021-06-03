@@ -1,22 +1,43 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import useHyper from "../hooks/useHyper.js";
 import {SessionInfo, TitleCard} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
-import {Text} from "ink";
-import Loader from "../components/Loader";
+import Errors from "../components/Errors";
+import useConstant from "../hooks/useConstant";
+import {Registry} from "../fs/registry";
+import CommandWrapper from "../components/CommandWrapper";
+import {isEmpty} from "../fs/io";
+import {Newline, Text} from "ink";
 
 /// Joins an existing portal using a given `sessionId`
-const Client = ({ sessionId }) => {
-  const [registryTree, setRegistryTree] = useState([])
-  const { hyper, error, loading } = useHyper(sessionId, ({registry, eventLog}) => {
+const Client = ({ dir, forceOverwrite, sessionId }) => {
+  const [errors, setErrors] = useState([])
+  const addError = (err) => setErrors(errors => [...errors, err])
+
+  if (isEmpty(dir) && !forceOverwrite) {
+    return <Text>
+      <Text color="yellow" bold>Warning: </Text>
+      <Text>There are already files in this directory! Syncing could overwrite these files</Text>
+      <Newline />
+      <Text dimColor>
+        <Text>To force overwrite: </Text>
+        <Text color="cyan" bold> portal join [sessionId] -f</Text>
+      </Text>
+    </Text>
+  }
+
+  // registry entries
+  const remoteRegistry = useConstant(() => new Registry(addError))
+  const [remoteRegistryTree, setRemoteRegistryTree] = useState([])
+
+  const { error, loading } = useHyper(sessionId, ({eventLog}) => {
     const process = (data) => {
-      registry.parseEvt(JSON.parse(data))
+      remoteRegistry.parseEvt(JSON.parse(data))
+      setRemoteRegistryTree(remoteRegistry.getTree())
     }
 
-    // sync down and preload
     eventLog.download()
-
     // reconstruct file registry from event stream
     const dataPromises = []
     for (let i = 0; i < eventLog.length; i++) {
@@ -26,13 +47,12 @@ const Client = ({ sessionId }) => {
       .then(data => data.forEach(process))
       .then(() => {
         // setup registry tree
-        setRegistryTree(registry.getTree())
+        setRemoteRegistryTree(remoteRegistry.getTree())
 
         // if we get a new block
         eventLog.on('append', async () => {
           const data = await eventLog.get(eventLog.length - 1)
           process(data)
-          setRegistryTree(registry.getTree())
         })
 
         eventLog.on('close', () => {
@@ -44,28 +64,28 @@ const Client = ({ sessionId }) => {
       })
   })
 
-  if (loading) {
-    return <Loader status="Initializing Hyperspace..." />
-  }
-
-  if (error) {
-    return <Text>
-      <Text color="red">Error connecting to hypercore: </Text>
-      <Text>{error}</Text>
-    </Text>
-  }
-
   return (
-    <>
-      <TitleCard/>
-      <FileTree registry={registryTree}/>
+    <CommandWrapper error={error} loading={loading}>
+      <TitleCard />
+      <FileTree registry={remoteRegistryTree}/>
       <SessionInfo sessionId={sessionId}/>
-    </>
+      <Errors errors={errors}/>
+    </CommandWrapper>
   )
 }
 
 Client.propTypes = {
   sessionId: PropTypes.string.isRequired,
+  dir: PropTypes.string,
+  forceOverwrite: PropTypes.bool,
+};
+Client.shortFlags = {
+  dir: 'd',
+  forceOverwrite: 'f',
+};
+Client.defaultProps = {
+  dir: '.',
+  forceOverwrite: false,
 };
 
 Client.positionalArgs = ['sessionId'];

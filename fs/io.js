@@ -9,3 +9,8 @@ export const read = (path) => new Promise((resolve, reject) => {
     }
   })
 })
+
+export const isEmpty = (dir) => fs
+  .promises
+  .readdir(dir)
+  .then(files => files.length === 0)

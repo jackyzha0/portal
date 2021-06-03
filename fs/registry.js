@@ -8,8 +8,7 @@ export const STATUS = Object.freeze({
   synced: "synced",
 })
 
-// integrate with
-// https://hypercore-protocol.org/guides/walkthroughs/sharing-files-with-hyperdrive/
+// single file/folder node
 class TrieNode {
   constructor(key, isDir = false) {
     this.key = key
@@ -19,9 +18,12 @@ class TrieNode {
     this.isDir = isDir
   }
 
+  // return full path to this node
   getPath() {
     const output = []
     let cur = this
+
+    // skip root placeholder node
     while (cur.parent !== null) {
       output.unshift(cur.key)
       cur = cur.parent
@@ -29,14 +31,22 @@ class TrieNode {
     return output
   }
 
+  // return array of all children
   getChildren() {
     return Object.values(this.children)
   }
 
+  // TODO
+  download(drive) {
+
+  }
+
+  // recursively syncs current node and children
+  // to given drive instance
   sync(drive, errCb) {
     // dont sync already synced files
     if (this.status === STATUS.synced) {
-      return this.status
+      return Promise.resolve(this.status)
     }
 
     // if folder, sync all files
@@ -60,7 +70,7 @@ class TrieNode {
       .then(() => this.status = STATUS.synced)
       .catch((err) => {
         this.status = STATUS.error
-        errCb(err.toString())
+        errCb(`[sync]: ${err.toString()}`)
       })
       .finally(() => this.status)
   }
@@ -74,6 +84,7 @@ export class Registry {
     this.errorCallback = errorCallback
   }
 
+  // sync all nodes to drive
   sync() {
     const promises = this
       .root
@@ -86,6 +97,8 @@ export class Registry {
     return this.getTree().length
   }
 
+  // returns pre-order traversal of all nodes
+  // in trie
   getTree() {
     const output = []
     const toStringRecur = (indent, node) => {
@@ -111,19 +124,15 @@ export class Registry {
     return output
   }
 
+  // insert an entry into the registry
   insert(pathSegments, isDir = false) {
     let cur = this.root
-    pathSegments.forEach((segment, i) => {
+    pathSegments.forEach(segment => {
       if (!cur.children[segment]) {
         cur.children[segment] = new TrieNode(segment, true)
         cur.children[segment].parent = cur
       }
-
-      // increment next in trie
       cur = cur.children[segment]
-      if (i === pathSegments.length - 1) {
-        cur.leaf = true
-      }
     })
 
     // set whether leaf node is directory or not
@@ -156,6 +165,7 @@ export class Registry {
     return cur
   }
 
+  // parse events emitted from fs watcher
   parseEvt({ path: targetPath, status, isDir }) {
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
@@ -163,9 +173,7 @@ export class Registry {
         this.insert(pathSegments, isDir)
         break
       case 'modify':
-        // replace
-        // does nothing right now, but might want to
-        // add a value prop to trienode later
+        this.find(pathSegments).status = STATUS.unsynced
         break
       case 'delete':
         this.remove(pathSegments, isDir)
@@ -177,6 +185,7 @@ export class Registry {
     this.drive = drive
   }
 
+  // watch given directory for changes
   watch(dir, onChange, onReady) {
     registerWatcher(dir, data => {
       this.parseEvt(data)

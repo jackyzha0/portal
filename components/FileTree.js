@@ -15,19 +15,24 @@ const StatusIndicator = ({status}) => {
   }
 }
 
-export default ({registry}) => <Box flexDirection="column" marginTop={1}>
-  <Text bold>Files</Text>
-  {registry.length !== 0 ? registry.map(file => (
-    <Box key={file.name}>
-      <StatusIndicator status={file.status} />
-      <Box paddingLeft={file.padding + 2}>
-        <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
-          {file.name}
-        </Text>
+export default ({registry}) => {
+  const synced = registry.filter(f => f.status === STATUS.synced).length
+  return <Box flexDirection="column" marginTop={1}>
+    <Text bold>Files</Text>
+    {registry.length !== 0 ? registry.map(file => (
+      <Box key={file.name}>
+        <StatusIndicator status={file.status} />
+        <Box paddingLeft={file.padding + 2}>
+          <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
+            {file.name}
+          </Text>
+        </Box>
       </Box>
+    )) : <Text color="yellow">Waiting for remote files...</Text>}
+    <Box marginTop={1}>
+      <Text bold>
+        <Loader color="yellow"/> Watching {registry.length} files ({synced}/{registry.length} synced)
+      </Text>
     </Box>
-  )) : <Text color="yellow">Waiting for remote files...</Text>}
-  <Box marginTop={1}>
-    <Text bold>Watching {registry.length} files</Text>
   </Box>
-</Box>
+}

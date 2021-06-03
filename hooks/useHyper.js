@@ -31,11 +31,29 @@ export default (key, onReady) => {
     await eventLog.ready()
 
     // initialize hyperdrive
-    const drive = new Hyperdrive(store, key ? Buffer.from(key, 'hex') : null)
-    await drive.promises.ready()
-    await client.replicate(drive.metadata)
-
-    const remoteRegistry = new Registry(drive)
+    const drive = new Hyperdrive(store, null)
+    // let drive
+    // if (!key) {
+    //   // new drive
+    //   drive = new Hyperdrive(store, null)
+    //   await drive.promises.ready()
+    //
+    //   // fetch drive metadata and write to genesis block
+    //
+    //
+    //   await client.replicate(drive.metadata)
+    // } else {
+    //   // if key exists, read genesis block and set drive info
+    // }
+    // const hypercoreKey = key ?
+    //   Buffer.from(key, 'hex') :
+    //   eventLog.key
+    // const
+    //
+    //
+    // // create remote registry
+    // const remoteRegistry = new Registry()
+    // remoteRegistry.drive = drive
 
     // replicate
     await client.replicate(eventLog)
