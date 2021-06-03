@@ -55,6 +55,7 @@ class TrieNode {
 
     // single file, just sync
     const path = this.getPath().join("/")
+    console.log(drive)
     return read(path)
       .then(buf => this.drive.promises.writeFile(path, buf))
       .then(() => this.status = STATUS.synced)
