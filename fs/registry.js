@@ -187,6 +187,9 @@ export class Registry {
       case 'delete':
         this.remove(pathSegments, isDir)
         break
+      case 'genesis':
+        // hyperdrive key info, ignore
+        break
     }
   }
 

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import useHyper from "../hooks/useHyper.js";
-import {SessionInfo, TitleCard} from '../components/Title'
+import {SessionInfo} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Errors from "../components/Errors";
@@ -65,7 +65,6 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
 
   return (
     <CommandWrapper error={error} loading={loading}>
-      <TitleCard />
       <FileTree registry={remoteRegistryTree}/>
       <SessionInfo sessionId={sessionId}/>
       <Errors errors={errors}/>

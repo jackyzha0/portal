@@ -40,7 +40,8 @@ export default (key, onReady, errCb) => {
       // fetch drive metadata and write to genesis block
       eventLog.append(JSON.stringify({
         status: 'genesis',
-        key: drive.metadata.key,
+        path: '',
+        key: drive.metadata.key.toString('hex'),
       }))
     } else {
       // if key exists, read genesis block and set drive info
