@@ -28,7 +28,7 @@ export default ({registry}) => {
           </Text>
         </Box>
       </Box>
-    )) : <Text color="yellow">Waiting for remote files...</Text>}
+    )) : <Text color="yellow">No files found</Text>}
     <Box marginTop={1}>
       <Text bold>
         Watching {registry.length} files ({synced}/{registry.length} synced)

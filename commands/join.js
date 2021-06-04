@@ -8,10 +8,12 @@ import useConstant from "../hooks/useConstant";
 import {Registry} from "../fs/registry";
 import CommandWrapper from "../components/CommandWrapper";
 import {isEmpty} from "../fs/io";
-import {Newline, Text} from "ink";
+import {Box, Newline, Text} from "ink";
+import Loader from "../components/Loader";
 
 /// Joins an existing portal using a given `sessionId`
 const Client = ({ dir, forceOverwrite, sessionId }) => {
+  const [initialScanComplete, setInitialScanComplete] = useState(false)
   const [errors, setErrors] = useState([])
   const addError = (err) => setErrors(errors => [...errors, err])
 
@@ -28,44 +30,18 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
   }
 
   // registry entries
-  const remoteRegistry = useConstant(() => new Registry(addError))
-  const [remoteRegistryTree, setRemoteRegistryTree] = useState([])
-
-  const { error, loading } = useHyper(sessionId, ({eventLog}) => {
-    const process = (data) => {
-      remoteRegistry.parseEvt(JSON.parse(data))
-      setRemoteRegistryTree(remoteRegistry.getTree())
-    }
-
-    // reconstruct file registry from event stream
-    const dataPromises = []
-    for (let i = 0; i < eventLog.length; i++) {
-      dataPromises.push(eventLog.get(i))
-    }
-    Promise.all(dataPromises)
-      .then(data => data.forEach(process))
-      .then(() => {
-        // setup registry tree
-        setRemoteRegistryTree(remoteRegistry.getTree())
-
-        // if we get a new block
-        eventLog.on('append', async () => {
-          const data = await eventLog.get(eventLog.length - 1)
-          process(data)
-        })
-
-        eventLog.on('close', () => {
-          console.log('stream closed')
-        })
-
-        // TODO: handle more feed events here
-        // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
-      })
-  })
+  const { remoteRegistryTree, remoteRegistry, error, loading } = useHyper(
+    sessionId,
+    () => {
+      setInitialScanComplete(true)
+    }, addError)
 
   return (
     <CommandWrapper error={error} loading={loading}>
-      <FileTree registry={remoteRegistryTree}/>
+      {initialScanComplete ?
+        <FileTree registry={remoteRegistryTree}/> :
+        <Loader status='Waiting for remote...' />
+      }
       <SessionInfo sessionId={sessionId}/>
       <Errors errors={errors}/>
     </CommandWrapper>

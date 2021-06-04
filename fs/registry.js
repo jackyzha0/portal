@@ -1,6 +1,7 @@
 import path from 'path'
-import {read} from './io'
+import {read, writeFile} from './io'
 import {registerWatcher} from "./watcher";
+import join from "../commands/join";
 
 export const STATUS = Object.freeze({
   unsynced: "unsynced",
@@ -41,17 +42,14 @@ class TrieNode {
     return Object.values(this.children)
   }
 
-  // TODO
-  download(drive) {
+  _treeOp(op, opName, applyPromise, folderPreRun = () => {}) {
+    const path = this.getPath()
 
-  }
-
-  // recursively syncs current node and children
-  // to given drive instance
-  sync() {
-    // if folder, sync all files
+    // if folder, apply op to all files
     if (this.isDir) {
-      const statusPromises = this.getChildren().map(child => child.sync())
+      // do something with current path if necessary
+      folderPreRun(path)
+      const statusPromises = this.getChildren().map(op)
       return Promise.all(statusPromises).then(statuses => {
         // if all children are synced, we are synced
         if (statuses.every(status => status === STATUS.synced)) {
@@ -63,24 +61,54 @@ class TrieNode {
       })
     }
 
-    // dont sync already synced files
+    // dont apply op to already synced files
     if (this.status === STATUS.synced) {
       return Promise.resolve(this.status)
     }
 
     // single file, just sync
-    const path = this.getPath().join("/")
-    return read(path)
-      .then(buf => this.registry.drive.promises.writeFile(path, buf))
+    return applyPromise(path)
       .then(() => this.status = STATUS.synced)
       .catch((err) => {
         this.status = STATUS.error
-        this.registry.errorCallback(`[sync]: ${err.toString()}`)
+        this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
       })
       .finally(() => {
         this.registry.onChange()
         return this.status
       })
+  }
+
+  download() {
+    return this._treeOp(
+      child => child.download(),
+      'download',
+      (path) => this
+        .registry
+        .drive
+        .promises
+        .readFile(path.join("/"))
+        .then((buf) => writeFile(path, buf)),
+    )
+  }
+
+  // recursively syncs current node and children
+  // to given drive instance
+  sync() {
+    return this._treeOp(
+      child => child.sync(),
+      'sync',
+      (path) => {
+        const joinedPath = path.join("/")
+        return read(joinedPath)
+          .then(buf => this
+            .registry
+            .drive
+            .promises
+            .writeFile(joinedPath, buf)
+          )
+      },
+    )
   }
 }
 
@@ -93,13 +121,22 @@ export class Registry {
     this.onChange = onChangeCallback
   }
 
-  // sync all nodes to drive
-  sync() {
+  _treeOp(fn) {
     const promises = this
       .root
       .getChildren()
-      .map(child => child.sync())
+      .map(fn)
     return Promise.all(promises).then(() => this.getTree())
+  }
+
+  // sync all nodes to drive
+  sync() {
+    return this._treeOp(child => child.sync())
+  }
+
+  // download all nodes to given directory
+  download(dir) {
+    return this._treeOp(child => child.download(dir))
   }
 
   size() {
@@ -176,6 +213,7 @@ export class Registry {
 
   // parse events emitted from fs watcher
   parseEvt({ path: targetPath, status, isDir }) {
+    if (status === 'genesis') return
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
       case 'add':
@@ -187,9 +225,6 @@ export class Registry {
       case 'delete':
         this.remove(pathSegments, isDir)
         break
-      case 'genesis':
-        // hyperdrive key info, ignore
-        break
     }
   }
 
@@ -197,12 +232,46 @@ export class Registry {
     this.drive = drive
   }
 
-  // watch given directory for changes
+  _onChangeCallback(data, onChange) {
+    this.parseEvt(data)
+    onChange(data)
+    this.onChange()
+  }
+
+  // watch local directory for changes
   watch(dir, onChange, onReady) {
-    registerWatcher(dir, data => {
-      this.parseEvt(data)
-      onChange(data)
-      this.onChange()
-    }, onReady)
+    registerWatcher(
+      dir,
+      data => this._onChangeCallback(data, onChange),
+      onReady,
+    )
+  }
+
+  // subscribe to remote eventLog hypercore feed
+  subscribe(eventLog, onChange, onReady) {
+    // reconstruct file registry from event stream
+    const dataPromises = []
+    for (let i = 0; i < eventLog.length; i++) {
+      dataPromises.push(eventLog.get(i))
+    }
+
+    const process = (data) => this._onChangeCallback(JSON.parse(data), onChange)
+    Promise.all(dataPromises)
+      .then(data => data.forEach(process))
+      .then(() => {
+        // if we get a new block
+        eventLog.on('append', async () => {
+          const data = await eventLog.get(eventLog.length - 1)
+          process(data)
+        })
+
+        eventLog.on('close', () => {
+          console.log('stream closed')
+        })
+
+        // TODO: handle more feed events here
+        // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
+      })
+      .then(() => onReady())
   }
 }

@@ -40,7 +40,7 @@ const Host = ({dir}) => {
         setInitialScanComplete(true)
       },
     )
-  })
+  }, addError)
 
   return (
     <CommandWrapper error={error} loading={loading}>

@@ -4,7 +4,7 @@ import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
-export default (key, onReady, errCb) => {
+export default (key, onReady, errCb, onRemoteChange) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
     let client
@@ -40,7 +40,6 @@ export default (key, onReady, errCb) => {
       // fetch drive metadata and write to genesis block
       eventLog.append(JSON.stringify({
         status: 'genesis',
-        path: '',
         key: drive.metadata.key.toString('hex'),
       }))
     } else {
@@ -56,13 +55,23 @@ export default (key, onReady, errCb) => {
 
     // create remote registry
     const remoteRegistry = new Registry(
-      (err) => errCb(`[remote]: ${err.toString()}`)
+      (err) => errCb(`[remote]: ${err.toString()}`),
+      () => remoteRegistry.download().then(setRemoteRegistryTree)
     )
     remoteRegistry.setDrive(drive)
 
+    if (key) {
+      remoteRegistry.subscribe(eventLog, onRemoteChange, () => {})
+    }
+
     // replicate
     await client.replicate(eventLog)
-    const hyper = { store, remoteRegistry, eventLog, drive }
+    const hyper = {
+      store,
+      remoteRegistry,
+      eventLog,
+      drive
+    }
     onReady(hyper)
     return hyper
   }, [])
