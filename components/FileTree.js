@@ -1,6 +1,6 @@
 import React from 'react'
 import {Box, Text} from "ink";
-import {STATUS} from "../fs/registry";
+import {STATUS} from "../domain/registry";
 import Loader from "./Loader";
 
 const StatusIndicator = ({status}) => {

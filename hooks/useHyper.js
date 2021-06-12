@@ -1,4 +1,4 @@
-import {Registry} from "../fs/registry.js"
+import {Registry} from "../domain/registry.js"
 import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'

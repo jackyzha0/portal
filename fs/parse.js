@@ -25,6 +25,7 @@ const getAllGitIgnores = (dir) => {
 }
 
 export const readGitIgnore = (providedPath) => {
+  // TODO: make this flag enabled
   const filePaths = ['.git']
   try {
     const resolved = path.resolve(providedPath)

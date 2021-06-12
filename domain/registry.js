@@ -1,7 +1,8 @@
 import path from 'path'
-import {read, writeFile} from './io'
-import {registerWatcher} from "./watcher";
+import {read, writeFile} from '../fs/io'
+import {registerWatcher} from "../fs/watcher";
 import join from "../commands/join";
+import {TrieNode} from "./trie";
 
 export const STATUS = Object.freeze({
   unsynced: "unsynced",
@@ -9,149 +10,30 @@ export const STATUS = Object.freeze({
   synced: "synced",
 })
 
-// single file/folder node
-class TrieNode {
-  constructor(registry, key, isDir = false) {
-    this.key = key
-    this.parent = null
-    this.children = {}
-    this.registry = registry
-    this.status = STATUS.unsynced
-    this.isDir = isDir
-  }
-
-  traverse() {
-    const output = []
-    let cur = this
-
-    // skip root placeholder node
-    while (cur.parent !== null) {
-      output.unshift(cur)
-      cur = cur.parent
-    }
-    return output
-  }
-
-  // return full path to this node
-  getPath() {
-    return this.traverse().map(node => node.key)
-  }
-
-  // return array of all children
-  getChildren() {
-    return Object.values(this.children)
-  }
-
-  _treeOp(op, opName, applyPromise, folderPreRun = () => {}) {
-    const path = this.getPath()
-
-    // if folder, apply op to all files
-    if (this.isDir) {
-      // do something with current path if necessary
-      folderPreRun(path)
-      const statusPromises = this.getChildren().map(op)
-      return Promise.all(statusPromises).then(statuses => {
-        // if all children are synced, we are synced
-        if (statuses.every(status => status === STATUS.synced)) {
-          this.status = STATUS.synced
-        } else {
-          this.status = STATUS.error
-        }
-        return this.status
-      })
-    }
-
-    // dont apply op to already synced files
-    if (this.status === STATUS.synced) {
-      return Promise.resolve(this.status)
-    }
-
-    // single file, just sync
-    return applyPromise(path)
-      .then(() => this.status = STATUS.synced)
-      .catch((err) => {
-        this.status = STATUS.error
-        this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
-      })
-      .finally(() => {
-        this.registry.onChange()
-        return this.status
-      })
-  }
-
-  download() {
-    return this._treeOp(
-      child => child.download(),
-      'download',
-      (path) => this
-        .registry
-        .drive
-        .promises
-        .readFile(path.join("/"))
-        .then((buf) => writeFile(path, buf)),
-    )
-  }
-
-  // recursively syncs current node and children
-  // to given drive instance
-  sync() {
-    return this._treeOp(
-      child => child.sync(),
-      'sync',
-      (path) => {
-        const joinedPath = path.join("/")
-        return read(joinedPath)
-          .then(buf => this
-            .registry
-            .drive
-            .promises
-            .writeFile(joinedPath, buf)
-          )
-      },
-    )
-  }
-}
-
-// actually just a trie
 export class Registry {
   constructor() {
     this.root = new TrieNode(this, null)
     this.drive = undefined
     this.errorCallback = () => {}
-    this.onChange = () => {}
+    this.subscribers = []
   }
 
+  // registy error callback
   onError(fn) {
     this.errorCallback = fn
     return this
   }
 
-  onChange(fn) {
-    this.onChange = fn
+  // add subscriber to event stream
+  addSubscriber(fn) {
+    this.subscribers.push(fn)
     return this
   }
 
+  // set remote hyperdrive
   setDrive(drive) {
     this.drive = drive
     return this
-  }
-
-  _treeOp(fn) {
-    const promises = this
-      .root
-      .getChildren()
-      .map(fn)
-    return Promise.all(promises).then(() => this.getTree())
-  }
-
-  // sync all nodes to drive
-  sync() {
-    return this._treeOp(child => child.sync())
-  }
-
-  // download all nodes to given directory
-  download(dir) {
-    return this._treeOp(child => child.download(dir))
   }
 
   size() {
@@ -245,7 +127,7 @@ export class Registry {
 
   _onChangeCallback(data) {
     this.parseEvt(data)
-    this.onChange(data)
+    this.subscribers.forEach(fn => fn(data))
   }
 
   // watch local directory for changes

@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import {useConstant, useError} from "./utility";
-import {Registry} from "../fs/registry";
+import {Registry} from "../domain/registry";
 
-export default (dir, hyper) => {
+export default (dir, eventLog) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -10,22 +10,20 @@ export default (dir, hyper) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState([])
   const localRegistry = useConstant(() => new Registry()
     .onError(addError)
-    .onChange(() => setRegistryRenderableArray(localRegistry.getTree()))
+    .addSubscriber(() => setRegistryRenderableArray(localRegistry.getTree()))
     .watch(dir, () => setLoading(false))
   )
 
-  const h = hyper?.hyperObj
   // also publish to eventLog if present
   useEffect(() => {
-    if (h?.eventLog) {
-      localRegistry.onChange(data => {
-        h.eventLog
+    if (eventLog) {
+      localRegistry.addSubscriber(data => {
+        eventLog
           .append(JSON.stringify(data))
           .catch(addError)
-        setRegistryRenderableArray(localRegistry.getTree())
       })
     }
-  }, [h?.eventLog])
+  }, [eventLog])
 
   return {
     errors,
