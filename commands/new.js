@@ -7,6 +7,7 @@ import FileTree from "../components/FileTree";
 import Loader from "../components/Loader";
 import Errors from "../components/Errors";
 import CommandWrapper from "../components/CommandWrapper";
+import useLocalRegistry from "../hooks/useLocalRegistry";
 
 /// Creates a new portal in the given directory.
 /// If no directory is provided, uses current working directory

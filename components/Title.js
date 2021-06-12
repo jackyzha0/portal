@@ -10,7 +10,7 @@ export const TitleCard = () => <Box
   <Text
     color="white"
     dimColor
-  >two-way P2P folder syncing</Text>
+  >p2p directory syncing</Text>
 </Box>
 
 export const SessionInfo = ({sessionId}) => <Box>

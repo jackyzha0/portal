@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Newline, Text} from "ink";
+import {Box, Text} from "ink";
 
 export default ({errors}) => errors.length !== 0 &&
   <Box marginTop={2} flexDirection="column">

@@ -114,11 +114,26 @@ class TrieNode {
 
 // actually just a trie
 export class Registry {
-  constructor(errorCallback, onChangeCallback) {
+  constructor() {
     this.root = new TrieNode(this, null)
     this.drive = undefined
-    this.errorCallback = errorCallback
-    this.onChange = onChangeCallback
+    this.errorCallback = () => {}
+    this.onChange = () => {}
+  }
+
+  onError(fn) {
+    this.errorCallback = fn
+    return this
+  }
+
+  onChange(fn) {
+    this.onChange = fn
+    return this
+  }
+
+  setDrive(drive) {
+    this.drive = drive
+    return this
   }
 
   _treeOp(fn) {
@@ -228,21 +243,16 @@ export class Registry {
     }
   }
 
-  setDrive(drive) {
-    this.drive = drive
-  }
-
-  _onChangeCallback(data, onChange) {
+  _onChangeCallback(data) {
     this.parseEvt(data)
-    onChange(data)
-    this.onChange()
+    this.onChange(data)
   }
 
   // watch local directory for changes
-  watch(dir, onChange, onReady) {
+  watch(dir, onReady) {
     registerWatcher(
       dir,
-      data => this._onChangeCallback(data, onChange),
+      data => this._onChangeCallback(data),
       onReady,
     )
   }

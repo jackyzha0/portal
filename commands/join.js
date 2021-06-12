@@ -1,14 +1,12 @@
-import React, {useState} from "react";
+import React from "react";
 import useHyper from "../hooks/useHyper.js";
 import {SessionInfo} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Errors from "../components/Errors";
-import useConstant from "../hooks/useConstant";
-import {Registry} from "../fs/registry";
 import CommandWrapper from "../components/CommandWrapper";
 import {isEmpty} from "../fs/io";
-import {Box, Newline, Text} from "ink";
+import {Newline, Text} from "ink";
 import Loader from "../components/Loader";
 
 /// Joins an existing portal using a given `sessionId`
@@ -35,7 +33,7 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
 
   const getLoader = () => {
     if (remoteLoading) {
-      return <Loader status='Waiting for remote hyperspace...' />
+      return <Loader status='Syncing remote hyperspace...' />
     } else {
       return <Loader status={`Scanning directory... ${registryRenderableArray.size()} files found`} />
     }
