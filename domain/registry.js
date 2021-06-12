@@ -177,5 +177,6 @@ export class Registry {
         // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
       })
       .then(() => onReady())
+    return this
   }
 }

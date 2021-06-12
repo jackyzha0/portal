@@ -6,7 +6,6 @@ export default (dir, eventLog) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
-  // actual registry
   const [registryRenderableArray, setRegistryRenderableArray] = useState([])
   const localRegistry = useConstant(() => new Registry()
     .onError(addError)

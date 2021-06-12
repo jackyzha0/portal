@@ -8,11 +8,13 @@ import CommandWrapper from "../components/CommandWrapper";
 import {isEmpty} from "../fs/io";
 import {Newline, Text} from "ink";
 import Loader from "../components/Loader";
+import useLocalRegistry from "../hooks/useLocalRegistry";
+import useRemoteRegistry from "../hooks/useRemoteRegistry";
 
 /// Joins an existing portal using a given `sessionId`
 const Client = ({ dir, forceOverwrite, sessionId }) => {
   const hyper = useHyper(sessionId)
-  const {errors: remoteRegistryErrors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper)
+  const {errors: remoteRegistryErrors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
   const {errors: localRegistryErrors, loading: localLoading, localRegistry} = useLocalRegistry(dir)
   const diffList = useDiff(remoteRegistry, localRegistry)
   const {errors: ioErrors} = useIoWriter(dir, diffList, hyper)
