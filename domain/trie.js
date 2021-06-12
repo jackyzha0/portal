@@ -66,7 +66,7 @@ export class TrieNode {
         this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
       })
       .finally(() => {
-        this.registry.onChange()
+        this.registry.rerender()
         return this.status
       })
   }

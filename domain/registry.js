@@ -15,12 +15,18 @@ export class Registry {
     this.root = new TrieNode(this, null)
     this.drive = undefined
     this.errorCallback = () => {}
+    this.rerender = () => {}
     this.subscribers = []
   }
 
   // registy error callback
   onError(fn) {
     this.errorCallback = fn
+    return this
+  }
+
+  onRerender(fn) {
+    this.rerender = fn
     return this
   }
 
@@ -34,6 +40,10 @@ export class Registry {
   setDrive(drive) {
     this.drive = drive
     return this
+  }
+
+  sync() {
+    return this.root.getChildren().map(child => child.sync(this.drive, this.errorCallback))
   }
 
   size() {
@@ -128,6 +138,7 @@ export class Registry {
   _onChangeCallback(data) {
     this.parseEvt(data)
     this.subscribers.forEach(fn => fn(data))
+    this.rerender()
   }
 
   // watch local directory for changes
@@ -137,6 +148,7 @@ export class Registry {
       data => this._onChangeCallback(data),
       onReady,
     )
+    return this
   }
 
   // subscribe to remote eventLog hypercore feed

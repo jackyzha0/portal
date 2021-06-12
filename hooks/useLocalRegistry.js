@@ -10,7 +10,7 @@ export default (dir, eventLog) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState([])
   const localRegistry = useConstant(() => new Registry()
     .onError(addError)
-    .addSubscriber(() => setRegistryRenderableArray(localRegistry.getTree()))
+    .onRerender(() => setRegistryRenderableArray(localRegistry.getTree()))
     .watch(dir, () => setLoading(false))
   )
 

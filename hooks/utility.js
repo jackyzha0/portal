@@ -3,7 +3,7 @@ import {useRef, useState} from "react";
 export const useConstant = (fn) => {
   const ref = useRef({v: undefined})
 
-  if (!ref.current) {
+  if (!ref.current.v) {
     ref.current = { v: fn() }
   }
 
