@@ -1,55 +1,29 @@
-import React, {useState} from 'react';
+import React from 'react';
 import useHyper from "../hooks/useHyper.js";
 import {SessionInfo} from '../components/Title'
 import {Box} from "ink";
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Loader from "../components/Loader";
-import useConstant from "../hooks/useConstant";
-import {Registry} from "../fs/registry";
 import Errors from "../components/Errors";
 import CommandWrapper from "../components/CommandWrapper";
 
 /// Creates a new portal in the given directory.
 /// If no directory is provided, uses current working directory
 const Host = ({dir}) => {
-  const [initialScanComplete, setInitialScanComplete] = useState(false)
-  const [errors, setErrors] = useState([])
-  const addError = (err) => setErrors(errors => [...errors, err])
-
-  // registry entries
-  const localRegistry = useConstant(() => new Registry(
-    addError,
-    () => localRegistry.sync().then(setLocalRegistryTree),
-  ))
-  const [localRegistryTree, setLocalRegistryTree] = useState([])
-
-  const { hyper, error, loading } = useHyper(undefined, ({eventLog, drive}) => {
-    // link local registry to hypercore
-    localRegistry.setDrive(drive)
-    localRegistry.watch(
-      dir,
-      (data) => {
-        // on change, push to hypercore
-        eventLog
-          .append(JSON.stringify(data))
-          .catch(err => addError(`[eventLog]: ${err.toString()}`))
-      },
-      () => {
-        // when finished initial scan, sync all to remote
-        setInitialScanComplete(true)
-      },
-    )
-  }, addError)
+  const hyper = useHyper()
+  const {errors: registryErrors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper)
+  const {errors: ioErrors} = useIoReader(dir, localRegistry, hyper?.hyperObj?.drive)
+  const errors = [...registryErrors, ...ioErrors]
 
   return (
-    <CommandWrapper error={error} loading={loading}>
+    <CommandWrapper error={hyper.error} loading={hyper.loading}>
       <Box marginX={1} flexDirection="column">
-        {initialScanComplete ?
-          <FileTree registry={localRegistryTree}/> :
-          <Loader status={`Scanning directory... ${localRegistry.size()} files found`} />
+        {loading ?
+          <FileTree registry={registryRenderableArray}/> :
+          <Loader status={`Scanning directory... ${registryRenderableArray.size()} files found`} />
         }
-        <SessionInfo sessionId={hyper?.eventLog?.key?.toString('hex')}/>
+        <SessionInfo sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <Errors errors={errors}/>
       </Box>
     </CommandWrapper>

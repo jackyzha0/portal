@@ -13,10 +13,14 @@ import Loader from "../components/Loader";
 
 /// Joins an existing portal using a given `sessionId`
 const Client = ({ dir, forceOverwrite, sessionId }) => {
-  const [initialScanComplete, setInitialScanComplete] = useState(false)
-  const [errors, setErrors] = useState([])
-  const addError = (err) => setErrors(errors => [...errors, err])
+  const hyper = useHyper(sessionId)
+  const {errors: remoteRegistryErrors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper)
+  const {errors: localRegistryErrors, loading: localLoading, localRegistry} = useLocalRegistry(dir)
+  const diffList = useDiff(remoteRegistry, localRegistry)
+  const {errors: ioErrors} = useIoWriter(dir, diffList, hyper)
+  const errors = [...remoteRegistryErrors, ...localRegistryErrors, ...ioErrors]
 
+  // warning text for trying to sync in a non-empty directory
   if (isEmpty(dir) && !forceOverwrite) {
     return <Text>
       <Text color="yellow" bold>Warning: </Text>
@@ -29,18 +33,19 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
     </Text>
   }
 
-  // registry entries
-  const { remoteRegistryTree, remoteRegistry, error, loading } = useHyper(
-    sessionId,
-    () => {
-      setInitialScanComplete(true)
-    }, addError)
+  const getLoader = () => {
+    if (remoteLoading) {
+      return <Loader status='Waiting for remote hyperspace...' />
+    } else {
+      return <Loader status={`Scanning directory... ${registryRenderableArray.size()} files found`} />
+    }
+  }
 
   return (
-    <CommandWrapper error={error} loading={loading}>
-      {initialScanComplete ?
-        <FileTree registry={remoteRegistryTree}/> :
-        <Loader status='Waiting for remote...' />
+    <CommandWrapper error={hyper.error} loading={hyper.loading}>
+      {!(remoteLoading && localLoading) ?
+        <FileTree registry={registryRenderableArray}/> :
+        getLoader()
       }
       <SessionInfo sessionId={sessionId}/>
       <Errors errors={errors}/>
