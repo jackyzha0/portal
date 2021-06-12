@@ -17,7 +17,7 @@ const StatusIndicator = ({status}) => {
 
 export default ({registry}) => {
   const synced = registry.filter(f => f.status === STATUS.synced).length
-  return <Box flexDirection="column" marginTop={1}>
+  return <Box flexDirection="column" marginY={1}>
     <Text bold>Files</Text>
     {registry.length !== 0 ? registry.map(file => (
       <Box key={file.name}>

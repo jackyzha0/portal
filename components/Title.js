@@ -13,7 +13,7 @@ export const TitleCard = () => <Box
   >p2p directory syncing</Text>
 </Box>
 
-export const SessionInfo = ({sessionId}) => <Box>
-  <Text bold>Session ID: </Text>
+export const SessionInfo = ({sessionId}) => <>
+  <Text bold>Session ID </Text>
   <Text>{sessionId}</Text>
-</Box>
+</>
