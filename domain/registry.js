@@ -1,7 +1,5 @@
 import path from 'path'
-import {read, writeFile} from '../fs/io'
 import {registerWatcher} from "../fs/watcher";
-import join from "../commands/join";
 import {TrieNode} from "./trie";
 
 export const STATUS = Object.freeze({
