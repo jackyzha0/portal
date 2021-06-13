@@ -106,14 +106,12 @@ export class Registry {
   // attempts to return entry with given path segments
   // returns false if not present
   find(pathSegments) {
-    let cur = this.root
-    pathSegments.forEach(segment => {
-      if (!cur.children[segment]) {
+    return pathSegments.reduce((cur, segment) => {
+      if (!(cur.children && cur.children[segment])) {
         return false
       }
-      cur = cur.children[segment]
-    })
-    return cur
+      return cur.children[segment]
+    }, this.root)
   }
 
   // parse events emitted from fs watcher
