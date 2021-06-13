@@ -150,31 +150,33 @@ export class Registry {
   }
 
   // subscribe to remote eventLog hypercore feed
-  subscribe(eventLog, onChange, onReady) {
+  subscribeRemote(eventLog, onReady) {
+    eventLog.download()
+    const process = (data) => {
+      this._onChangeCallback(JSON.parse(data))
+      this.rerender()
+    }
+
     // reconstruct file registry from event stream
     const dataPromises = []
     for (let i = 0; i < eventLog.length; i++) {
       dataPromises.push(eventLog.get(i))
     }
 
-    const process = (data) => this._onChangeCallback(JSON.parse(data), onChange)
     Promise.all(dataPromises)
       .then(data => data.forEach(process))
-      .then(() => {
-        // if we get a new block
-        eventLog.on('append', async () => {
-          const data = await eventLog.get(eventLog.length - 1)
-          process(data)
-        })
-
-        eventLog.on('close', () => {
-          console.log('stream closed')
-        })
-
-        // TODO: handle more feed events here
-        // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
-      })
       .then(() => onReady())
+
+    // TODO: handle more feed events here
+    // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
+    eventLog
+      .on('append', async () => {
+        const data = await eventLog.get(eventLog.length - 1)
+        process(data)
+      })
+      .on('close', () => {
+        console.log('stream closed')
+      })
     return this
   }
 }

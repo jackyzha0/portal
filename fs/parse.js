@@ -8,14 +8,17 @@ const getAllGitIgnores = (dir) => {
   const recur = (searchDir) => {
     fs.readdirSync(searchDir).forEach(file => {
       const absPath = path.join(searchDir, file)
-      if (fs.statSync(absPath).isDirectory()) {
-        recur(absPath)
-      } else {
-        if (file === '.gitignore') {
-          res.push({
-            path: absPath,
-            prefix: searchDir,
-          })
+      if (fs.existsSync(absPath)) {
+        const stat = fs.statSync(absPath)
+        if (stat.isDirectory()) {
+          recur(absPath)
+        } else if (stat.isFile()) {
+          if (file === '.gitignore') {
+            res.push({
+              path: absPath,
+              prefix: searchDir,
+            })
+          }
         }
       }
     })
@@ -27,18 +30,14 @@ const getAllGitIgnores = (dir) => {
 export const readGitIgnore = (providedPath) => {
   // TODO: make this flag enabled
   const filePaths = ['.git']
-  try {
-    const resolved = path.resolve(providedPath)
-    const ignoredFiles = getAllGitIgnores(providedPath)
-      .map(gitIgnore => {
-        const fullPath = path.join(resolved, gitIgnore.path)
-        const allIgnored = [...parse(fs.readFileSync(fullPath)), '.git']
-        return allIgnored.map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
-      })
-      .flat()
-    filePaths.push(...ignoredFiles)
-    return filePaths
-  } catch {
-    return filePaths
-  }
+  const resolved = path.resolve(providedPath)
+  const ignoredFiles = getAllGitIgnores(providedPath)
+    .map(gitIgnore => {
+      const fullPath = path.join(resolved, gitIgnore.path)
+      const allIgnored = [...parse(fs.readFileSync(fullPath)), '.git']
+      return allIgnored.map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
+    })
+    .flat()
+  filePaths.push(...ignoredFiles)
+  return filePaths
 }

@@ -49,6 +49,7 @@ export class TrieNode {
         } else {
           this.status = STATUS.error
         }
+        this.registry.rerender()
         return this.status
       })
     }
