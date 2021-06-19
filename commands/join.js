@@ -8,17 +8,14 @@ import CommandWrapper from "../components/CommandWrapper";
 import {isEmpty} from "../fs/io";
 import {Newline, Text} from "ink";
 import Loader from "../components/Loader";
-import useLocalRegistry from "../hooks/useLocalRegistry";
 import useRemoteRegistry from "../hooks/useRemoteRegistry";
+import useDriveDownload from "../hooks/useDriveDownload";
 
 /// Joins an existing portal using a given `sessionId`
 const Client = ({ dir, forceOverwrite, sessionId }) => {
   const hyper = useHyper(sessionId)
-  const {errors: remoteRegistryErrors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
-  const {errors: localRegistryErrors, loading: localLoading, localRegistry} = useLocalRegistry(dir)
-  const diffList = useDiff(remoteRegistry, localRegistry)
-  const {errors: ioErrors} = useIoWriter(dir, diffList, hyper)
-  const errors = [...remoteRegistryErrors, ...localRegistryErrors, ...ioErrors]
+  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
+  useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
   // warning text for trying to sync in a non-empty directory
   if (isEmpty(dir) && !forceOverwrite) {
@@ -43,7 +40,7 @@ const Client = ({ dir, forceOverwrite, sessionId }) => {
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
-      {!(remoteLoading && localLoading) ?
+      {!remoteLoading ?
         <FileTree registry={registryRenderableArray}/> :
         getLoader()
       }

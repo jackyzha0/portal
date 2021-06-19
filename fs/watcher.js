@@ -8,15 +8,14 @@ export const registerWatcher = (dir, onChangeCallback, onReadyCallback = () => {
     persistent: true,
   })
 
-  const notify = (path, status, isDir = false) => {
+  const notify = (path, status, isDir = false ) => {
     onChangeCallback({ path, status, isDir })
   }
-
   watcher
     .on('add', path => notify(path, 'add'))
     .on('change', path => notify(path, 'modify'))
-    .on('unlink', path => notify(path, 'delete'))
     .on('addDir', path => notify(path, 'add', true))
+    .on('unlink', path => notify(path, 'delete'))
     .on('unlinkDir', path => notify(path, 'delete', true))
     .on('ready', onReadyCallback)
     .on('error', error => console.log(`Watcher error: ${error}`))

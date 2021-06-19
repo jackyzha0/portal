@@ -16,7 +16,6 @@ export default ({loading, error, children}) => {
   }
 
   return (<>
-    <TitleCard />
     {children}
   </>)
 }

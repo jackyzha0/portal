@@ -19,7 +19,7 @@ const Host = ({dir}) => {
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
-      <Box marginX={1} flexDirection="column">
+      <Box flexDirection="column">
         {!loading ?
           <FileTree registry={registryRenderableArray}/> :
           <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`} />

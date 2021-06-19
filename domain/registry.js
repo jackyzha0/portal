@@ -41,7 +41,11 @@ export class Registry {
   }
 
   sync() {
-    return this.root.getChildren().map(child => child.sync(this.drive, this.errorCallback))
+    return this.root.getChildren().map(child => child.sync())
+  }
+
+  download() {
+    return this.root.getChildren().map(child => child.download())
   }
 
   size() {
@@ -123,7 +127,8 @@ export class Registry {
         this.insert(pathSegments, isDir)
         break
       case 'modify':
-        this.find(pathSegments).status = STATUS.unsynced
+        const modNode = this.find(pathSegments)
+        modNode.status = STATUS.unsynced
         break
       case 'delete':
         this.remove(pathSegments, isDir)
@@ -149,7 +154,6 @@ export class Registry {
 
   // subscribe to remote eventLog hypercore feed
   subscribeRemote(eventLog, onReady) {
-    eventLog.download()
     const process = (data) => {
       this._onChangeCallback(JSON.parse(data))
       this.rerender()
@@ -157,7 +161,7 @@ export class Registry {
 
     // reconstruct file registry from event stream
     const dataPromises = []
-    for (let i = 0; i < eventLog.length; i++) {
+    for (let i = 1; i < eventLog.length; i++) {
       dataPromises.push(eventLog.get(i))
     }
 
