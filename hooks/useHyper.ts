@@ -39,9 +39,6 @@ const useHyper = (key?: string) => {
     // Initialize hyperdrive
     let drive
     if (key) {
-      // If key exists, predownload eventLog
-      await eventLog.download()
-
       // Read genesis block and set drive info
       const genesisBlock = await eventLog.get(0)
       const driveKey = (JSON.parse(genesisBlock) as IGenesisBlock).key

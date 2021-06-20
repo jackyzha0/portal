@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Newline, Text} from 'ink'
+import {Box, Newline, Text} from 'ink'
 import useHyper from '../hooks/useHyper'
 import {SessionInfo} from '../components/SessionInfo'
 import FileTree from '../components/FileTree'
@@ -40,11 +40,13 @@ const Client = ({dir, isForceOverwrite, sessionId}: IClientProps) => {
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
-      {remoteLoading ?
-        <Loader status="Syncing remote hyperspace..."/> :
-        <FileTree registry={registryRenderableArray}/>}
-      <SessionInfo sessionId={sessionId}/>
-      <Errors errors={errors}/>
+        <Box flexDirection="column">
+            {remoteLoading ?
+                <Loader status="Syncing remote hyperspace..."/> :
+                <FileTree registry={registryRenderableArray}/>}
+            <SessionInfo sessionId={sessionId}/>
+            <Errors errors={errors}/>
+        </Box>
     </CommandWrapper>
   )
 }
