@@ -1,6 +1,7 @@
 import fs from 'fs'
 import * as path from 'path'
 
+// Read file at path and return buffer
 export const read = (path: string) => new Promise<Buffer>((resolve, reject) => {
   fs.readFile(path, (err, data) => {
     if (err) {
@@ -11,10 +12,18 @@ export const read = (path: string) => new Promise<Buffer>((resolve, reject) => {
   })
 })
 
-export const writeFile = (pathSegments: string[], buf: Buffer) => {
-  fs.writeFileSync(path.join(...pathSegments), buf)
-}
+// Write current buffer to location of given path segment
+export const writeFile = (pathSegments: string[], buf: Buffer) => new Promise<void>((resolve, reject) => {
+  fs.writeFile(path.join(...pathSegments), buf, (err) => {
+    if (err) {
+      reject(err)
+    } else {
+      resolve()
+    }
+  })
+})
 
+// Creates folder at current location
 export const mkdir = (pathSegments: string[]) => {
   try {
     fs.mkdirSync(path.join(...pathSegments))
@@ -26,6 +35,7 @@ export const mkdir = (pathSegments: string[]) => {
   }
 }
 
+// Check if given folder is empty
 export const isEmpty = (dir: string) => fs
   .promises
   .readdir(dir)

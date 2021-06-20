@@ -3,11 +3,13 @@ import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
+// Genesis block definition
 export interface IGenesisBlock {
   status: 'genesis',
   key: string,
 }
 
+// Hook to initialize hyperspace related items (corestore, eventlog feed, hyperdrive)
 export default (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
@@ -21,7 +23,6 @@ export default (key?: string) => {
       // no daemon, start it in-process
       server = new Server()
       await server.ready()
-
       client = new Client()
       await client.ready()
     }
@@ -29,7 +30,7 @@ export default (key?: string) => {
     const store = client.corestore()
     await store.ready()
 
-    // initialize eventLog
+    // initialize eventLog feed from corestore
     const eventLog = key ?
       store.get({ key: key, valueEncoding: 'json' }) :
       store.get({ name: nanoid(), valueEncoding: 'json' })
@@ -38,7 +39,7 @@ export default (key?: string) => {
     // initialize hyperdrive
     let drive
     if (!key) {
-      // new drive
+      // if no key, new drive
       drive = new Hyperdrive(store, null)
       await drive.promises.ready()
 
@@ -48,16 +49,17 @@ export default (key?: string) => {
         key: drive.metadata.key.toString('hex'),
       } as IGenesisBlock))
     } else {
-      // if key exists, read genesis block and set drive info
+      // if key exists, predownload eventLog
       eventLog.download()
 
-      // TODO: check for genesis block
+      // read genesis block and set drive info
       const genesisBlock = await eventLog.get(0)
       const driveKey = (JSON.parse(genesisBlock) as IGenesisBlock).key
       drive = new Hyperdrive(store, Buffer.from(driveKey, 'hex'))
       await drive.promises.ready()
     }
 
+    // seed remote
     await client.replicate(drive.metadata)
     await client.replicate(eventLog)
     return {
