@@ -1,9 +1,12 @@
 import React from 'react'
 import {Box, Text} from "ink";
-import {STATUS} from "../domain/registry";
+import {ITreeRepresentation, STATUS} from "../domain/registry";
 import Loader from "./Loader";
 
-const StatusIndicator = ({status}) => {
+interface IStatusIndicatorProps {
+  status: STATUS;
+}
+const StatusIndicator = ({status}: IStatusIndicatorProps) => {
   switch (status) {
     case STATUS.synced:
       return <Text color="green">✔</Text>
@@ -15,7 +18,10 @@ const StatusIndicator = ({status}) => {
   }
 }
 
-export default ({registry}) => {
+interface IFileTreeProps {
+  registry: ITreeRepresentation[],
+}
+export default ({registry}: IFileTreeProps) => {
   const synced = registry.filter(f => f.status === STATUS.synced).length
   return <Box flexDirection="column" marginY={1}>
     <Text bold>Files</Text>

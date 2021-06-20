@@ -1,9 +1,14 @@
 import React from 'react'
 import Loader from "./Loader";
 import {Text} from "ink";
-import {TitleCard} from "./Title";
 
-export default ({loading, error, children}) => {
+interface ICommandWrapperProps {
+  loading: boolean,
+  error: string,
+  children?: React.ReactNode,
+}
+
+export default ({loading, error, children}: ICommandWrapperProps) => {
   if (loading) {
     return <Loader status="Initializing Hyperspace..." />
   }

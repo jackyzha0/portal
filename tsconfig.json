@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "es2015",
+    "strict": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  }
+}

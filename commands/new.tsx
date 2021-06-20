@@ -1,5 +1,5 @@
 import React from 'react';
-import useHyper from "../hooks/useHyper.js";
+import useHyper from "../hooks/useHyper";
 import {SessionInfo} from '../components/Title'
 import {Box} from "ink";
 import PropTypes from "prop-types";
@@ -10,9 +10,13 @@ import CommandWrapper from "../components/CommandWrapper";
 import useLocalRegistry from "../hooks/useLocalRegistry";
 import useDriveSync from "../hooks/useDriveSync";
 
+interface IHostProps {
+  dir: string,
+}
+
 /// Creates a new portal in the given directory.
 /// If no directory is provided, uses current working directory
-const Host = ({dir}) => {
+const Host = ({dir}: IHostProps) => {
   const hyper = useHyper()
   const {errors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper?.hyperObj?.eventLog)
   useDriveSync(dir, localRegistry, hyper?.hyperObj?.drive)

@@ -1,10 +1,9 @@
-import {Registry} from "../domain/registry.js"
 import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
-export default (key) => {
+export default (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
     let client
@@ -23,6 +22,7 @@ export default (key) => {
     }
 
     const store = client.corestore()
+    await store.ready()
 
     // initialize eventLog
     const eventLog = key ?
@@ -38,13 +38,15 @@ export default (key) => {
       await drive.promises.ready()
 
       // fetch drive metadata and write to genesis block
-      eventLog.append(JSON.stringify({
+      await eventLog.append(JSON.stringify({
         status: 'genesis',
         key: drive.metadata.key.toString('hex'),
       }))
     } else {
       // if key exists, read genesis block and set drive info
       eventLog.download()
+
+      // TODO: check for genesis block
       const genesisBlock = await eventLog.get(0)
       const driveKey = JSON.parse(genesisBlock).key
       drive = new Hyperdrive(store, Buffer.from(driveKey, 'hex'))

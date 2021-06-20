@@ -1,5 +1,5 @@
 import React from "react";
-import useHyper from "../hooks/useHyper.js";
+import useHyper from "../hooks/useHyper";
 import {SessionInfo} from '../components/Title'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
@@ -11,8 +11,14 @@ import Loader from "../components/Loader";
 import useRemoteRegistry from "../hooks/useRemoteRegistry";
 import useDriveDownload from "../hooks/useDriveDownload";
 
+interface IClientProps {
+  dir: string,
+  forceOverwrite: boolean,
+  sessionId: string,
+}
+
 /// Joins an existing portal using a given `sessionId`
-const Client = ({ dir, forceOverwrite, sessionId }) => {
+const Client = ({ dir, forceOverwrite, sessionId }: IClientProps) => {
   const hyper = useHyper(sessionId)
   const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
   useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)

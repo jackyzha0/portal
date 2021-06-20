@@ -1,12 +1,13 @@
-import test from 'ava';
+import anyTest, {ExecutionContext, TestInterface} from 'ava';
 import {Registry, STATUS} from "../domain/registry";
 
 // helpers
+const test = anyTest as TestInterface<{reg: Registry}>;
 test.beforeEach(t => {
   t.context.reg = new Registry();
 });
 
-const complexTree = (r) => {
+const complexTree = (r: Registry) => {
   r.insert(['a', 'b', 'c.txt'])
   r.insert(['a', 'b', 'd.txt'])
   r.insert(['a', 'b', 'e', 'f.txt'])
@@ -15,8 +16,9 @@ const complexTree = (r) => {
   return r
 }
 
-const nodeNotPresent = (t, r, pathSegments) => t.falsy(r.find(pathSegments))
-const nodePresent = (t, r, pathSegments) => t.truthy(r.find(pathSegments))
+type NodeAssertion = (t: ExecutionContext, r: Registry, pathSegments: string[]) => void
+const nodeNotPresent: NodeAssertion = (t, r, pathSegments) => t.falsy(r.find(pathSegments))
+const nodePresent: NodeAssertion = (t, r, pathSegments) => t.truthy(r.find(pathSegments))
 
 // find() tests
 test('find() - empty root', t => {
@@ -54,7 +56,7 @@ test('insert() - directory', t => {
   const r = t.context.reg
   const path = ['folder', 'inner']
   r.insert(path, true)
-  t.truthy(r.find(path).isDir)
+  t.truthy(r.find(path)?.isDir)
 })
 
 test('insert() - existing', t => {

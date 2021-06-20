@@ -1,10 +1,17 @@
 // single file/folder node
 import {read, writeFile} from "../fs/io";
-import {STATUS} from "./registry";
+import {Registry, STATUS} from "./registry";
 import * as path from "path";
 
 export class TrieNode {
-  constructor(registry, key, isDir = false) {
+  key: string
+  parent: TrieNode | null
+  children: {[key: string]: TrieNode}
+  isDir: boolean
+  status: STATUS
+  private registry: Registry;
+  
+  constructor(registry: Registry, key: string, isDir = false) {
     this.key = key
     this.parent = null
     this.children = {}
@@ -15,7 +22,7 @@ export class TrieNode {
 
   traverse() {
     const output = []
-    let cur = this
+    let cur: TrieNode = this
 
     // skip root placeholder node
     while (cur.parent !== null) {
@@ -35,34 +42,32 @@ export class TrieNode {
     return Object.values(this.children)
   }
 
-  _treeOp(op, opName, applyPromise, folderPreRun = () => {}) {
+  _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T>, folderPreRun = (path: string[]) => {}): Promise<STATUS> {
     const path = this.getPath()
-
-    const handlePromise = promise => promise
-      .catch((err) => {
-        this.status = STATUS.error
-        this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
-      })
-      .finally(() => {
-        this.registry.rerender()
-        return this.status
-      })
 
     // if folder, apply op to all files
     if (this.isDir) {
       // do something with current path if necessary
       folderPreRun(path)
-      const statusPromises = this.getChildren().map(op)
-      return handlePromise(Promise.all(statusPromises)
+      const statusPromises: Promise<STATUS>[] = this.getChildren().map(child => child._treeOp(opName, op, folderPreRun))
+      return Promise.all(statusPromises)
         .then(statuses => {
           // if all children are synced, we are synced
-          console.log(statuses)
           if (statuses.every(status => status === STATUS.synced)) {
             this.status = STATUS.synced
           } else {
             this.status = STATUS.error
           }
-        }))
+          return this.status
+        })
+        .catch(err => {
+          this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
+          this.status = STATUS.error
+          return this.status
+        })
+        .finally(() => {
+          this.registry.rerender()
+        })
     }
 
     // dont apply op to already synced files
@@ -71,12 +76,20 @@ export class TrieNode {
     }
 
     // single file, just sync
-    return handlePromise(applyPromise(path).then(() => this.status = STATUS.synced))
+    return op(path)
+      .then(() => STATUS.synced)
+      .catch((err: Error) => {
+        this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
+        this.status = STATUS.error
+        return this.status
+      })
+      .finally(() => {
+        this.registry.rerender()
+      })
   }
 
   download() {
     return this._treeOp(
-      child => child.download(),
       'download',
       (pathSegments) => this
         .registry
@@ -91,9 +104,8 @@ export class TrieNode {
   // to given drive instance
   sync() {
     return this._treeOp(
-      child => child.sync(),
       'sync',
-      (path) => {
+      (pathSegments) => {
         const joinedPath = path.join("/")
         return read(joinedPath)
           .then(buf => this

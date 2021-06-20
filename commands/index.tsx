@@ -1,14 +1,11 @@
 import React from 'react';
-import {TitleCard} from '../components/Title';
 import {version, description} from '../package.json';
 import {Box, Newline, Text} from "ink";
 
 /// Displays help info
 const Hello = () => <Box flexDirection="column">
-  <TitleCard />
   <Box
     margin={1}
-    color="white"
     flexDirection="column"
   >
     <Text>Version: {version}</Text>
