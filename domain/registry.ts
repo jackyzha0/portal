@@ -1,15 +1,10 @@
 import path from 'path'
 import {EventCallback, EventData, registerWatcher} from "../fs/watcher";
-import {TrieNode} from "./trie";
+import {STATUS, TrieNode} from "./trie";
 import Hyperdrive from "hyperdrive";
 import {Feed} from "hyperspace";
 
-export enum STATUS {
-  unsynced,
-  error,
-  synced,
-}
-
+// interface representation of renderable version of registry
 export interface ITreeRepresentation {
   padding: number,
   name: string,
@@ -17,12 +12,17 @@ export interface ITreeRepresentation {
   status: STATUS,
 }
 
+// Wrapper around trie node to represent a folder and its contents
 export class Registry {
   private readonly root: TrieNode;
-  drive: Hyperdrive | undefined;
-  errorCallback: (err: string) => void;
-  rerender: () => void;
   private subscribers: EventCallback[];
+  errorCallback: (err: string) => void;
+
+  // Remote hyperdrive to sync up to, won't sync if undefined
+  drive: Hyperdrive | undefined;
+
+  // Callback to rerender external tree representations on any changes that require
+  rerender: () => void;
 
   constructor() {
     this.root = new TrieNode(this, "")
@@ -32,50 +32,53 @@ export class Registry {
     this.subscribers = []
   }
 
-  // registry error callback
+  // Set registry error callback
   onError(fn: (err: string) => void) {
     this.errorCallback = fn
     return this
   }
 
+  // Set registry rerender callback
   onRerender(fn: () => void) {
     this.rerender = fn
     return this
   }
 
-  // add subscriber to event stream
+  // Subscribe an event to event stream
   addSubscriber(fn: EventCallback) {
     this.subscribers.push(fn)
     return this
   }
 
-  // set remote hyperdrive
+  // Set remote hyperdrive
   setDrive(drive: Hyperdrive) {
     this.drive = drive
     return this
   }
 
+  // Sync all nodes to remote
   sync() {
     return this.root.getChildren().map(child => child.sync())
   }
 
+  // Download all files to cwd
   download() {
     return this.root.getChildren().map(child => child.download())
   }
 
+  // Get number of nodes in registry
   size(): number {
     return this.getTree().length
   }
 
-  // returns pre-order traversal of all nodes
-  // in trie
+  // Returns a renderable representation of pre-order traversal of all nodes in trie
   getTree(): ITreeRepresentation[] {
     const output: ITreeRepresentation[] = []
     const toStringRecur = (indent: number, node: TrieNode) => {
+      // base case: empty trie
       if (!node) {
         return
       }
-
       output.push({
         padding: indent,
         name: node.key,
@@ -83,18 +86,19 @@ export class Registry {
         status: node.status,
       })
       node.getChildren().forEach(child => {
+        // default to indent 2 spaces
         toStringRecur(indent + 2, child)
       })
     }
 
-    // ignore root node
+    // ignore root node, recurse starting at first level
     this.root.getChildren().forEach(child => {
       toStringRecur(0, child)
     })
     return output
   }
 
-  // insert an entry into the registry
+  // Insert an entry into the registry
   insert(pathSegments: string[], isDir = false): void {
     let cur = this.root
     pathSegments.forEach(segment => {
@@ -122,26 +126,35 @@ export class Registry {
     }
   }
 
-  // attempts to return entry with given path segments
-  // returns false if not present
+  update(pathSegments: string[]): void {
+    // TODO: implement
+  }
+
+  // Attempts to return node at given path. Returns null if not present
   find(pathSegments: string[]): TrieNode | null {
     return pathSegments.reduce((cur: TrieNode | null, segment) => {
+      // if child not found or parent was also not found, return null
       if (!cur || !(cur.children && cur.children[segment])) {
         return null
       }
+
+      // next path segment
       return cur.children[segment]
     }, this.root)
   }
 
-  // parse events emitted from fs watcher
+  // Parse event data emitted from fs watcher to modify trie
   parseEvt({ path: targetPath, status, isDir }: EventData) {
+    // ignore genesis block (only contains hyperdrive info)
     if (status === 'genesis') return
+
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
       case 'add':
         this.insert(pathSegments, isDir)
         break
       case 'modify':
+        // TODO: refactor to use update()
         const modNode = this.find(pathSegments)
         if (modNode) {
           modNode.status = STATUS.unsynced
@@ -159,7 +172,7 @@ export class Registry {
     this.rerender()
   }
 
-  // watch local directory for changes
+  // Watch directory for changes and link to internal onChange handler
   watch(dir: string, onReady: () => void) {
     registerWatcher(
       dir,
@@ -169,11 +182,10 @@ export class Registry {
     return this
   }
 
-  // subscribe to remote eventLog hypercore feed
+  // Subscribe to remote eventLog hypercore feed
   subscribeRemote(eventLog: Feed, onReady: () => void) {
     const process = (data: string) => {
       this._onChangeCallback(JSON.parse(data) as EventData)
-      this.rerender()
     }
 
     // reconstruct file registry from event stream
@@ -181,7 +193,6 @@ export class Registry {
     for (let i = 1; i < eventLog.length; i++) {
       dataPromises.push(eventLog.get(i))
     }
-
     Promise.all(dataPromises)
       .then(data => data.forEach(process))
       .then(() => onReady())

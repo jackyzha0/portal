@@ -1,7 +1,8 @@
 import React from 'react'
 import {Box, Text} from "ink";
-import {ITreeRepresentation, STATUS} from "../domain/registry";
+import {ITreeRepresentation} from "../domain/registry";
 import Loader from "./Loader";
+import {STATUS} from "../domain/trie";
 
 interface IStatusIndicatorProps {
   status: STATUS;
