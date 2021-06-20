@@ -3,7 +3,7 @@ import * as path from "path";
 import {Registry} from "../domain/registry";
 import HyperDrive from "hyperdrive";
 
-export default (dir: string, registry: Registry, drive: HyperDrive) => {
+export default (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)

@@ -6,6 +6,8 @@ import Loader from "./Loader";
 interface IStatusIndicatorProps {
   status: STATUS;
 }
+
+// Node status indicator component
 const StatusIndicator = ({status}: IStatusIndicatorProps) => {
   switch (status) {
     case STATUS.synced:
@@ -21,6 +23,8 @@ const StatusIndicator = ({status}: IStatusIndicatorProps) => {
 interface IFileTreeProps {
   registry: ITreeRepresentation[],
 }
+
+// File tree display component
 export default ({registry}: IFileTreeProps) => {
   const synced = registry.filter(f => f.status === STATUS.synced).length
   return <Box flexDirection="column" marginY={1}>

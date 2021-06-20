@@ -6,6 +6,8 @@ interface ILoaderProps {
     status?: string,
     color?: string,
 }
+
+// Thin wrapper around ink spinner component
 export default ({status, color}: ILoaderProps) => (
   <Text>
     <Text color={color ?? "green"}>

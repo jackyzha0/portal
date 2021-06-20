@@ -1,10 +1,12 @@
 import React from "react";
 import {Text} from "ink";
 
-interface ITitleProps {
+interface ISessionInfoProps {
   sessionId: string | undefined,
 }
-export const SessionInfo = ({sessionId}: ITitleProps) => <>
+
+// Displays info about current portal session
+export const SessionInfo = ({sessionId}: ISessionInfoProps) => <>
   <Text bold>Session ID </Text>
   <Text>{sessionId}</Text>
 </>

@@ -1,6 +1,6 @@
 import React from 'react';
 import useHyper from "../hooks/useHyper";
-import {SessionInfo} from '../components/Title'
+import {SessionInfo} from '../components/SessionInfo'
 import {Box} from "ink";
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
@@ -14,8 +14,7 @@ interface IHostProps {
   dir: string,
 }
 
-/// Creates a new portal in the given directory.
-/// If no directory is provided, uses current working directory
+/// Creates a new portal from the given directory
 const Host = ({dir}: IHostProps) => {
   const hyper = useHyper()
   const {errors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper?.hyperObj?.eventLog)
@@ -36,6 +35,7 @@ const Host = ({dir}: IHostProps) => {
 }
 
 Host.propTypes = {
+  /// Directory to create portal from. Defaults to current working directory
   dir: PropTypes.string,
 };
 Host.shortFlags = {

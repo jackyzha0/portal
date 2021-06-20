@@ -8,6 +8,8 @@ interface ICommandWrapperProps {
   children?: React.ReactNode,
 }
 
+// Wrapper component to show any loading/error states if they exist
+// instead of children
 export default ({loading, error, children}: ICommandWrapperProps) => {
   if (loading) {
     return <Loader status="Initializing Hyperspace..." />

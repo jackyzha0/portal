@@ -3,7 +3,7 @@ import {useConstant, useError} from "./utility";
 import {ITreeRepresentation, Registry} from "../domain/registry";
 import {Feed} from "hyperspace";
 
-export default (dir: string, eventLog: Feed) => {
+export default (dir: string, eventLog: Feed | undefined) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 

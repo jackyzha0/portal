@@ -5,10 +5,10 @@ import {Box, Newline, Text} from "ink";
 /// Displays help info
 const Hello = () => <Box flexDirection="column">
   <Box
-    margin={1}
+    marginY={1}
     flexDirection="column"
   >
-    <Text>Version: {version}</Text>
+    <Text>portal v{version}</Text>
     <Text dimColor>{description}</Text>
     <Newline/>
     <Text>To create a new portal in the current directory:

@@ -1,6 +1,6 @@
 import React from "react";
 import useHyper from "../hooks/useHyper";
-import {SessionInfo} from '../components/Title'
+import {SessionInfo} from '../components/SessionInfo'
 import PropTypes from "prop-types";
 import FileTree from "../components/FileTree";
 import Errors from "../components/Errors";
@@ -36,19 +36,11 @@ const Client = ({ dir, forceOverwrite, sessionId }: IClientProps) => {
     </Text>
   }
 
-  const getLoader = () => {
-    if (remoteLoading) {
-      return <Loader status='Syncing remote hyperspace...' />
-    } else {
-      return <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`} />
-    }
-  }
-
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
       {!remoteLoading ?
         <FileTree registry={registryRenderableArray}/> :
-        getLoader()
+        <Loader status='Syncing remote hyperspace...' />
       }
       <SessionInfo sessionId={sessionId}/>
       <Errors errors={errors}/>
@@ -57,8 +49,13 @@ const Client = ({ dir, forceOverwrite, sessionId }: IClientProps) => {
 }
 
 Client.propTypes = {
+  /// Session ID of portal to join
   sessionId: PropTypes.string.isRequired,
+
+  /// Directory to sync files to. Defaults to current working directory
   dir: PropTypes.string,
+
+  /// Whether to overwrite current files in directory
   forceOverwrite: PropTypes.bool,
 };
 Client.shortFlags = {
