@@ -1,3 +1,5 @@
+// incomplete type definitions extrapolated from API docs
+// literally only here for my mental sanity, please don't actually use these
 declare module 'hyperspace' {
     import {IHyperDriveMetadata} from "hyperdrive";
 

@@ -8,7 +8,7 @@ export default (dir: string, eventLog: Feed | undefined) => {
   const [loading, setLoading] = useState(true)
 
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
-  const remoteRegistry: Registry = useConstant(() => new Registry()
+  const remoteRegistry: Registry = useConstant<Registry>(() => new Registry()
     .onError(addError)
     .onRerender(() => setRegistryRenderableArray(remoteRegistry.getTree()))
   )

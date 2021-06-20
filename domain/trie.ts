@@ -43,6 +43,7 @@ export class TrieNode {
   }
 
   _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T> | undefined, folderPreRun = (path: string[]) => {}): Promise<STATUS> {
+    // if noop, early return
     if (!op) {
       return Promise.resolve(this.status)
     }

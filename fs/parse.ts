@@ -3,9 +3,15 @@ import fs from 'fs'
 import path from 'path'
 import parse from 'parse-gitignore'
 
-const getAllGitIgnores = (dir) => {
-  const res = []
-  const recur = (searchDir) => {
+interface IGitIgnoreResult {
+  path: string,
+  prefix: string,
+}
+
+// returns relative path of all .gitignore files in current directory
+const getAllGitIgnores = (dir: string): IGitIgnoreResult[] => {
+  const res: IGitIgnoreResult[] = []
+  const recur = (searchDir: string) => {
     fs.readdirSync(searchDir).forEach(file => {
       const absPath = path.join(searchDir, file)
       if (fs.existsSync(absPath)) {
@@ -27,9 +33,9 @@ const getAllGitIgnores = (dir) => {
   return res
 }
 
-export const readGitIgnore = (providedPath) => {
+export const readGitIgnore = (providedPath: string) => {
   // TODO: make this flag enabled
-  const filePaths = ['.git']
+  const filePaths: string[] = ['.git']
   const resolved = path.resolve(providedPath)
   const ignoredFiles = getAllGitIgnores(providedPath)
     .map(gitIgnore => {

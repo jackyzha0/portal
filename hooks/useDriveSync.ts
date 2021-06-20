@@ -1,7 +1,9 @@
 import {useEffect} from "react";
 import * as path from "path";
+import {Registry} from "../domain/registry";
+import HyperDrive from "hyperdrive";
 
-export default (dir, registry, drive) => {
+export default (dir: string, registry: Registry, drive: HyperDrive) => {
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)
