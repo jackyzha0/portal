@@ -1,12 +1,12 @@
-import {useRef, useState} from "react";
+import {useRef, useState} from 'react'
 
 // Hook to create a singleton value that does not ever get recreated
-type ResultBox<T> = { v: T }
+type ResultBox<T> = {v: T}
 export function useConstant<T>(fn: () => T): T {
   const ref = useRef<ResultBox<T>>()
 
   if (!ref.current) {
-    ref.current = { v: fn() }
+    ref.current = {v: fn()}
   }
 
   return ref.current.v
@@ -15,6 +15,9 @@ export function useConstant<T>(fn: () => T): T {
 // Hook to easily track/add to error stack
 export const useError = () => {
   const [errors, setErrors] = useState<string[]>([])
-  const addError = (err: string) => setErrors(errors => [...errors, err])
+  const addError = (error: string) => {
+    setErrors(errors => [...errors, error])
+  }
+
   return {errors, addError}
 }

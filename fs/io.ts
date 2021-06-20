@@ -1,11 +1,11 @@
 import fs from 'fs'
-import * as path from 'path'
+import path from 'path'
 
 // Read file at path and return buffer
-export const read = (path: string) => new Promise<Buffer>((resolve, reject) => {
-  fs.readFile(path, (err, data) => {
-    if (err) {
-      reject(err)
+export const read = async (path: string) => new Promise<Buffer>((resolve, reject) => {
+  fs.readFile(path, (error, data) => {
+    if (error) {
+      reject(error)
     } else {
       resolve(data)
     }
@@ -13,30 +13,31 @@ export const read = (path: string) => new Promise<Buffer>((resolve, reject) => {
 })
 
 // Write current buffer to location of given path segment
-export const writeFile = (pathSegments: string[], buf: Buffer) => new Promise<void>((resolve, reject) => {
-  fs.writeFile(path.join(...pathSegments), buf, (err) => {
-    if (err) {
-      reject(err)
+export const writeFile = async (pathSegments: string[], buf: Buffer) => new Promise<void>((resolve, reject) => {
+  fs.writeFile(path.join(...pathSegments), buf, error => {
+    if (error) {
+      reject(error)
     } else {
       resolve()
     }
   })
 })
 
+function isError(error: any): error is NodeJS.ErrnoException {
+  return error instanceof Error
+}
+
 // Creates folder at current location
 export const mkdir = (pathSegments: string[]) => {
   try {
     fs.mkdirSync(path.join(...pathSegments))
-  } catch (err) {
+  } catch (error: unknown) {
     // ignore if it already exists
-    if (err.code !== 'EEXIST') {
-      throw err
+    if (isError(error) && error.code !== 'EEXIST') {
+      throw error
     }
   }
 }
 
 // Check if given folder is empty
-export const isEmpty = (dir: string) => fs
-  .promises
-  .readdir(dir)
-  .then(files => files.length === 0)
+export const isEmpty = (dir: string) => fs.readdirSync(dir).length === 0

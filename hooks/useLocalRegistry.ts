@@ -1,23 +1,25 @@
-import {useEffect, useState} from "react";
-import {useConstant, useError} from "./utility";
-import {ITreeRepresentation, Registry} from "../domain/registry";
-import {Feed} from "hyperspace";
+import {useEffect, useState} from 'react'
+import {Feed} from 'hyperspace'
+import {ITreeRepresentation, Registry} from '../domain/registry'
+import {useConstant, useError} from './utility'
 
 // Hook to register a local registry to listen to local file changes and push to remote
-export default (dir: string, eventLog: Feed | undefined) => {
+const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
-  // array representation of registry internal trie
+  // Array representation of registry internal trie
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
-  // create registry and add handlers
+  // Create registry and add handlers
   const localRegistry: Registry = useConstant<Registry>(() => new Registry()
     .onError(addError)
-    .onRerender(() => setRegistryRenderableArray(localRegistry.getTree()))
+    .onRerender(() => {
+      setRegistryRenderableArray(localRegistry.getTree())
+    })
   )
 
-  // subscribe to local to publish to eventLog if present
+  // Subscribe to local to publish to eventLog if present
   useEffect(() => {
     if (eventLog) {
       localRegistry
@@ -26,7 +28,9 @@ export default (dir: string, eventLog: Feed | undefined) => {
             .append(JSON.stringify(data))
             .catch(addError)
         })
-        .watch(dir, () => setLoading(false))
+        .watch(dir, () => {
+          setLoading(false)
+        })
     }
   }, [eventLog])
 
@@ -37,3 +41,5 @@ export default (dir: string, eventLog: Feed | undefined) => {
     registryRenderableArray
   }
 }
+
+export default useLocalRegistry

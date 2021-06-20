@@ -1,22 +1,22 @@
-import {mkdir, read, writeFile} from "../fs/io";
-import {Registry} from "./registry";
+import {mkdir, read, writeFile} from '../fs/io'
+import {Registry} from './registry'
 
 // Possible trie node statuses
 export enum STATUS {
   unsynced,
   error,
-  synced,
+  synced
 }
 
 // Single trienode representing a file/folder
 export class TrieNode {
-  private registry: Registry
   key: string
   parent: TrieNode | null
-  children: {[key: string]: TrieNode}
+  children: Record<string, TrieNode>
   isDir: boolean
   status: STATUS
-  
+  private readonly registry: Registry
+
   constructor(registry: Registry, key: string, isDir = false) {
     this.key = key
     this.parent = null
@@ -31,11 +31,12 @@ export class TrieNode {
     const output = []
     let cur: TrieNode = this
 
-    // skip root placeholder node
+    // Skip root placeholder node
     while (cur.parent !== null) {
       output.unshift(cur)
       cur = cur.parent
     }
+
     return output
   }
 
@@ -49,24 +50,26 @@ export class TrieNode {
     return Object.values(this.children)
   }
 
-  // generic tree operation over all unsynced nodes
+  // Generic tree operation over all unsynced nodes
   // opName: operation name for logging
   // op: operation to apply to each leaf node given the path
   // folderPreRun: operation to apply to each folder
-  _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T> | undefined, folderPreRun = (path: string[]) => {}): Promise<STATUS> {
+  async _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T> | undefined, folderPreRun?: (path: string[]) => void): Promise<STATUS> {
     const path = this.getPath()
 
-    // if folder, apply op to all files
+    // If folder, apply op to all files
     if (this.isDir) {
-      // do something with current path if necessary
-      folderPreRun(path)
+      // Do something with current path if necessary
+      if (folderPreRun) {
+        folderPreRun(path)
+      }
 
-      // apply op to children children
-      const statusPromises: Promise<STATUS>[] = this.getChildren().map(child => child._treeOp(opName, op, folderPreRun))
+      // Apply op to children children
+      const statusPromises: Array<Promise<STATUS>> = this.getChildren().map(async child => child._treeOp(opName, op, folderPreRun))
       return Promise.all(statusPromises)
         .then(() => this.status = STATUS.synced)
-        .catch(err => {
-          this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
+        .catch((error: Error) => {
+          this.registry.errorCallback(`[${opName}]: ${error.message}`)
           this.status = STATUS.error
           return this.status
         })
@@ -75,21 +78,23 @@ export class TrieNode {
         })
     }
 
-    // dont apply op to already synced files
+    // Dont apply op to already synced files
     if (this.status === STATUS.synced) {
       return Promise.resolve(this.status)
     }
 
-    // single file, apply operation
-    const opRes = op(path)
+    // Single file, apply operation
+    const opResult = op(path)
     // ignore on empty res
-    if (!opRes) return Promise.resolve(this.status)
+    if (!opResult) {
+      return Promise.resolve(this.status)
+    }
 
-    // resolve promise
-    return opRes
+    // Resolve promise
+    return opResult
       .then(() => this.status = STATUS.synced)
-      .catch((err: Error) => {
-        this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
+      .catch((error: Error) => {
+        this.registry.errorCallback(`[${opName}]: ${error.message}`)
         this.status = STATUS.error
         return this.status
       })
@@ -99,29 +104,29 @@ export class TrieNode {
   }
 
   // Recursively downloads current node and children from drive to local
-  download() {
+  async download() {
     return this._treeOp(
       'download',
-      (pathSegments) => this
+      pathSegments => this
         .registry.drive?.promises
-        .readFile(pathSegments.join("/"))
-        .then((buf) => writeFile(pathSegments, buf)),
-       mkdir
+        .readFile(pathSegments.join('/'))
+        .then(async buf => writeFile(pathSegments, buf)),
+      mkdir
     )
   }
 
   // Recursively syncs current node and children to given drive instance
-  sync() {
+  async sync() {
     return this._treeOp(
       'sync',
-      (pathSegments) => {
-        const joinedPath = pathSegments.join("/")
+      async pathSegments => {
+        const joinedPath = pathSegments.join('/')
         return read(joinedPath)
           .then(buf => this
             .registry.drive?.promises
             .writeFile(joinedPath, buf)
           )
-      },
+      }
     )
   }
 }

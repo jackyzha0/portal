@@ -1,11 +1,12 @@
-import anyTest, {ExecutionContext, TestInterface} from 'ava';
-import {Registry, STATUS} from "../domain/registry";
+import anyTest, {ExecutionContext, TestInterface} from 'ava'
+import {Registry} from '../domain/registry'
+import {STATUS} from '../domain/trie'
 
-// helpers
-const test = anyTest as TestInterface<{reg: Registry}>;
+// Helpers
+const test = anyTest as TestInterface<{reg: Registry}>
 test.beforeEach(t => {
-  t.context.reg = new Registry();
-});
+  t.context.reg = new Registry()
+})
 
 const complexTree = (r: Registry) => {
   r.insert(['a', 'b', 'c.txt'])
@@ -17,15 +18,20 @@ const complexTree = (r: Registry) => {
 }
 
 type NodeAssertion = (t: ExecutionContext, r: Registry, pathSegments: string[]) => void
-const nodeNotPresent: NodeAssertion = (t, r, pathSegments) => t.falsy(r.find(pathSegments))
-const nodePresent: NodeAssertion = (t, r, pathSegments) => t.truthy(r.find(pathSegments))
+const nodeNotPresent: NodeAssertion = (t, r, pathSegments) => {
+  t.falsy(r.find(pathSegments))
+}
 
-// find() tests
+const nodePresent: NodeAssertion = (t, r, pathSegments) => {
+  t.truthy(r.find(pathSegments))
+}
+
+// Find() tests
 test('find() - empty root', t => {
   const r = t.context.reg
   nodeNotPresent(t, r, ['test'])
   nodePresent(t, r, [])
-});
+})
 
 test('find() - file at root', t => {
   const r = t.context.reg
@@ -33,16 +39,16 @@ test('find() - file at root', t => {
   nodeNotPresent(t, r, path)
   r.insert(path)
   nodePresent(t, r, path)
-});
+})
 
 test('find() - file not present', t => {
   const r = t.context.reg
   r.insert(['test'])
   nodeNotPresent(t, r, ['test', 'notPresent'])
   nodeNotPresent(t, r, ['alsoNotPresent'])
-});
+})
 
-// insert() tests
+// Insert() tests
 test('insert() - nested file', t => {
   const r = t.context.reg
   const path = ['folder', 'inner', 'test.txt']
@@ -50,7 +56,7 @@ test('insert() - nested file', t => {
   nodePresent(t, r, path)
   nodePresent(t, r, path.slice(0, 1))
   nodePresent(t, r, path.slice(0, 2))
-});
+})
 
 test('insert() - directory', t => {
   const r = t.context.reg
@@ -63,17 +69,19 @@ test('insert() - existing', t => {
   const r = t.context.reg
   const path = ['test.txt']
   r.insert(path)
-  t.notThrows(() => r.insert(path))
+  t.notThrows(() => {
+    r.insert(path)
+  })
 })
 
-// remove() tests
+// Remove() tests
 test('remove() - nested file', t => {
   const r = t.context.reg
   const path = ['folder', 'inner', 'test.txt']
   r.insert(path)
   nodePresent(t, r, path)
 
-  // remove most nested text element but not folder
+  // Remove most nested text element but not folder
   r.remove(path)
   nodeNotPresent(t, r, path)
   nodePresent(t, r, path.slice(0, 1))
@@ -121,11 +129,15 @@ test('remove() - folder removes all children', t => {
 test('remove() - nonexistent file', t => {
   const r = t.context.reg
   const path = ['test']
-  t.notThrows(() => r.remove(path, true))
-  t.notThrows(() => r.remove(path))
+  t.notThrows(() => {
+    r.remove(path, true)
+  })
+  t.notThrows(() => {
+    r.remove(path)
+  })
 })
 
-// size() tests
+// Size() tests
 test('size() - empty', t => {
   const r = t.context.reg
   t.is(r.size(), 0)
@@ -149,7 +161,7 @@ test('size() - complex', t => {
   t.is(r.size(), 8)
 })
 
-// getTree() tests
+// GetTree() tests
 test('getTree() - empty', t => {
   const r = t.context.reg
   t.deepEqual(r.getTree(), [])
@@ -159,13 +171,13 @@ test('getTree() - heavily nested', t => {
   const r = t.context.reg
   complexTree(r)
   t.deepEqual(r.getTree(), [
-    { padding: 0, name: 'a', isDir: true, status: STATUS.unsynced },
-    { padding: 2, name: 'b', isDir: true, status: STATUS.unsynced },
-    { padding: 4, name: 'c.txt', isDir: false, status: STATUS.unsynced },
-    { padding: 4, name: 'd.txt', isDir: false, status: STATUS.unsynced },
-    { padding: 4, name: 'e', isDir: true, status: STATUS.unsynced },
-    { padding: 6, name: 'f.txt', isDir: false, status: STATUS.unsynced },
-    { padding: 2, name: 'g.txt', isDir: false, status: STATUS.unsynced },
-    { padding: 0, name: 'h.txt', isDir: false, status: STATUS.unsynced }
+    {padding: 0, name: 'a', isDir: true, status: STATUS.unsynced},
+    {padding: 2, name: 'b', isDir: true, status: STATUS.unsynced},
+    {padding: 4, name: 'c.txt', isDir: false, status: STATUS.unsynced},
+    {padding: 4, name: 'd.txt', isDir: false, status: STATUS.unsynced},
+    {padding: 4, name: 'e', isDir: true, status: STATUS.unsynced},
+    {padding: 6, name: 'f.txt', isDir: false, status: STATUS.unsynced},
+    {padding: 2, name: 'g.txt', isDir: false, status: STATUS.unsynced},
+    {padding: 0, name: 'h.txt', isDir: false, status: STATUS.unsynced}
   ])
 })

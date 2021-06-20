@@ -1,47 +1,48 @@
-import React from "react";
-import useHyper from "../hooks/useHyper";
+import React from 'react'
+import PropTypes from 'prop-types'
+import {Newline, Text} from 'ink'
+import useHyper from '../hooks/useHyper'
 import {SessionInfo} from '../components/SessionInfo'
-import PropTypes from "prop-types";
-import FileTree from "../components/FileTree";
-import Errors from "../components/Errors";
-import CommandWrapper from "../components/CommandWrapper";
-import {isEmpty} from "../fs/io";
-import {Newline, Text} from "ink";
-import Loader from "../components/Loader";
-import useRemoteRegistry from "../hooks/useRemoteRegistry";
-import useDriveDownload from "../hooks/useDriveDownload";
+import FileTree from '../components/FileTree'
+import Errors from '../components/Errors'
+import CommandWrapper from '../components/CommandWrapper'
+import {isEmpty} from '../fs/io'
+import Loader from '../components/Loader'
+import useRemoteRegistry from '../hooks/useRemoteRegistry'
+import useDriveDownload from '../hooks/useDriveDownload'
 
 interface IClientProps {
-  dir: string,
-  forceOverwrite: boolean,
-  sessionId: string,
+  dir: string;
+  isForceOverwrite: boolean;
+  sessionId: string;
 }
 
 /// Joins an existing portal using a given `sessionId`
-const Client = ({ dir, forceOverwrite, sessionId }: IClientProps) => {
+const Client = ({dir, isForceOverwrite, sessionId}: IClientProps) => {
   const hyper = useHyper(sessionId)
   const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
   useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
-  // warning text for trying to sync in a non-empty directory
-  if (isEmpty(dir) && !forceOverwrite) {
-    return <Text>
-      <Text color="yellow" bold>Warning: </Text>
-      <Text>There are already files in this directory! Syncing could overwrite these files</Text>
-      <Newline />
-      <Text dimColor>
-        <Text>To force overwrite: </Text>
-        <Text color="cyan" bold> portal join [sessionId] -f</Text>
+  // Warning text for trying to sync in a non-empty directory
+  if (isEmpty(dir) && !isForceOverwrite) {
+    return (
+      <Text>
+        <Text bold color="yellow">Warning: </Text>
+        <Text>There are already files in this directory! Syncing could overwrite these files</Text>
+        <Newline/>
+        <Text dimColor>
+          <Text>To force overwrite: </Text>
+          <Text bold color="cyan"> portal join [sessionId] -f</Text>
+        </Text>
       </Text>
-    </Text>
+    )
   }
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
-      {!remoteLoading ?
-        <FileTree registry={registryRenderableArray}/> :
-        <Loader status='Syncing remote hyperspace...' />
-      }
+      {remoteLoading ?
+        <Loader status="Syncing remote hyperspace..."/> :
+        <FileTree registry={registryRenderableArray}/>}
       <SessionInfo sessionId={sessionId}/>
       <Errors errors={errors}/>
     </CommandWrapper>
@@ -56,16 +57,16 @@ Client.propTypes = {
   dir: PropTypes.string,
 
   /// Whether to overwrite current files in directory
-  forceOverwrite: PropTypes.bool,
-};
+  isForceOverwrite: PropTypes.bool
+}
 Client.shortFlags = {
   dir: 'd',
-  forceOverwrite: 'f',
-};
+  isForceOverwrite: 'f'
+}
 Client.defaultProps = {
   dir: '.',
-  forceOverwrite: false,
-};
+  isForceOverwrite: false
+}
 
-Client.positionalArgs = ['sessionId'];
+Client.positionalArgs = ['sessionId']
 export default Client

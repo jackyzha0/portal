@@ -1,8 +1,8 @@
 import React from 'react'
-import {Box, Text} from "ink";
-import {ITreeRepresentation} from "../domain/registry";
-import Loader from "./Loader";
-import {STATUS} from "../domain/trie";
+import {Box, Text} from 'ink'
+import {ITreeRepresentation} from '../domain/registry'
+import {STATUS} from '../domain/trie'
+import Loader from './Loader'
 
 interface IStatusIndicatorProps {
   status: STATUS;
@@ -15,35 +15,39 @@ const StatusIndicator = ({status}: IStatusIndicatorProps) => {
       return <Text color="green">✔</Text>
     case STATUS.error:
       return <Text color="red">✖</Text>
-    default:
     case STATUS.unsynced:
+    default:
       return <Loader color="yellow"/>
   }
 }
 
 interface IFileTreeProps {
-  registry: ITreeRepresentation[],
+  registry: ITreeRepresentation[];
 }
 
 // File tree display component
-export default ({registry}: IFileTreeProps) => {
+const FileTree = ({registry}: IFileTreeProps) => {
   const synced = registry.filter(f => f.status === STATUS.synced).length
-  return <Box flexDirection="column" marginY={1}>
-    <Text bold>Files</Text>
-    {registry.length !== 0 ? registry.map(file => (
-      <Box key={file.name}>
-        <StatusIndicator status={file.status} />
-        <Box paddingLeft={file.padding + 2}>
-          <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
-            {file.name}
-          </Text>
+  return (
+    <Box flexDirection="column" marginY={1}>
+      <Text bold>Files</Text>
+      {registry.length > 0 ? registry.map((file, i) => (
+        <Box key={`${file.name}_${i}`}>
+          <StatusIndicator status={file.status}/>
+          <Box paddingLeft={file.padding + 2}>
+            <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
+              {file.name}
+            </Text>
+          </Box>
         </Box>
+      )) : <Text color="yellow">No files found</Text>}
+      <Box marginTop={1}>
+        <Text bold>
+          Watching {registry.length} files ({synced}/{registry.length} synced)
+        </Text>
       </Box>
-    )) : <Text color="yellow">No files found</Text>}
-    <Box marginTop={1}>
-      <Text bold>
-        Watching {registry.length} files ({synced}/{registry.length} synced)
-      </Text>
     </Box>
-  </Box>
+  )
 }
+
+export default FileTree
