@@ -43,11 +43,6 @@ export class TrieNode {
   }
 
   _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T> | undefined, folderPreRun = (path: string[]) => {}): Promise<STATUS> {
-    // if noop, early return
-    if (!op) {
-      return Promise.resolve(this.status)
-    }
-    
     const path = this.getPath()
 
     // if folder, apply op to all files
@@ -83,10 +78,11 @@ export class TrieNode {
     // single file, just sync
     const opRes = op(path)
     if (!opRes) {
+      console.log("early resolve")
       return Promise.resolve(this.status)
     }
     return opRes
-      .then(() => STATUS.synced)
+      .then(() => this.status = STATUS.synced)
       .catch((err: Error) => {
         this.registry.errorCallback(`[${opName}]: ${err.toString()}`)
         this.status = STATUS.error
@@ -101,7 +97,7 @@ export class TrieNode {
     return this._treeOp(
       'download',
       (pathSegments) => this
-        .registry?.drive?.promises
+        .registry.drive?.promises
         .readFile(pathSegments.join("/"))
         .then((buf) => writeFile(pathSegments, buf)),
     )
@@ -116,7 +112,7 @@ export class TrieNode {
         const joinedPath = pathSegments.join("/")
         return read(joinedPath)
           .then(buf => this
-            .registry?.drive?.promises
+            .registry.drive?.promises
             .writeFile(joinedPath, buf)
           )
       },
