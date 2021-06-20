@@ -1,5 +1,5 @@
 // single file/folder node
-import {read, writeFile} from "../fs/io";
+import {mkdir, read, writeFile} from "../fs/io";
 import {Registry, STATUS} from "./registry";
 import * as path from "path";
 
@@ -78,7 +78,6 @@ export class TrieNode {
     // single file, just sync
     const opRes = op(path)
     if (!opRes) {
-      console.log("early resolve")
       return Promise.resolve(this.status)
     }
     return opRes
@@ -93,6 +92,7 @@ export class TrieNode {
       })
   }
 
+  // recursively downloads current node and children from drive to local
   download() {
     return this._treeOp(
       'download',
@@ -100,6 +100,7 @@ export class TrieNode {
         .registry.drive?.promises
         .readFile(pathSegments.join("/"))
         .then((buf) => writeFile(pathSegments, buf)),
+       mkdir
     )
   }
 
