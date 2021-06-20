@@ -12,7 +12,7 @@ export function useConstant<T>(fn: () => T): T {
 }
 
 export const useError = () => {
-  const [errors, setErrors] = useState<Error[]>([])
-  const addError = (err: Error) => setErrors(errors => [...errors, err])
+  const [errors, setErrors] = useState<string[]>([])
+  const addError = (err: string) => setErrors(errors => [...errors, err])
   return {errors, addError}
 }

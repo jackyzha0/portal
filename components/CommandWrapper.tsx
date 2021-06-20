@@ -4,7 +4,7 @@ import {Text} from "ink";
 
 interface ICommandWrapperProps {
   loading: boolean,
-  error: string,
+  error: string | undefined,
   children?: React.ReactNode,
 }
 

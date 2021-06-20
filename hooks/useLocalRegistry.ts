@@ -9,7 +9,7 @@ export default (dir, eventLog) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState([])
   const localRegistry = useConstant(() => new Registry()
     .onError(addError)
-    .onRerender(() => setRegistryRenderableArray(localRegistry.getTree()))
+      .onRerender(() => setRegistryRenderableArray(localRegistry.getTree()))
   )
 
   // also publish to eventLog if present

@@ -33,7 +33,7 @@ export class Registry {
   }
 
   // registry error callback
-  onError(fn: (err: string) => {}) {
+  onError(fn: (err: string) => void) {
     this.errorCallback = fn
     return this
   }
@@ -188,14 +188,13 @@ export class Registry {
 
     // TODO: handle more feed events here
     // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
-    eventLog
-      .on('append', async () => {
-        const data = await eventLog.get(eventLog.length - 1)
-        process(data)
-      })
-      .on('close', () => {
-        console.log('stream closed')
-      })
+    eventLog.on('append', async () => {
+      const data = await eventLog.get(eventLog.length - 1)
+      process(data)
+    })
+    eventLog.on('close', () => {
+      console.log('stream closed')
+    })
     return this
   }
 }

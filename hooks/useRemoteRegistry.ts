@@ -1,13 +1,14 @@
 import {useConstant, useError} from "./utility";
 import {useEffect, useState} from "react";
-import {Registry} from "../domain/registry";
+import {ITreeRepresentation, Registry} from "../domain/registry";
+import {Feed} from "hyperspace";
 
-export default (dir, eventLog) => {
+export default (dir: string, eventLog: Feed | undefined) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
-  const [registryRenderableArray, setRegistryRenderableArray] = useState([])
-  const remoteRegistry = useConstant(() => new Registry()
+  const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
+  const remoteRegistry: Registry = useConstant(() => new Registry()
     .onError(addError)
     .onRerender(() => setRegistryRenderableArray(remoteRegistry.getTree()))
   )

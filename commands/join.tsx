@@ -40,7 +40,7 @@ const Client = ({ dir, forceOverwrite, sessionId }: IClientProps) => {
     if (remoteLoading) {
       return <Loader status='Syncing remote hyperspace...' />
     } else {
-      return <Loader status={`Scanning directory... ${registryRenderableArray.size()} files found`} />
+      return <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`} />
     }
   }
 

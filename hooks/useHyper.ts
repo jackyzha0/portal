@@ -3,6 +3,11 @@ import Hyperdrive from 'hyperdrive'
 import { useAsync } from 'react-async-hook'
 import { nanoid } from 'nanoid'
 
+export interface IGenesisBlock {
+  status: 'genesis',
+  key: string,
+}
+
 export default (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // setup hyperspace client
@@ -41,14 +46,14 @@ export default (key?: string) => {
       await eventLog.append(JSON.stringify({
         status: 'genesis',
         key: drive.metadata.key.toString('hex'),
-      }))
+      } as IGenesisBlock))
     } else {
       // if key exists, read genesis block and set drive info
       eventLog.download()
 
       // TODO: check for genesis block
       const genesisBlock = await eventLog.get(0)
-      const driveKey = JSON.parse(genesisBlock).key
+      const driveKey = (JSON.parse(genesisBlock) as IGenesisBlock).key
       drive = new Hyperdrive(store, Buffer.from(driveKey, 'hex'))
       await drive.promises.ready()
     }
