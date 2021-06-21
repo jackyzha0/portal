@@ -1,4 +1,4 @@
-import {mkdir, createReadStream, writeFile, createWriteStream} from '../fs/io'
+import {mkdir, createReadStream, createWriteStream} from '../fs/io'
 import {Registry} from './registry'
 
 // Possible trie node statuses
@@ -111,10 +111,11 @@ export class TrieNode {
           readStream.pipe(writeStream)
 
           // TODO: make this async
-          await new Promise((resolve, reject) => readStream
+          await new Promise((resolve, reject) => {
+            readStream
               .on('end', resolve)
               .on('error', reject)
-          )
+          })
         }
       },
       mkdir
@@ -133,10 +134,11 @@ export class TrieNode {
           readStream.pipe(writeStream)
 
           // TODO: make this async
-          await new Promise((resolve, reject) => readStream
+          await new Promise((resolve, reject) => {
+            readStream
               .on('end', resolve)
               .on('error', reject)
-          )
+          })
         }
       }
     )

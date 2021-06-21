@@ -17,9 +17,9 @@ declare module 'hyperdrive' {
         rmdir(dir: string): Promise<void>;
         unlink(dir: string): Promise<void>;
       }
+      constructor(core: CoreStore, key: Key)
       createWriteStream(name: string): stream.Writable
       createReadStream(name: string): stream.Readable
-      constructor(core: CoreStore, key: Key)
     }
 
     export default Hyperdrive

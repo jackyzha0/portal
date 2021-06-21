@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-// helper wrappers around fs package
+// Helper wrappers around fs package
 export const createReadStream = (path: string) => fs.createReadStream(path)
 export const createWriteStream = (path: string) => fs.createWriteStream(path)
 
