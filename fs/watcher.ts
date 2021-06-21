@@ -16,13 +16,16 @@ export interface EventData {
 export type EventCallback = (data: EventData) => void
 
 // Register a file watcher at given directory
-export const registerWatcher = (
+export function registerWatcher(
   dir: string,
   ignoreGitFiles: boolean,
-  onErrorCallback: (error: string) => void,
-  onChangeCallback: EventCallback,
-  onReadyCallback = () => {},
-) => {
+  callbacks: {
+    onErrorCallback: (error: string) => void,
+    onChangeCallback: EventCallback,
+    onReadyCallback: () => void,
+  }
+) {
+  const {onErrorCallback, onChangeCallback, onReadyCallback} = callbacks
   const watcher = chokidar.watch(dir, {
     ignored: readGitIgnore(dir, ignoreGitFiles),
     persistent: true

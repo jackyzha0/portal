@@ -23,7 +23,7 @@ export class Registry {
 
   private readonly root: TrieNode
   private readonly subscribers: Map<string, EventCallback>
-  private readonly DEBUG: boolean;
+  private readonly DEBUG: boolean
 
   constructor(debug = false) {
     this.DEBUG = debug
@@ -34,10 +34,10 @@ export class Registry {
     this.subscribers = new Map()
   }
 
-  _debug(msg: string) {
+  _debug(message: string) {
     if (this.DEBUG) {
       const now = new Date().toISOString()
-      console.log(`[${now}] DEBUG: ${msg}`)
+      console.log(`[${now}] DEBUG: ${message}`)
     }
   }
 
@@ -72,13 +72,13 @@ export class Registry {
 
   // Sync all nodes to remote
   sync() {
-    this._debug("syncing registry to remote")
+    this._debug('syncing registry to remote')
     return this.root.getChildren().map(async child => child.sync())
   }
 
   // Download all files to cwd
   download() {
-    this._debug("syncing downloading files from remote")
+    this._debug('syncing downloading files from remote')
     return this.root.getChildren().map(async child => child.download())
   }
 
@@ -89,7 +89,7 @@ export class Registry {
 
   // Returns a renderable representation of pre-order traversal of all nodes in trie
   getTree(): ITreeRepresentation[] {
-    this._debug("request registry tree render")
+    this._debug('request registry tree render')
     const output: ITreeRepresentation[] = []
     const toStringRecur = (indent: number, node: TrieNode) => {
       // Base case: empty trie
@@ -130,7 +130,7 @@ export class Registry {
     }
 
     // Set whether leaf node is directory or not
-    this._debug(`inserted ${isDir ? 'folder' : 'file'} ${pathSegments.join("/")}`)
+    this._debug(`inserted ${isDir ? 'folder' : 'file'} ${pathSegments.join('/')}`)
     cur.isDir = isDir
   }
 
@@ -142,11 +142,11 @@ export class Registry {
     // Only remove if node is present
     // and is a directory remove on a directory
     if (node && (isDir ? node.isDir : !node.isDir)) {
-      this._debug(`removed ${pathSegments.join("/")}`)
+      this._debug(`removed ${pathSegments.join('/')}`)
       const {parent} = node
       delete parent?.children[node.key]
     } else {
-      this._debug(`failed to remove ${pathSegments.join("/")}`)
+      this._debug(`failed to remove ${pathSegments.join('/')}`)
     }
   }
 
@@ -164,7 +164,7 @@ export class Registry {
   }
 
   update(pathSegments: string[]) {
-    this._debug(`updating ${pathSegments.join("/")}`)
+    this._debug(`updating ${pathSegments.join('/')}`)
     const modNode = this.find(pathSegments)
     if (modNode) {
       modNode.traverse().forEach(node => node.status = STATUS.unsynced)
@@ -198,7 +198,7 @@ export class Registry {
       fn(data)
     }
 
-    this._debug(`change evt... rerendering`)
+    this._debug('change evt... rerendering')
     this.rerender()
   }
 
@@ -207,11 +207,13 @@ export class Registry {
     registerWatcher(
       dir,
       ignoreGitFiles,
-      this.errorCallback,
-      data => {
-        this._onChangeCallback(data)
-      },
-      onReady,
+      {
+        onErrorCallback: this.errorCallback,
+        onChangeCallback: data => {
+          this._onChangeCallback(data)
+        },
+        onReadyCallback: onReady
+      }
     )
     return this
   }
