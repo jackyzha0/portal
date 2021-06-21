@@ -12,7 +12,7 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
   // Create registry and add handlers
-  const localRegistry: Registry = useConstant<Registry>(() => new Registry()
+  const localRegistry: Registry = useConstant(() => new Registry()
     .onError(addError)
     .onRerender(() => {
       setRegistryRenderableArray(localRegistry.getTree())
@@ -23,7 +23,7 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
   useEffect(() => {
     if (eventLog) {
       localRegistry
-        .addSubscriber(data => {
+        .addSubscriber('eventLogPublish', data => {
           eventLog
             .append(JSON.stringify(data))
             .catch(addError)
@@ -31,6 +31,9 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
         .watch(dir, () => {
           setLoading(false)
         })
+      return () => {
+        localRegistry.removeSubscriber('eventLogPublish')
+      }
     }
   }, [eventLog])
 

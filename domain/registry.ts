@@ -22,14 +22,14 @@ export class Registry {
   errorCallback: (error: string) => void
 
   private readonly root: TrieNode
-  private readonly subscribers: EventCallback[]
+  private readonly subscribers: Map<string, EventCallback>
 
   constructor() {
     this.root = new TrieNode(this, '')
     this.drive = undefined
     this.errorCallback = () => {}
     this.rerender = () => {}
-    this.subscribers = []
+    this.subscribers = new Map()
   }
 
   // Set registry error callback
@@ -45,9 +45,14 @@ export class Registry {
   }
 
   // Subscribe an event to event stream
-  addSubscriber(fn: EventCallback) {
-    this.subscribers.push(fn)
+  addSubscriber(name: string, fn: EventCallback) {
+    this.subscribers.set(name, fn)
     return this
+  }
+
+  // Remove a subscriber from event stream
+  removeSubscriber(name: string) {
+    this.subscribers.delete(name)
   }
 
   // Set remote hyperdrive
@@ -171,7 +176,7 @@ export class Registry {
 
   _onChangeCallback(data: EventData) {
     this.parseEvt(data)
-    for (const fn of this.subscribers) {
+    for (const fn of this.subscribers.values()) {
       fn(data)
     }
 

@@ -12,7 +12,7 @@ const useRemoteRegistry = (dir: string, eventLog: Feed | undefined) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
   // Create registry and add handlers
-  const remoteRegistry: Registry = useConstant<Registry>(() => new Registry()
+  const remoteRegistry: Registry = useConstant(() => new Registry()
     .onError(addError)
     .onRerender(() => {
       setRegistryRenderableArray(remoteRegistry.getTree())

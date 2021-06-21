@@ -2,6 +2,7 @@ import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import {useAsync} from 'react-async-hook'
 import {nanoid} from 'nanoid'
+import {useEffect} from "react";
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -13,8 +14,8 @@ export interface IGenesisBlock {
 const useHyper = (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // Setup hyperspace client
-    let client
-    let server
+    let client: Client
+    let server: Server
     try {
       // Use existing daemon if exists
       client = new Client()
@@ -37,7 +38,7 @@ const useHyper = (key?: string) => {
     await eventLog.ready()
 
     // Initialize hyperdrive
-    let drive
+    let drive: Hyperdrive
     if (key) {
       // Read genesis block and set drive info
       const genesisBlock = await eventLog.get(0)
@@ -59,10 +60,11 @@ const useHyper = (key?: string) => {
     // Seed remote
     await client.replicate(drive.metadata)
     await client.replicate(eventLog)
+
     return {
       store,
       eventLog,
-      drive
+      drive,
     }
   }, [])
 

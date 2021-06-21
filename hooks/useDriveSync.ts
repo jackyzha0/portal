@@ -9,7 +9,7 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
     if (registry && drive) {
       registry.setDrive(drive)
       registry.sync()
-      registry.addSubscriber(data => {
+      registry.addSubscriber('driveSync', data => {
         if (data.status === 'add' || data.status === 'modify') {
           const segments = data.path.split(path.sep)
           const node = registry.find(segments)
@@ -19,6 +19,7 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
           }
         }
       })
+      return () => registry.removeSubscriber('driveSync')
     }
   }, [registry, drive])
 }

@@ -2,7 +2,6 @@ import React from 'react'
 import {Box, Text} from 'ink'
 import {ITreeRepresentation} from '../domain/registry'
 import {STATUS} from '../domain/trie'
-import Loader from './Loader'
 
 interface IStatusIndicatorProps {
   status: STATUS;
@@ -12,21 +11,21 @@ interface IStatusIndicatorProps {
 const StatusIndicator = ({status}: IStatusIndicatorProps) => {
   switch (status) {
     case STATUS.synced:
-      return <Text color="green">█▍</Text>
+      return <Text color="green">█</Text>
     case STATUS.error:
-      return <Text color="red">█▍</Text>
+      return <Text color="red">█</Text>
     case STATUS.unsynced:
     default:
-      return <Text color="yellow">█▍</Text>
+      return <Text color="yellow">█</Text>
   }
 }
 
 const Legend = () => (
   <Box marginTop={1}>
     <Text bold>Legend: </Text>
-    <Text color="green"> █▍Synced </Text>
-    <Text color="yellow">█▍Unsynced </Text>
-    <Text color="red">█▍Error </Text>
+    <Text color="green"> █ Synced </Text>
+    <Text color="yellow">█ Unsynced </Text>
+    <Text color="red">█ Error </Text>
   </Box>
 )
 

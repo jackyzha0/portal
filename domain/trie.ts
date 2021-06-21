@@ -121,7 +121,7 @@ export class TrieNode {
   async sync() {
     return this._treeOp(
       'sync',
-      pathSegments => {
+      async pathSegments => {
         const joinedPath = pathSegments.join('/')
         return read(joinedPath)
           .then(buf => this

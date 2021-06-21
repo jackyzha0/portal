@@ -20,7 +20,6 @@ declare module 'hyperspace' {
 
       ready(): Promise<void>
       append(value: string): Promise<void>
-      download(): Promise<void>
       get(start: number, end?: number): Promise<string>
       on(evt: FeedEventType, callback: () => void): void
     }
@@ -37,10 +36,12 @@ declare module 'hyperspace' {
 
     class Server {
       ready(): Promise<void>
+      close(callback?: () => void): Promise<void>
     }
 
     class Client {
       ready(): Promise<void>
+      close(callback?: () => void): Promise<void>
       replicate(src: Feed | IHyperDriveMetadata): Promise<void>
 
       corestore(): CoreStore

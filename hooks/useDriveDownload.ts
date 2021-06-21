@@ -9,7 +9,7 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
     if (registry && drive) {
       registry.setDrive(drive)
       registry.download()
-      registry.addSubscriber(data => {
+      registry.addSubscriber('driveDownload', data => {
         if (data.status === 'add' || data.status === 'modify') {
           const segments = data.path.split(path.sep)
           const node = registry.find(segments)
@@ -19,6 +19,7 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
           }
         }
       })
+      return () => registry.removeSubscriber('driveDownload')
     }
   }, [registry, drive])
 }
