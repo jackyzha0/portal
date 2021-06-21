@@ -37,7 +37,7 @@ interface IFileTreeProps {
 const FileTree = ({registry}: IFileTreeProps) => {
   const synced = registry.filter(f => f.status === STATUS.synced).length
   return (
-    <Box flexDirection="column" marginY={1}>
+    <Box flexDirection="column" marginBottom={1}>
       <Text bold>Files</Text>
       {registry.length > 0 ? registry.map((file, i) => (
         <Box key={`${file.name}_${i}`}>

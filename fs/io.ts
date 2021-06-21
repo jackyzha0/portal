@@ -1,29 +1,9 @@
 import fs from 'fs'
 import path from 'path'
 
-// Read file at path and return buffer
-// TODO: refactor to use readstream: https://nodejs.org/api/fs.html#fs_fs_createreadstream_path_options
-export const read = async (path: string) => new Promise<Buffer>((resolve, reject) => {
-  fs.readFile(path, (error, data) => {
-    if (error) {
-      reject(error)
-    } else {
-      resolve(data)
-    }
-  })
-})
-
-// Write current buffer to location of given path segment
-// TODO: refactor to use writestream
-export const writeFile = async (pathSegments: string[], buf: Buffer) => new Promise<void>((resolve, reject) => {
-  fs.writeFile(path.join(...pathSegments), buf, error => {
-    if (error) {
-      reject(error)
-    } else {
-      resolve()
-    }
-  })
-})
+// helper wrappers around fs package
+export const createReadStream = (path: string) => fs.createReadStream(path)
+export const createWriteStream = (path: string) => fs.createWriteStream(path)
 
 function isError(error: any): error is NodeJS.ErrnoException {
   return error instanceof Error

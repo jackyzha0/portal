@@ -1,6 +1,7 @@
 // Incomplete type definitions extrapolated from API docs
 // literally only here for my mental sanity, please don't actually use these
 declare module 'hyperdrive' {
+  import * as stream from 'stream'
   import {CoreStore} from 'hyperspace'
 
     type Key = string | null | Buffer
@@ -16,6 +17,8 @@ declare module 'hyperdrive' {
         rmdir(dir: string): Promise<void>;
         unlink(dir: string): Promise<void>;
       }
+      createWriteStream(name: string): stream.Writable
+      createReadStream(name: string): stream.Readable
       constructor(core: CoreStore, key: Key)
     }
 

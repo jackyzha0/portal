@@ -1,4 +1,4 @@
-import {mkdir, read, writeFile} from '../fs/io'
+import {mkdir, createReadStream, writeFile, createWriteStream} from '../fs/io'
 import {Registry} from './registry'
 
 // Possible trie node statuses
@@ -103,10 +103,20 @@ export class TrieNode {
   async download() {
     return this._treeOp(
       'download',
-      pathSegments => this
-        .registry.drive?.promises
-        .readFile(pathSegments.join('/'))
-        .then(async buf => writeFile(pathSegments, buf)),
+      async pathSegments => {
+        if (this.registry.drive) {
+          const joinedPath = pathSegments.join('/')
+          const readStream = this.registry.drive.createReadStream(joinedPath)
+          const writeStream = createWriteStream(joinedPath)
+          readStream.pipe(writeStream)
+
+          // TODO: make this async
+          await new Promise((resolve, reject) => readStream
+              .on('end', resolve)
+              .on('error', reject)
+          )
+        }
+      },
       mkdir
     )
   }
@@ -116,12 +126,18 @@ export class TrieNode {
     return this._treeOp(
       'sync',
       async pathSegments => {
-        const joinedPath = pathSegments.join('/')
-        return read(joinedPath)
-          .then(buf => this
-            .registry.drive?.promises
-            .writeFile(joinedPath, buf)
+        if (this.registry.drive) {
+          const joinedPath = pathSegments.join('/')
+          const readStream = createReadStream(joinedPath)
+          const writeStream = this.registry.drive.createWriteStream(joinedPath)
+          readStream.pipe(writeStream)
+
+          // TODO: make this async
+          await new Promise((resolve, reject) => readStream
+              .on('end', resolve)
+              .on('error', reject)
           )
+        }
       }
     )
   }
