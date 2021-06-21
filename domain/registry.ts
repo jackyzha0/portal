@@ -190,8 +190,8 @@ export class Registry {
       data => {
         this._onChangeCallback(data)
       },
-      onReady,
       ignoreGitFiles,
+      onReady
     )
     return this
   }

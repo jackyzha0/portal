@@ -11,8 +11,8 @@ import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
 
 interface IHostProps {
-  dir: string,
-  includeGitFiles: boolean
+  dir: string;
+  includeGitFiles: boolean;
 }
 
 /// Creates a new portal from the given directory
@@ -46,7 +46,7 @@ Host.shortFlags = {
 }
 Host.defaultProps = {
   dir: '.',
-  includeGitFiles: false,
+  includeGitFiles: false
 }
 
 export default Host

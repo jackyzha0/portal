@@ -38,7 +38,7 @@ const getAllGitIgnores = (dir: string): IGitIgnoreResult[] => {
 
 // Read .gitignore at given path and return all ignored patterns
 export const readGitIgnore = (providedPath: string, ignoreGitFiles: boolean) => {
-  // default to ignoring .git files
+  // Default to ignoring .git files
   const filePaths: string[] = ignoreGitFiles ? ['.git'] : []
 
   // Parse path from string
@@ -52,6 +52,7 @@ export const readGitIgnore = (providedPath: string, ignoreGitFiles: boolean) => 
       if (ignoreGitFiles) {
         allIgnored.push('.git')
       }
+
       // Add prefixes to all ignored patterns
       return allIgnored.map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
     })
