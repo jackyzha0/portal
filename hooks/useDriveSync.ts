@@ -10,16 +10,23 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
       registry.setDrive(drive)
       registry.sync()
       registry.addSubscriber('driveSync', data => {
-        if (data.status === 'add' || data.status === 'modify') {
-          const segments = data.path.split(path.sep)
-          const node = registry.find(segments)
-          if (node) {
+        const segments = data.path.split(path.sep)
+        const node = registry.find(segments)
+        if (node) {
+          if (data.status === 'add' || data.status === 'modify') {
             node.sync().finally(() => {
               registry.rerender()
             })
           }
+          if (data.status === 'delete') {
+            const promise = data.isDir ?
+              registry.drive?.promises.rmdir(data.path) :
+              registry.drive?.promises.unlink(data.path)
+            if (promise) {
+              promise.finally(() => registry.rerender())
+            }
+          }
         }
-        // TODO: handle delete
       })
       return () => {
         registry.removeSubscriber('driveSync')

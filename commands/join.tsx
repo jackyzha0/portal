@@ -26,8 +26,8 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
   const [isPaused, setIsPaused] = useState(!isEmpty(dir) && !isForceOverwrite)
 
   const hyper = useHyper(sessionId)
-  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose)
-  useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive, isPaused)
+  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose, isPaused)
+  useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
   // Warning text for trying to sync in a non-empty directory
   if (isPaused) {

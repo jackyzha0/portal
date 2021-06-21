@@ -2,16 +2,17 @@ import path from 'path'
 import {useEffect} from 'react'
 import HyperDrive from 'hyperdrive'
 import {Registry} from '../domain/registry'
+import {rm} from "../fs/io";
 
 // Hook to subscribe to a registry and download on all changes
-const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined, pause = false) => {
+const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
   useEffect(() => {
-    if (registry && drive && !pause) {
+    if (registry && drive) {
       registry.setDrive(drive)
       registry.download()
       registry.addSubscriber('driveDownload', data => {
+        const segments = data.path.split(path.sep)
         if (data.status === 'add' || data.status === 'modify') {
-          const segments = data.path.split(path.sep)
           const node = registry.find(segments)
           if (node) {
             node.download().finally(() => {
@@ -19,13 +20,17 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
             })
           }
         }
-        // TODO: handle delete
+        if (data.status === 'delete') {
+          rm(segments).finally(() => {
+            registry.rerender()
+          })
+        }
       })
       return () => {
         registry.removeSubscriber('driveDownload')
       }
     }
-  }, [registry, drive, pause])
+  }, [registry, drive])
 }
 
 export default useDriveDownload

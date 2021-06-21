@@ -13,6 +13,8 @@ declare module 'hyperdrive' {
         ready(): Promise<void>;
         readFile(dir: string): Promise<Buffer>;
         writeFile(dir: string, buf: Buffer): Promise<void>;
+        rmdir(dir: string): Promise<void>;
+        unlink(dir: string): Promise<void>;
       }
       constructor(core: CoreStore, key: Key)
     }

@@ -5,7 +5,7 @@ import {useConstant, useError} from './utility'
 import useDebouncedState from './useDebouncedState'
 
 // Hook to register a remote registry to listen to remote file changes and sync down to local
-const useRemoteRegistry = (dir: string, eventLog: Feed | undefined, isDebug = false) => {
+const useRemoteRegistry = (dir: string, eventLog: Feed | undefined, isDebug: boolean, isPaused: boolean) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -17,12 +17,12 @@ const useRemoteRegistry = (dir: string, eventLog: Feed | undefined, isDebug = fa
 
   // Subscribe to remote when remote is ready
   useEffect(() => {
-    if (eventLog) {
+    if (eventLog && !isPaused) {
       remoteRegistry.subscribeRemote(eventLog, () => {
         setLoading(false)
       })
     }
-  }, [eventLog])
+  }, [eventLog, isPaused])
 
   return {
     errors,
