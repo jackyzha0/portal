@@ -4,7 +4,7 @@ import {ITreeRepresentation, Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
 
 // Hook to register a remote registry to listen to remote file changes and sync down to local
-const useRemoteRegistry = (dir: string, eventLog: Feed | undefined) => {
+const useRemoteRegistry = (dir: string, eventLog: Feed | undefined, isDebug = false) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -12,7 +12,7 @@ const useRemoteRegistry = (dir: string, eventLog: Feed | undefined) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
   // Create registry and add handlers
-  const remoteRegistry: Registry = useConstant(() => new Registry()
+  const remoteRegistry: Registry = useConstant(() => new Registry(isDebug)
     .onError(addError)
     .onRerender(() => {
       setRegistryRenderableArray(remoteRegistry.getTree())

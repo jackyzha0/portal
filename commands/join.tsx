@@ -15,12 +15,13 @@ interface IClientProps {
   dir: string;
   isForceOverwrite: boolean;
   sessionId: string;
+  verbose: boolean;
 }
 
 /// Joins an existing portal using a given `sessionId`
-const Client = ({dir, isForceOverwrite, sessionId}: IClientProps) => {
+const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
   const hyper = useHyper(sessionId)
-  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog)
+  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose)
   useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
   // Warning text for trying to sync in a non-empty directory
@@ -59,15 +60,20 @@ Client.propTypes = {
   dir: PropTypes.string,
 
   /// Whether to overwrite current files in directory
-  isForceOverwrite: PropTypes.bool
+  isForceOverwrite: PropTypes.bool,
+
+  /// Verbose mode
+  verbose: PropTypes.bool
 }
 Client.shortFlags = {
   dir: 'd',
-  isForceOverwrite: 'f'
+  isForceOverwrite: 'f',
+  verbose: 'v'
 }
 Client.defaultProps = {
   dir: '.',
-  isForceOverwrite: false
+  isForceOverwrite: false,
+  verbose: false
 }
 
 Client.positionalArgs = ['sessionId']

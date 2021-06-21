@@ -18,9 +18,10 @@ export type EventCallback = (data: EventData) => void
 // Register a file watcher at given directory
 export const registerWatcher = (
   dir: string,
-  onChangeCallback: EventCallback,
   ignoreGitFiles: boolean,
-  onReadyCallback = () => {}
+  onErrorCallback: (error: string) => void,
+  onChangeCallback: EventCallback,
+  onReadyCallback = () => {},
 ) => {
   const watcher = chokidar.watch(dir, {
     ignored: readGitIgnore(dir, ignoreGitFiles),
@@ -52,12 +53,7 @@ export const registerWatcher = (
       notify(path, 'delete', true)
     })
     .on('ready', onReadyCallback)
-    .on('error', error => {
-      console.log(`Watcher error: ${error.message}`)
+    .on('error', (error: Error) => {
+      onErrorCallback(`[watcher]: ${error.message}`)
     })
-
-  const stop = async () => watcher.close().then(() => {
-    console.log('closed')
-  })
-  return {stop}
 }

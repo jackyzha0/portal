@@ -4,7 +4,7 @@ import {ITreeRepresentation, Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
 
 // Hook to register a local registry to listen to local file changes and push to remote
-const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFiles: boolean) => {
+const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFiles: boolean, isDebug = false) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -12,7 +12,7 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFile
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
   // Create registry and add handlers
-  const localRegistry: Registry = useConstant(() => new Registry()
+  const localRegistry: Registry = useConstant(() => new Registry(isDebug)
     .onError(addError)
     .onRerender(() => {
       setRegistryRenderableArray(localRegistry.getTree())

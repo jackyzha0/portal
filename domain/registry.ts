@@ -23,13 +23,22 @@ export class Registry {
 
   private readonly root: TrieNode
   private readonly subscribers: Map<string, EventCallback>
+  private readonly DEBUG: boolean;
 
-  constructor() {
+  constructor(debug = false) {
+    this.DEBUG = debug
     this.root = new TrieNode(this, '')
     this.drive = undefined
     this.errorCallback = () => {}
     this.rerender = () => {}
     this.subscribers = new Map()
+  }
+
+  _debug(msg: string) {
+    if (this.DEBUG) {
+      const now = new Date().toISOString()
+      console.log(`[${now}] DEBUG: ${msg}`)
+    }
   }
 
   // Set registry error callback
@@ -63,11 +72,13 @@ export class Registry {
 
   // Sync all nodes to remote
   sync() {
+    this._debug("syncing registry to remote")
     return this.root.getChildren().map(async child => child.sync())
   }
 
   // Download all files to cwd
   download() {
+    this._debug("syncing downloading files from remote")
     return this.root.getChildren().map(async child => child.download())
   }
 
@@ -78,6 +89,7 @@ export class Registry {
 
   // Returns a renderable representation of pre-order traversal of all nodes in trie
   getTree(): ITreeRepresentation[] {
+    this._debug("request registry tree render")
     const output: ITreeRepresentation[] = []
     const toStringRecur = (indent: number, node: TrieNode) => {
       // Base case: empty trie
@@ -118,6 +130,7 @@ export class Registry {
     }
 
     // Set whether leaf node is directory or not
+    this._debug(`inserted ${isDir ? 'folder' : 'file'} ${pathSegments.join("/")}`)
     cur.isDir = isDir
   }
 
@@ -129,8 +142,11 @@ export class Registry {
     // Only remove if node is present
     // and is a directory remove on a directory
     if (node && (isDir ? node.isDir : !node.isDir)) {
+      this._debug(`removed ${pathSegments.join("/")}`)
       const {parent} = node
       delete parent?.children[node.key]
+    } else {
+      this._debug(`failed to remove ${pathSegments.join("/")}`)
     }
   }
 
@@ -148,6 +164,7 @@ export class Registry {
   }
 
   update(pathSegments: string[]) {
+    this._debug(`updating ${pathSegments.join("/")}`)
     const modNode = this.find(pathSegments)
     if (modNode) {
       modNode.traverse().forEach(node => node.status = STATUS.unsynced)
@@ -156,6 +173,7 @@ export class Registry {
 
   // Parse event data emitted from fs watcher to modify trie
   parseEvt({path: targetPath, status, isDir}: EventData) {
+    this._debug(`parsing evt to ${status} ${targetPath}`)
     const pathSegments = targetPath.split(path.sep)
     switch (status) {
       case 'add':
@@ -180,6 +198,7 @@ export class Registry {
       fn(data)
     }
 
+    this._debug(`change evt... rerendering`)
     this.rerender()
   }
 
@@ -187,11 +206,12 @@ export class Registry {
   watch(dir: string, onReady: () => void, ignoreGitFiles: boolean) {
     registerWatcher(
       dir,
+      ignoreGitFiles,
+      this.errorCallback,
       data => {
         this._onChangeCallback(data)
       },
-      ignoreGitFiles,
-      onReady
+      onReady,
     )
     return this
   }
@@ -224,9 +244,6 @@ export class Registry {
     eventLog.on('append', async () => {
       const data = await eventLog.get(eventLog.length - 1)
       process(data)
-    })
-    eventLog.on('close', () => {
-      console.log('stream closed')
     })
     return this
   }
