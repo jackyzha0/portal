@@ -18,12 +18,15 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
               registry.rerender()
             })
           }
+
           if (data.status === 'delete') {
             const promise = data.isDir ?
               registry.drive?.promises.rmdir(data.path) :
               registry.drive?.promises.unlink(data.path)
             if (promise) {
-              promise.finally(() => registry.rerender())
+              promise.finally(() => {
+                registry.rerender()
+              })
             }
           }
         }

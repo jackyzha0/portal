@@ -2,7 +2,7 @@ import path from 'path'
 import {useEffect} from 'react'
 import HyperDrive from 'hyperdrive'
 import {Registry} from '../domain/registry'
-import {rm} from "../fs/io";
+import {rm} from '../fs/io'
 
 // Hook to subscribe to a registry and download on all changes
 const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
@@ -20,6 +20,7 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
             })
           }
         }
+
         if (data.status === 'delete') {
           rm(segments).finally(() => {
             registry.rerender()

@@ -42,14 +42,14 @@ export const mkdir = (pathSegments: string[]) => {
 }
 
 // Delete folder
-export const rm = (pathSegments: string[]) => {
+export const rm = async (pathSegments: string[]) => {
   return new Promise<void>((resolve, reject) => {
     fs.rm(path.join(...pathSegments), {
       force: true,
-      recursive: true,
-    }, err => {
-      if (err) {
-        reject(err)
+      recursive: true
+    }, error => {
+      if (error) {
+        reject(error)
       } else {
         resolve()
       }
