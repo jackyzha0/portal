@@ -113,7 +113,6 @@ export class Registry {
         cur.children[segment] = new TrieNode(this, segment, true)
         cur.children[segment].parent = cur
       }
-
       cur = cur.children[segment]
     }
 
