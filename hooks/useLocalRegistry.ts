@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react'
 import {Feed} from 'hyperspace'
-import {ITreeRepresentation, Registry} from '../domain/registry'
+import {Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
-import useDebouncedState from "./useDebouncedState";
+import useDebouncedState from './useDebouncedState'
 
 // Hook to register a local registry to listen to local file changes and push to remote
 const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFiles: boolean, isDebug = false) => {

@@ -4,9 +4,9 @@ import HyperDrive from 'hyperdrive'
 import {Registry} from '../domain/registry'
 
 // Hook to subscribe to a registry and download on all changes
-const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
+const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined, pause = false) => {
   useEffect(() => {
-    if (registry && drive) {
+    if (registry && drive && !pause) {
       registry.setDrive(drive)
       registry.download()
       registry.addSubscriber('driveDownload', data => {
@@ -25,7 +25,7 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
         registry.removeSubscriber('driveDownload')
       }
     }
-  }, [registry, drive])
+  }, [registry, drive, pause])
 }
 
 export default useDriveDownload

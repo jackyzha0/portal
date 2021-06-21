@@ -9,6 +9,7 @@ import Errors from '../components/Errors'
 import CommandWrapper from '../components/CommandWrapper'
 import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
+import Hotkeys from '../components/Hotkeys'
 
 interface IHostProps {
   dir: string;
@@ -29,6 +30,7 @@ const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
           <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`}/> :
           <FileTree registry={registryRenderableArray}/>}
         <SessionInfo sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
+        <Hotkeys/>
         <Errors errors={errors}/>
       </Box>
     </CommandWrapper>

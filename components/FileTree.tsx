@@ -50,11 +50,9 @@ const FileTree = ({registry}: IFileTreeProps) => {
         </Box>
       )) : <Text color="yellow">No files found</Text>}
       <Legend/>
-      <Box>
-        <Text bold>
-          Watching {registry.length} files ({synced}/{registry.length} synced)
-        </Text>
-      </Box>
+      <Text bold>
+        Watching {registry.length} files ({synced}/{registry.length} synced).
+      </Text>
     </Box>
   )
 }

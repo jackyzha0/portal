@@ -25,6 +25,7 @@
 		"hyperspace": "^3.19.0",
 		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
+		"ink-select-input": "^4.2.0",
 		"ink-spinner": "^4.0.2",
 		"nanoid": "^3.1.23",
 		"parse-gitignore": "^1.0.1",
@@ -62,6 +63,7 @@
 			"no-return-assign": "off",
 			"unicorn/no-array-reduce": "off",
 			"unicorn/no-array-for-each": "off",
+			"unicorn/no-process-exit": "off",
 			"unicorn/no-array-callback-reference": "off",
 			"@typescript-eslint/no-empty-function": [
 				"error",
