@@ -184,13 +184,14 @@ export class Registry {
   }
 
   // Watch directory for changes and link to internal onChange handler
-  watch(dir: string, onReady: () => void) {
+  watch(dir: string, onReady: () => void, ignoreGitFiles: boolean) {
     registerWatcher(
       dir,
       data => {
         this._onChangeCallback(data)
       },
-      onReady
+      onReady,
+      ignoreGitFiles,
     )
     return this
   }

@@ -19,7 +19,9 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
           }
         }
       })
-      return () => registry.removeSubscriber('driveSync')
+      return () => {
+        registry.removeSubscriber('driveSync')
+      }
     }
   }, [registry, drive])
 }

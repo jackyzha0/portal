@@ -4,7 +4,7 @@ import {ITreeRepresentation, Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
 
 // Hook to register a local registry to listen to local file changes and push to remote
-const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
+const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFiles: boolean) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -30,7 +30,7 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined) => {
         })
         .watch(dir, () => {
           setLoading(false)
-        })
+        }, ignoreGitFiles)
       return () => {
         localRegistry.removeSubscriber('eventLogPublish')
       }

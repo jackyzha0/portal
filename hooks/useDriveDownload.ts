@@ -19,7 +19,9 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
           }
         }
       })
-      return () => registry.removeSubscriber('driveDownload')
+      return () => {
+        registry.removeSubscriber('driveDownload')
+      }
     }
   }, [registry, drive])
 }

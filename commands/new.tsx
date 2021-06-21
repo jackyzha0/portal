@@ -11,13 +11,14 @@ import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
 
 interface IHostProps {
-  dir: string;
+  dir: string,
+  includeGitFiles: boolean
 }
 
 /// Creates a new portal from the given directory
-const Host = ({dir}: IHostProps) => {
+const Host = ({dir, includeGitFiles}: IHostProps) => {
   const hyper = useHyper()
-  const {errors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper?.hyperObj?.eventLog)
+  const {errors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper?.hyperObj?.eventLog, !includeGitFiles)
   useDriveSync(dir, localRegistry, hyper?.hyperObj?.drive)
 
   return (
@@ -35,13 +36,17 @@ const Host = ({dir}: IHostProps) => {
 
 Host.propTypes = {
   /// Directory to create portal from. Defaults to current working directory
-  dir: PropTypes.string
+  dir: PropTypes.string,
+
+  /// Include git dotfiles
+  includeGitFiles: PropTypes.bool
 }
 Host.shortFlags = {
   dir: 'd'
 }
 Host.defaultProps = {
-  dir: '.'
+  dir: '.',
+  includeGitFiles: false,
 }
 
 export default Host

@@ -37,10 +37,9 @@ const getAllGitIgnores = (dir: string): IGitIgnoreResult[] => {
 }
 
 // Read .gitignore at given path and return all ignored patterns
-export const readGitIgnore = (providedPath: string) => {
-  // TODO: make this flag enabled
+export const readGitIgnore = (providedPath: string, ignoreGitFiles: boolean) => {
   // default to ignoring .git files
-  const filePaths: string[] = ['.git']
+  const filePaths: string[] = ignoreGitFiles ? ['.git'] : []
 
   // Parse path from string
   const resolved = path.resolve(providedPath)
@@ -49,7 +48,10 @@ export const readGitIgnore = (providedPath: string) => {
       // Construct absolute path
       const fullPath = path.join(resolved, gitIgnore.path)
       // Read file and get all ignored patterns
-      const allIgnored = [...parse(fs.readFileSync(fullPath)), '.git']
+      const allIgnored = [...parse(fs.readFileSync(fullPath))]
+      if (ignoreGitFiles) {
+        allIgnored.push('.git')
+      }
       // Add prefixes to all ignored patterns
       return allIgnored.map(ignoredFile => path.join(gitIgnore.prefix, ignoredFile))
     })

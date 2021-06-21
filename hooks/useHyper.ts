@@ -2,7 +2,6 @@ import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import {useAsync} from 'react-async-hook'
 import {nanoid} from 'nanoid'
-import {useEffect} from "react";
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -64,7 +63,7 @@ const useHyper = (key?: string) => {
     return {
       store,
       eventLog,
-      drive,
+      drive
     }
   }, [])
 
