@@ -40,13 +40,13 @@ const Client = ({dir, isForceOverwrite, sessionId}: IClientProps) => {
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
-        <Box flexDirection="column">
-            {remoteLoading ?
-                <Loader status="Syncing remote hyperspace..."/> :
-                <FileTree registry={registryRenderableArray}/>}
-            <SessionInfo sessionId={sessionId}/>
-            <Errors errors={errors}/>
-        </Box>
+      <Box flexDirection="column">
+        {remoteLoading ?
+          <Loader status="Syncing remote hyperspace..."/> :
+          <FileTree registry={registryRenderableArray}/>}
+        <SessionInfo sessionId={sessionId}/>
+        <Errors errors={errors}/>
+      </Box>
     </CommandWrapper>
   )
 }

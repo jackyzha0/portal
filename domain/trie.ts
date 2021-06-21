@@ -95,6 +95,8 @@ export class TrieNode {
       .then(() => this.status = STATUS.synced)
       .catch((error: Error) => {
         this.registry.errorCallback(`[${opName}]: ${error.message}`)
+        // Propagate up
+        this.traverse().forEach(node => node.status = STATUS.unsynced)
         this.status = STATUS.error
         return this.status
       })
@@ -119,7 +121,7 @@ export class TrieNode {
   async sync() {
     return this._treeOp(
       'sync',
-      async pathSegments => {
+      pathSegments => {
         const joinedPath = pathSegments.join('/')
         return read(joinedPath)
           .then(buf => this

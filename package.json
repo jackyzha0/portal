@@ -10,7 +10,7 @@
 		"build": "pastel build",
 		"dev": "pastel dev",
 		"prepare": "husky install && pastel build",
-		"test": "xo && ava",
+		"test": "xo --fix && ava",
 		"lint": "xo --fix"
 	},
 	"files": [

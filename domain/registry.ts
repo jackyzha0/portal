@@ -145,7 +145,7 @@ export class Registry {
   update(pathSegments: string[]) {
     const modNode = this.find(pathSegments)
     if (modNode) {
-      modNode.status = STATUS.unsynced
+      modNode.traverse().forEach(node => node.status = STATUS.unsynced)
     }
   }
 
