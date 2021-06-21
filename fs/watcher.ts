@@ -20,9 +20,9 @@ export function registerWatcher(
   dir: string,
   ignoreGitFiles: boolean,
   callbacks: {
-    onErrorCallback: (error: string) => void,
-    onChangeCallback: EventCallback,
-    onReadyCallback: () => void,
+    onErrorCallback: (error: string) => void;
+    onChangeCallback: EventCallback;
+    onReadyCallback: () => void;
   }
 ) {
   const {onErrorCallback, onChangeCallback, onReadyCallback} = callbacks

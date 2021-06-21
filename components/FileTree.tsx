@@ -22,7 +22,7 @@ const StatusIndicator = ({status}: IStatusIndicatorProps) => {
 
 const Legend = () => (
   <Box marginTop={1}>
-    <Text bold>Legend: </Text>
+    <Text bold>Legend:</Text>
     <Text color="green"> █ Synced </Text>
     <Text color="yellow">█ Unsynced </Text>
     <Text color="red">█ Error </Text>
@@ -50,7 +50,7 @@ const FileTree = ({registry}: IFileTreeProps) => {
         </Box>
       )) : <Text color="yellow">No files found</Text>}
       <Legend/>
-      <Box marginTop={1}>
+      <Box>
         <Text bold>
           Watching {registry.length} files ({synced}/{registry.length} synced)
         </Text>

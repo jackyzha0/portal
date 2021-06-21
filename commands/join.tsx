@@ -25,6 +25,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
   useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
   // Warning text for trying to sync in a non-empty directory
+  // TODO: make this interactable
   if (isEmpty(dir) && !isForceOverwrite) {
     return (
       <Text>

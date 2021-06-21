@@ -14,10 +14,12 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
           const segments = data.path.split(path.sep)
           const node = registry.find(segments)
           if (node) {
-            // TODO: proper promise handling here
-            node.sync().then(() => {}).catch(() => {})
+            node.sync().finally(() => {
+              registry.rerender()
+            })
           }
         }
+        // TODO: handle delete
       })
       return () => {
         registry.removeSubscriber('driveSync')

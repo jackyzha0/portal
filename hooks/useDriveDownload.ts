@@ -14,10 +14,12 @@ const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | u
           const segments = data.path.split(path.sep)
           const node = registry.find(segments)
           if (node) {
-            // TODO: proper promise handling here
-            node.download().then(() => {}).catch(() => {})
+            node.download().finally(() => {
+              registry.rerender()
+            })
           }
         }
+        // TODO: handle delete
       })
       return () => {
         registry.removeSubscriber('driveDownload')

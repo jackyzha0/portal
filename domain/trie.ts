@@ -73,9 +73,6 @@ export class TrieNode {
           this.status = STATUS.error
           return this.status
         })
-        .finally(() => {
-          this.registry.rerender()
-        })
     }
 
     // Dont apply op to already synced files
@@ -99,9 +96,6 @@ export class TrieNode {
         this.traverse().forEach(node => node.status = STATUS.unsynced)
         this.status = STATUS.error
         return this.status
-      })
-      .finally(() => {
-        this.registry.rerender()
       })
   }
 
