@@ -1,16 +1,10 @@
-import {Text, useApp, useInput} from 'ink'
+import {Text} from 'ink'
 import React from 'react'
+import useHotkey from "../hooks/useHotkey";
 
 // Hotkey component to listen for hotkeys to exit
 const Hotkeys = () => {
-  const {exit} = useApp()
-  useInput((input, key) => {
-    if (input === 'q' || key.escape) {
-      exit()
-      process.exit()
-    }
-  })
-
+  useHotkey()
   return (<Text dimColor>[esc] or [q] to quit.</Text>)
 }
 

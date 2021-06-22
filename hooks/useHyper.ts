@@ -35,6 +35,7 @@ const useHyper = (key?: string) => {
       store.get({key, valueEncoding: 'json'}) :
       store.get({name: nanoid(), valueEncoding: 'json'})
     await eventLog.ready()
+    await client.replicate(eventLog)
 
     // Initialize hyperdrive
     let drive: Hyperdrive
@@ -55,10 +56,7 @@ const useHyper = (key?: string) => {
         key: drive.metadata.key.toString('hex')
       } as IGenesisBlock))
     }
-
-    // Seed remote
     await client.replicate(drive.metadata)
-    await client.replicate(eventLog)
 
     return {
       store,

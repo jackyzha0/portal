@@ -10,6 +10,7 @@ declare module 'hyperdrive' {
     }
     class Hyperdrive {
       metadata: IHyperDriveMetadata
+      peer: any[]
       promises: {
         ready(): Promise<void>;
         readFile(dir: string): Promise<Buffer>;
