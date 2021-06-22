@@ -1,9 +1,9 @@
 // Incomplete type definitions extrapolated from API docs
 // literally only here for my mental sanity, please don't actually use these
 declare module 'hyperspace' {
-  import {IHyperDriveMetadata} from 'hyperdrive'
 
-    type FeedEventType =
+    import Hyperdrive from "hyperdrive";
+  type FeedEventType =
         | 'peer-add'
         | 'peer-remove'
         | 'peer-open' // Peer channel has been fully opened.
@@ -25,8 +25,7 @@ declare module 'hyperspace' {
     }
 
     interface ICoreStoreGetOptions {
-      key?: string;
-      name?: string;
+      key?: Buffer;
       valueEncoding?: 'json' | 'utf-8' | 'binary';
     }
     class CoreStore {
@@ -42,7 +41,7 @@ declare module 'hyperspace' {
     class Client {
       ready(): Promise<void>
       close(callback?: () => void): Promise<void>
-      replicate(src: Feed | IHyperDriveMetadata): Promise<void>
+      replicate(src: Feed | Hyperdrive): Promise<void>
 
       corestore(): CoreStore
     }

@@ -5,11 +5,8 @@ declare module 'hyperdrive' {
   import {CoreStore} from 'hyperspace'
 
     type Key = string | null | Buffer
-    export interface IHyperDriveMetadata {
-      key: Buffer;
-    }
     class Hyperdrive {
-      metadata: IHyperDriveMetadata
+      key: Buffer;
       peer: any[]
       promises: {
         ready(): Promise<void>;

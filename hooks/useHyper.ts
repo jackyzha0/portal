@@ -1,7 +1,6 @@
 import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import {useAsync} from 'react-async-hook'
-import {nanoid} from 'nanoid'
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -32,8 +31,8 @@ const useHyper = (key?: string) => {
 
     // Initialize eventLog feed from corestore
     const eventLog = key ?
-      store.get({key, valueEncoding: 'json'}) :
-      store.get({name: nanoid(), valueEncoding: 'json'})
+      store.get({key: Buffer.from(key, 'hex'), valueEncoding: 'json'}) :
+      store.get({valueEncoding: 'json'})
     await eventLog.ready()
     await client.replicate(eventLog)
 
@@ -53,10 +52,11 @@ const useHyper = (key?: string) => {
       // Fetch drive metadata and write to genesis block
       await eventLog.append(JSON.stringify({
         status: 'genesis',
-        key: drive.metadata.key.toString('hex')
+        key: drive.key.toString('hex')
       } as IGenesisBlock))
     }
-    await client.replicate(drive.metadata)
+
+    await client.replicate(drive)
 
     return {
       store,
