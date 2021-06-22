@@ -1,6 +1,6 @@
 import {Text} from 'ink'
 import React from 'react'
-import useHotkey from "../hooks/useHotkey";
+import useHotkey from '../hooks/useHotkey'
 
 // Hotkey component to listen for hotkeys to exit
 const Hotkeys = () => {

@@ -1,4 +1,4 @@
-import {useApp, useInput} from "ink";
+import {useApp, useInput} from 'ink'
 
 const useHotkey = () => {
   const {exit} = useApp()
