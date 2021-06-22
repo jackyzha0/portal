@@ -2,7 +2,7 @@
 // literally only here for my mental sanity, please don't actually use these
 declare module 'hyperspace' {
 
-    import Hyperdrive from "hyperdrive";
+  import Hyperdrive from 'hyperdrive'
   type FeedEventType =
         | 'peer-add'
         | 'peer-remove'
@@ -14,35 +14,35 @@ declare module 'hyperspace' {
         | 'append' // Feed has been appended to (i.e. has a new length / byteLength).
         | 'sync' // Every time ALL data from 0 to feed.length has been downloaded.
         | 'close' // Feed has been fully closed
-    class Feed {
-      key: Buffer
-      length: number
+  class Feed {
+    key: Buffer
+    length: number
 
-      ready(): Promise<void>
-      append(value: string): Promise<void>
-      get(start: number, end?: number): Promise<string>
-      on(evt: FeedEventType, callback: () => void): void
-    }
+    ready(): Promise<void>
+    append(value: string): Promise<void>
+    get(start: number, end?: number): Promise<string>
+    on(evt: FeedEventType, callback: () => void): void
+  }
 
-    interface ICoreStoreGetOptions {
-      key?: Buffer;
-      valueEncoding?: 'json' | 'utf-8' | 'binary';
-    }
-    class CoreStore {
-      ready(): Promise<void>
-      get(opt: ICoreStoreGetOptions): Feed
-    }
+  interface ICoreStoreGetOptions {
+    key?: Buffer;
+    valueEncoding?: 'json' | 'utf-8' | 'binary';
+  }
+  class CoreStore {
+    ready(): Promise<void>
+    get(opt: ICoreStoreGetOptions): Feed
+  }
 
-    class Server {
-      ready(): Promise<void>
-      close(callback?: () => void): Promise<void>
-    }
+  class Server {
+    ready(): Promise<void>
+    close(callback?: () => void): Promise<void>
+  }
 
-    class Client {
-      ready(): Promise<void>
-      close(callback?: () => void): Promise<void>
-      replicate(src: Feed | Hyperdrive): Promise<void>
+  class Client {
+    ready(): Promise<void>
+    close(callback?: () => void): Promise<void>
+    replicate(src: Feed | Hyperdrive): Promise<void>
 
-      corestore(): CoreStore
-    }
+    corestore(): CoreStore
+  }
 }

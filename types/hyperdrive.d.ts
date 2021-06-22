@@ -6,7 +6,7 @@ declare module 'hyperdrive' {
 
     type Key = string | null | Buffer
     class Hyperdrive {
-      key: Buffer;
+      key: Buffer
       peer: any[]
       promises: {
         ready(): Promise<void>;
