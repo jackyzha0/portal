@@ -1,6 +1,7 @@
 import {Server, Client} from 'hyperspace'
 import Hyperdrive from 'hyperdrive'
 import {useAsync} from 'react-async-hook'
+import Replicator from '@hyperswarm/replicator'
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -26,6 +27,8 @@ const useHyper = (key?: string) => {
       await client.ready()
     }
 
+    // setup replication
+    const r = new Replicator()
     const store = client.corestore()
     await store.ready()
 
@@ -35,6 +38,7 @@ const useHyper = (key?: string) => {
       store.get({valueEncoding: 'json'})
     await eventLog.ready()
     await client.replicate(eventLog)
+    await r.add(eventLog, {live: true})
 
     // Initialize hyperdrive
     let drive: Hyperdrive
@@ -56,7 +60,7 @@ const useHyper = (key?: string) => {
       } as IGenesisBlock))
     }
 
-    await client.replicate(drive)
+    // await client.replicate(drive)
 
     return {
       store,

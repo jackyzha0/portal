@@ -1229,6 +1229,15 @@
     nanoresource "^1.3.0"
     utp-native "^2.2.1"
 
+"@hyperswarm/replicator@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@hyperswarm/replicator/-/replicator-2.0.2.tgz#3531f0a8d56c61099f156761bdcb15d13cb425e7"
+  integrity sha512-3/dhdffAdrKT3sFi+Qec6raXzGoVDjuI8mgtPGlLnf7cAUUC0jNXa5EB0v6G16daGnUTeRHEOjJpI4SfIT+XmQ==
+  dependencies:
+    hypercore-protocol "^8.0.7"
+    hyperswarm "^2.13.0"
+    pump "^3.0.0"
+
 "@iarna/toml@^2.2.0":
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
@@ -5189,7 +5198,7 @@ hyperspace@^3.0.0, hyperspace@^3.19.0:
     nanoresource-promise "^1.2.2"
     random-access-memory "^3.1.1"
 
-hyperswarm@^2.14.1, hyperswarm@^2.15.1:
+hyperswarm@^2.13.0, hyperswarm@^2.14.1, hyperswarm@^2.15.1:
   version "2.15.3"
   resolved "https://registry.yarnpkg.com/hyperswarm/-/hyperswarm-2.15.3.tgz#34395e0538fda4883d03f2565e2b529c12fb9d7a"
   integrity sha512-bESly7s6X7cLMWCn4dsAVE/ttNbbB13o6jku2B7fV2wIV/g7NVC/yF7S3NiknGlftKn/uLU3fhMmbOfdBvQ5IA==
