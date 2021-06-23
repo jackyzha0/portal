@@ -12,13 +12,14 @@ export interface IGenesisBlock {
 const useHyper = (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // Setup hyperspace client
+    // eslint-disable-next-line @typescript-eslint/await-thenable
     const hyper = await hyperSDK({
       persist: false,
       storage: null
     })
     const {
       Hypercore: newHypercore,
-      Hyperdrive: newHyperdrive,
+      Hyperdrive: newHyperdrive
     } = hyper
 
     let eventLog: Hypercore
