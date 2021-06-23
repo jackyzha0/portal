@@ -1,4 +1,3 @@
-import path from 'path'
 import {useEffect} from 'react'
 import {Hyperdrive} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
@@ -11,7 +10,7 @@ const useDriveDownload = (dir: string, registry: Registry, drive: Hyperdrive | u
       registry.setDrive(drive)
       registry.download()
       registry.addSubscriber('driveDownload', data => {
-        const segments = data.path.split(path.sep)
+        const segments = data.path.split('/')
         if (data.status === 'add' || data.status === 'modify') {
           const node = registry.find(segments)
           if (node) {

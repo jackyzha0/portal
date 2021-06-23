@@ -1,4 +1,3 @@
-import path from 'path'
 import {useEffect} from 'react'
 import {Hyperdrive} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
@@ -10,7 +9,7 @@ const useDriveSync = (dir: string, registry: Registry, drive: Hyperdrive | undef
       registry.setDrive(drive)
       registry.sync()
       registry.addSubscriber('driveSync', data => {
-        const segments = data.path.split(path.sep)
+        const segments = data.path.split('/')
         const node = registry.find(segments)
         if (node) {
           if (data.status === 'add' || data.status === 'modify') {
