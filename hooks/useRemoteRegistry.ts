@@ -5,7 +5,7 @@ import {useConstant, useError} from './utility'
 import useDebouncedState from './useDebouncedState'
 
 // Hook to register a remote registry to listen to remote file changes and sync down to local
-const useRemoteRegistry = (dir: string, eventLog: Hypercore | undefined, isDebug: boolean, isPaused: boolean) => {
+const useRemoteRegistry = (dir: string, eventLog: Hypercore<string> | undefined, isDebug: boolean, isPaused: boolean) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 

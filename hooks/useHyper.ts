@@ -22,7 +22,7 @@ const useHyper = (key?: string) => {
       Hyperdrive: newHyperdrive
     } = hyper
 
-    let eventLog: Hypercore
+    let eventLog: Hypercore<string>
     let drive: Hyperdrive
     if (key) {
       // Recreate hypercore
@@ -32,7 +32,7 @@ const useHyper = (key?: string) => {
 
       // Read genesis block and set drive info
       const genesisBlock = await eventLog.get(0)
-      const driveKey = (JSON.parse(genesisBlock.toString()) as IGenesisBlock).key
+      const driveKey = (JSON.parse(genesisBlock) as IGenesisBlock).key
 
       // Join drive
       drive = newHyperdrive(driveKey)
@@ -55,7 +55,7 @@ const useHyper = (key?: string) => {
         status: 'genesis',
         key: drive.key.toString('hex')
       } as IGenesisBlock)
-      await eventLog.append(Buffer.from(genesis))
+      await eventLog.append(genesis)
     }
 
     return {

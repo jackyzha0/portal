@@ -218,9 +218,9 @@ export class Registry {
   }
 
   // Subscribe to remote eventLog hypercore feed
-  subscribeRemote(eventLog: Hypercore, onReady: () => void) {
-    const process = (data: Buffer) => {
-      this._onChangeCallback(JSON.parse(data.toString()) as EventData)
+  subscribeRemote(eventLog: Hypercore<string>, onReady: () => void) {
+    const process = (data: string) => {
+      this._onChangeCallback(JSON.parse(data) as EventData)
     }
 
     // Reconstruct file registry from event stream
