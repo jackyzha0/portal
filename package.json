@@ -20,10 +20,8 @@
 		"node": ">=10"
 	},
 	"dependencies": {
-		"@hyperswarm/replicator": "^2.0.2",
 		"chokidar": "^3.5.1",
-		"hyperdrive": "^10.20.0",
-		"hyperspace": "^3.19.0",
+		"hyper-sdk": "^3.0.7",
 		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
 		"ink-select-input": "^4.2.0",

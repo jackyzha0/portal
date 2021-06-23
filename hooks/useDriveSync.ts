@@ -1,10 +1,10 @@
 import path from 'path'
 import {useEffect} from 'react'
-import HyperDrive from 'hyperdrive'
+import {Hyperdrive} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
 
 // Hook to subscribe to a registry and sync all file changes to remote
-const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
+const useDriveSync = (dir: string, registry: Registry, drive: Hyperdrive | undefined) => {
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)
@@ -21,8 +21,8 @@ const useDriveSync = (dir: string, registry: Registry, drive: HyperDrive | undef
 
           if (data.status === 'delete') {
             const promise = data.isDir ?
-              registry.drive?.promises.rmdir(data.path) :
-              registry.drive?.promises.unlink(data.path)
+              registry.drive?.rmdir(data.path) :
+              registry.drive?.unlink(data.path)
             if (promise) {
               promise.finally(() => {
                 registry.rerender()

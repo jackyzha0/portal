@@ -1,11 +1,11 @@
 import path from 'path'
 import {useEffect} from 'react'
-import HyperDrive from 'hyperdrive'
+import {Hyperdrive} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
 import {rm} from '../fs/io'
 
 // Hook to subscribe to a registry and download on all changes
-const useDriveDownload = (dir: string, registry: Registry, drive: HyperDrive | undefined) => {
+const useDriveDownload = (dir: string, registry: Registry, drive: Hyperdrive | undefined) => {
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)

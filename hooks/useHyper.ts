@@ -1,7 +1,6 @@
-import {Server, Client} from 'hyperspace'
-import Hyperdrive from 'hyperdrive'
 import {useAsync} from 'react-async-hook'
-import Replicator from '@hyperswarm/replicator'
+import hyperSDK, {Hypercore, Hyperdrive} from 'hyper-sdk'
+import {nanoid} from 'nanoid'
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -13,57 +12,52 @@ export interface IGenesisBlock {
 const useHyper = (key?: string) => {
   const asyncHyper = useAsync(async () => {
     // Setup hyperspace client
-    let client: Client
-    let server: Server
-    try {
-      // Use existing daemon if exists
-      client = new Client()
-      await client.ready()
-    } catch {
-      // No daemon, start it in-process
-      server = new Server()
-      await server.ready()
-      client = new Client()
-      await client.ready()
-    }
+    const hyper = await hyperSDK({
+      persist: false,
+      storage: null
+    })
+    const {
+      Hypercore: newHypercore,
+      Hyperdrive: newHyperdrive,
+    } = hyper
 
-    // setup replication
-    const r = new Replicator()
-    const store = client.corestore()
-    await store.ready()
-
-    // Initialize eventLog feed from corestore
-    const eventLog = key ?
-      store.get({key: Buffer.from(key, 'hex'), valueEncoding: 'json'}) :
-      store.get({valueEncoding: 'json'})
-    await eventLog.ready()
-    await client.replicate(eventLog)
-    await r.add(eventLog, {live: true})
-
-    // Initialize hyperdrive
+    let eventLog: Hypercore
     let drive: Hyperdrive
     if (key) {
+      // Recreate hypercore
+      eventLog = newHypercore(key, {
+        valueEncoding: 'json'
+      })
+
       // Read genesis block and set drive info
       const genesisBlock = await eventLog.get(0)
-      const driveKey = (JSON.parse(genesisBlock) as IGenesisBlock).key
-      drive = new Hyperdrive(store, Buffer.from(driveKey, 'hex'))
-      await drive.promises.ready()
+      const driveKey = (JSON.parse(genesisBlock.toString()) as IGenesisBlock).key
+
+      // Join drive
+      drive = newHyperdrive(driveKey)
+      await drive.ready()
     } else {
-      // If no key, new drive
-      drive = new Hyperdrive(store, null)
-      await drive.promises.ready()
+      // Open new portal
+      const id = nanoid()
+
+      // Create hypercore
+      eventLog = newHypercore(`portal_eventLog_${id}`, {
+        valueEncoding: 'json'
+      })
+
+      // Create drive
+      drive = newHyperdrive(`portal_drive_${id}`)
+      await drive.ready()
 
       // Fetch drive metadata and write to genesis block
-      await eventLog.append(JSON.stringify({
+      const genesis = JSON.stringify({
         status: 'genesis',
         key: drive.key.toString('hex')
-      } as IGenesisBlock))
+      } as IGenesisBlock)
+      await eventLog.append(Buffer.from(genesis))
     }
 
-    // await client.replicate(drive)
-
     return {
-      store,
       eventLog,
       drive
     }

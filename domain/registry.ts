@@ -1,6 +1,5 @@
 import path from 'path'
-import Hyperdrive from 'hyperdrive'
-import {Feed} from 'hyperspace'
+import {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'
 import {STATUS, TrieNode} from './trie'
 
@@ -219,9 +218,9 @@ export class Registry {
   }
 
   // Subscribe to remote eventLog hypercore feed
-  subscribeRemote(eventLog: Feed, onReady: () => void) {
-    const process = (data: string) => {
-      this._onChangeCallback(JSON.parse(data) as EventData)
+  subscribeRemote(eventLog: Hypercore, onReady: () => void) {
+    const process = (data: Buffer) => {
+      this._onChangeCallback(JSON.parse(data.toString()) as EventData)
     }
 
     // Reconstruct file registry from event stream
@@ -244,7 +243,7 @@ export class Registry {
     // TODO: handle more feed events here
     // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
     eventLog.on('append', async () => {
-      const data = await eventLog.get(eventLog.length - 1)
+      const data = await eventLog.head()
       process(data)
     })
     return this

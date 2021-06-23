@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react'
-import {Feed} from 'hyperspace'
+import {Hypercore} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
 import useDebouncedState from './useDebouncedState'
 
 // Hook to register a local registry to listen to local file changes and push to remote
-const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFiles: boolean, isDebug = false) => {
+const useLocalRegistry = (dir: string, eventLog: Hypercore | undefined, ignoreGitFiles: boolean, isDebug = false) => {
   const {errors, addError} = useError()
   const [loading, setLoading] = useState(true)
 
@@ -21,7 +21,7 @@ const useLocalRegistry = (dir: string, eventLog: Feed | undefined, ignoreGitFile
       localRegistry
         .addSubscriber('eventLogPublish', data => {
           eventLog
-            .append(JSON.stringify(data))
+            .append(Buffer.from(JSON.stringify(data)))
             .catch(addError)
         })
         .watch(dir, () => {

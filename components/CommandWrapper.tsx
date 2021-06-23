@@ -1,6 +1,7 @@
 import React from 'react'
 import {Box, Text} from 'ink'
 import Loader from './Loader'
+import Hotkeys from './Hotkeys'
 
 interface ICommandWrapperProps {
   loading: boolean;
@@ -17,10 +18,13 @@ const CommandWrapper = ({loading, error, children}: ICommandWrapperProps) => {
 
   if (error) {
     return (
-      <Text>
-        <Text color="red">Error connecting to hypercore: </Text>
-        <Text>{error}</Text>
-      </Text>
+      <>
+        <Text>
+          <Text color="red">Error connecting to hypercore: </Text>
+          <Text>{error}</Text>
+        </Text>
+        <Hotkeys/>
+      </>
     )
   }
 
