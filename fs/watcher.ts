@@ -1,5 +1,6 @@
 import chokidar from 'chokidar'
 import {readGitIgnore} from './parse'
+import {normalizeToHyper} from './io'
 
 // Different event statuses
 // genesis is reserved for initial eventLog block for discovery key
@@ -34,7 +35,8 @@ export function registerWatcher(
   const notify = (path: string, status: EventStatus, isDir = false) => {
     // ignore .
     if (path !== '.') {
-      onChangeCallback({path, status, isDir})
+      const normalizedPath = normalizeToHyper(path)
+      onChangeCallback({path: normalizedPath, status, isDir})
     }
   }
 

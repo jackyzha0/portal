@@ -1,4 +1,3 @@
-import path from 'path'
 import {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'
 import {STATUS, TrieNode} from './trie'
@@ -173,7 +172,7 @@ export class Registry {
   // Parse event data emitted from fs watcher to modify trie
   parseEvt({path: targetPath, status, isDir}: EventData) {
     this._debug(`parsing evt to ${status} ${targetPath}`)
-    const pathSegments = targetPath.split(path.sep)
+    const pathSegments = targetPath.split('/')
     switch (status) {
       case 'add':
         this.insert(pathSegments, isDir)
