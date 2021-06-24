@@ -1,5 +1,5 @@
 import React from 'react'
-import {Text} from 'ink'
+import {Box, Text} from 'ink'
 import prettyBytes from 'pretty-bytes'
 
 export interface IStatsProps {
@@ -9,8 +9,11 @@ export interface IStatsProps {
 
 const Stats = ({totalBytes, bytesPerSecond}: IStatsProps) => {
   return (
-    <Text>{prettyBytes(bytesPerSecond)}/s, {prettyBytes(totalBytes)} total
-    </Text>
+    <Box marginBottom={1} flexDirection="column">
+      <Text bold>Throughput</Text>
+      <Text>{prettyBytes(bytesPerSecond)}/s, {prettyBytes(totalBytes)} total
+      </Text>
+    </Box>
   )
 }
 

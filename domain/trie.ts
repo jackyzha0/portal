@@ -15,6 +15,7 @@ export class TrieNode {
   children: Record<string, TrieNode>
   isDir: boolean
   status: STATUS
+  stats: IStreamPumpStats
   private readonly registry: Registry
 
   constructor(registry: Registry, key: string, isDir = false) {
@@ -24,6 +25,11 @@ export class TrieNode {
     this.registry = registry
     this.status = STATUS.unsynced
     this.isDir = isDir
+    this.stats = {
+      bytesPerSecond: 0,
+      totalTransferred: 0,
+      hasEnded: false
+    }
   }
 
   // Get list of all nodes from root to current node
@@ -139,13 +145,8 @@ export class TrieNode {
           const joinedPath = pathSegments.join('/')
           const readStream = createReadStream(joinedPath)
           const writeStream = this.registry.drive.createWriteStream(joinedPath)
-          const statsObject = {
-            bytesPerSecond: 0,
-            totalTransferred: 0,
-            hasEnded: false
-          }
-          ctx.set(joinedPath, statsObject)
-          return pump(readStream, writeStream, statsObject, this.registry.refreshStats)
+          ctx.set(joinedPath, this.stats)
+          return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
         }
       },
       this.registry.stats
