@@ -1,6 +1,7 @@
 import {useAsync} from 'react-async-hook'
 import hyperSDK, {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {nanoid} from 'nanoid'
+import {useState} from "react";
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -10,6 +11,8 @@ export interface IGenesisBlock {
 
 // Hook to initialize hyperspace related items (corestore, eventlog feed, hyperdrive)
 const useHyper = (key?: string) => {
+  const [peers, setPeers] = useState<string[]>([])
+
   const asyncHyper = useAsync(async () => {
     // Setup hyperspace client
     // eslint-disable-next-line @typescript-eslint/await-thenable
@@ -58,6 +61,22 @@ const useHyper = (key?: string) => {
       await eventLog.append(genesis)
     }
 
+    drive.on("peer-open", (peer) => {
+      const peerKey = peer.remotePublicKey.toString('hex')
+      setPeers(peers => peers.includes(peerKey) ?
+        peers :
+        [...peers, peerKey]
+      )
+    })
+
+    drive.on("peer-remove", (peer) => {
+      const peerKey = peer.remotePublicKey.toString('hex')
+      setPeers(peers => peers.includes(peerKey) ?
+        [...peers].filter(existingPeerKey => existingPeerKey !== peerKey) :
+        peers
+      )
+    })
+
     return {
       eventLog,
       drive
@@ -65,6 +84,7 @@ const useHyper = (key?: string) => {
   }, [])
 
   return {
+    numConnected: peers.length,
     hyperObj: asyncHyper.result,
     error: asyncHyper.error?.message,
     loading: asyncHyper.loading

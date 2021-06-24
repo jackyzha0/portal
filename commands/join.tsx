@@ -68,7 +68,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
         {remoteLoading ?
           <Loader status="Syncing remote hyperspace..."/> :
           <FileTree registry={registryRenderableArray}/>}
-        <SessionInfo sessionId={sessionId}/>
+        <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
         <Hotkeys/>
         <Errors errors={errors}/>
       </Box>

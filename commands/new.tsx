@@ -29,7 +29,7 @@ const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
         {loading ?
           <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`}/> :
           <FileTree registry={registryRenderableArray}/>}
-        <SessionInfo sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
+        <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <Hotkeys/>
         <Errors errors={errors}/>
       </Box>
