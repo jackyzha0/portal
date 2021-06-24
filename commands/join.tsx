@@ -12,6 +12,7 @@ import Loader from '../components/Loader'
 import useRemoteRegistry from '../hooks/useRemoteRegistry'
 import useDriveDownload from '../hooks/useDriveDownload'
 import Hotkeys from '../components/Hotkeys'
+import Stats from '../components/Stats'
 
 interface IClientProps {
   dir: string;
@@ -26,7 +27,13 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
   const [isPaused, setIsPaused] = useState(!isEmpty(dir) && !isForceOverwrite)
 
   const hyper = useHyper(sessionId)
-  const {errors, loading: remoteLoading, remoteRegistry, registryRenderableArray} = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose, isPaused)
+  const {
+    errors,
+    loading: remoteLoading,
+    remoteRegistry,
+    registryRenderableArray,
+    stats
+  } = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose, isPaused)
   useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
 
   // Warning text for trying to sync in a non-empty directory
@@ -62,12 +69,23 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
     )
   }
 
+  const DisplayComponent = () => {
+    if (remoteLoading) {
+      return <Loader status="Syncing remote hyperspace..."/>
+    }
+
+    return (
+      <>
+        <FileTree registry={registryRenderableArray}/>
+        <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+      </>
+    )
+  }
+
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
       <Box flexDirection="column">
-        {remoteLoading ?
-          <Loader status="Syncing remote hyperspace..."/> :
-          <FileTree registry={registryRenderableArray}/>}
+        <DisplayComponent/>
         <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
         <Hotkeys/>
         <Errors errors={errors}/>

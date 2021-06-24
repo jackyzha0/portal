@@ -1,5 +1,7 @@
 import {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'
+import {IStreamPumpStats} from '../fs/io'
+import {IStatsProps} from '../components/Stats'
 import {STATUS, TrieNode} from './trie'
 
 // Interface representation of renderable version of registry
@@ -17,7 +19,9 @@ export class Registry {
 
   // Callback to rerender external tree representations on any changes that require
   rerender: () => void
+  refreshStats: () => void
   errorCallback: (error: string) => void
+  stats: Map<string, IStreamPumpStats>
 
   private readonly root: TrieNode
   private readonly subscribers: Map<string, EventCallback>
@@ -29,7 +33,23 @@ export class Registry {
     this.drive = undefined
     this.errorCallback = () => {}
     this.rerender = () => {}
+    this.refreshStats = () => {}
     this.subscribers = new Map()
+    this.stats = new Map<string, IStreamPumpStats>()
+  }
+
+  getStats(): IStatsProps {
+    return [...this.stats.values()].reduce((total, status) => {
+      total.totalBytes += status.totalTransferred
+      if (!status.hasEnded) {
+        total.bytesPerSecond += status.bytesPerSecond
+      }
+
+      return total
+    }, {
+      totalBytes: 0,
+      bytesPerSecond: 0
+    })
   }
 
   _debug(message: string) {
@@ -48,6 +68,12 @@ export class Registry {
   // Set registry rerender callback
   onRerender(fn: () => void) {
     this.rerender = fn
+    return this
+  }
+
+  // Set stats rerender callback
+  onRefreshStats(fn: () => void) {
+    this.refreshStats = fn
     return this
   }
 
@@ -239,8 +265,6 @@ export class Registry {
         this.errorCallback(`[subscribe]: ${error.message}`)
       })
 
-    // TODO: handle more feed events here
-    // https://github.com/hypercore-protocol/hypercore#feedondownload-index-data
     eventLog.on('append', async () => {
       const data = await eventLog.head()
       process(data)

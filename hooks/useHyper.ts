@@ -1,7 +1,7 @@
 import {useAsync} from 'react-async-hook'
 import hyperSDK, {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {nanoid} from 'nanoid'
-import {useState} from "react";
+import {useState} from 'react'
 
 // Genesis block definition
 export interface IGenesisBlock {
@@ -18,7 +18,8 @@ const useHyper = (key?: string) => {
     // eslint-disable-next-line @typescript-eslint/await-thenable
     const hyper = await hyperSDK({
       persist: false,
-      storage: null
+      storage: null,
+      applicationName: 'portal'
     })
     const {
       Hypercore: newHypercore,
@@ -61,7 +62,7 @@ const useHyper = (key?: string) => {
       await eventLog.append(genesis)
     }
 
-    drive.on("peer-open", (peer) => {
+    drive.on('peer-open', peer => {
       const peerKey = peer.remotePublicKey.toString('hex')
       setPeers(peers => peers.includes(peerKey) ?
         peers :
@@ -69,7 +70,7 @@ const useHyper = (key?: string) => {
       )
     })
 
-    drive.on("peer-remove", (peer) => {
+    drive.on('peer-remove', peer => {
       const peerKey = peer.remotePublicKey.toString('hex')
       setPeers(peers => peers.includes(peerKey) ?
         [...peers].filter(existingPeerKey => existingPeerKey !== peerKey) :

@@ -10,6 +10,7 @@ import CommandWrapper from '../components/CommandWrapper'
 import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
 import Hotkeys from '../components/Hotkeys'
+import Stats from '../components/Stats'
 
 interface IHostProps {
   dir: string;
@@ -20,15 +21,32 @@ interface IHostProps {
 /// Creates a new portal from the given directory
 const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
   const hyper = useHyper()
-  const {errors, loading, localRegistry, registryRenderableArray} = useLocalRegistry(dir, hyper?.hyperObj?.eventLog, !includeGitFiles, verbose)
+  const {
+    errors,
+    loading,
+    localRegistry,
+    registryRenderableArray,
+    stats
+  } = useLocalRegistry(dir, hyper?.hyperObj?.eventLog, !includeGitFiles, verbose)
   useDriveSync(dir, localRegistry, hyper?.hyperObj?.drive)
+
+  const DisplayComponent = () => {
+    if (loading) {
+      return <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`}/>
+    }
+
+    return (
+      <>
+        <FileTree registry={registryRenderableArray}/>
+        <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+      </>
+    )
+  }
 
   return (
     <CommandWrapper error={hyper.error} loading={hyper.loading}>
       <Box flexDirection="column">
-        {loading ?
-          <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`}/> :
-          <FileTree registry={registryRenderableArray}/>}
+        <DisplayComponent/>
         <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <Hotkeys/>
         <Errors errors={errors}/>

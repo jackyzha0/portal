@@ -3,6 +3,7 @@ import {Hypercore} from 'hyper-sdk'
 import {Registry} from '../domain/registry'
 import {useConstant, useError} from './utility'
 import useDebouncedState from './useDebouncedState'
+import useStats from './useStats'
 
 // Hook to register a local registry to listen to local file changes and push to remote
 const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, ignoreGitFiles: boolean, isDebug = false) => {
@@ -14,6 +15,7 @@ const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, 
     .onError(addError)
   )
   const registryRenderableArray = useDebouncedState(localRegistry)
+  const stats = useStats(localRegistry)
 
   // Subscribe to local to publish to eventLog if present
   useEffect(() => {
@@ -37,7 +39,8 @@ const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, 
     errors,
     loading,
     localRegistry,
-    registryRenderableArray
+    registryRenderableArray,
+    stats
   }
 }
 

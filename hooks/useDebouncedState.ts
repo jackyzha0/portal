@@ -1,23 +1,28 @@
 import {useEffect, useState} from 'react'
 import {ITreeRepresentation, Registry} from '../domain/registry'
 
-const TARGET_REFRESH_RATE = 60
+const TARGET_REFRESH_RATE = 24
 const useDebouncedState = (registry: Registry) => {
   const [registryRenderableArray, setRegistryRenderableArray] = useState<ITreeRepresentation[]>([])
 
-  useEffect(() => {
-    let handler: NodeJS.Timeout
-    registry.onRerender(() => {
-      if (handler) {
-        clearTimeout(handler)
-      } else {
-        setRegistryRenderableArray(registry.getTree())
-      }
+  const update = () => {
+    setRegistryRenderableArray(registry.getTree())
+  }
 
-      handler = setTimeout(() => {
-        setRegistryRenderableArray(registry.getTree())
-      }, 1000 / TARGET_REFRESH_RATE)
+  useEffect(() => {
+    update()
+
+    const handler = setTimeout(() => {
+      update()
+    }, 1000 / TARGET_REFRESH_RATE)
+
+    registry.onRerender(() => {
+      handler.refresh()
     })
+
+    return () => {
+      clearTimeout(handler)
+    }
   }, [])
 
   return registryRenderableArray

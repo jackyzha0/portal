@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import speedometer from 'speedometer'
 
 // Helper wrappers around fs package
 export const createReadStream = (path: string) => fs.createReadStream(normalizeToSystem(path))
@@ -19,6 +20,42 @@ export const mkdir = (pathSegments: string[]) => {
       throw error
     }
   }
+}
+
+export interface IStreamPumpStats {
+  bytesPerSecond: number;
+  totalTransferred: number;
+  hasEnded: boolean;
+}
+export const pump = async (
+  readStream: NodeJS.ReadableStream,
+  writeStream: NodeJS.WritableStream,
+  statsObject: IStreamPumpStats,
+  refreshCallback: () => void
+) => {
+  // Reset statsObj entry
+  statsObject.bytesPerSecond = 0
+  statsObject.totalTransferred = 0
+  statsObject.hasEnded = false
+
+  // New pipe
+  const speed = speedometer(1)
+  readStream.pipe(writeStream)
+  return new Promise<void>((resolve, reject) => {
+    readStream
+      .on('end', () => {
+        statsObject.hasEnded = true
+        statsObject.bytesPerSecond = 0
+        resolve()
+      })
+      .on('data', (data: Buffer) => {
+        statsObject.bytesPerSecond = speed(data.length)
+        statsObject.totalTransferred += data.length
+        refreshCallback()
+      })
+      .on('error', reject)
+    writeStream.on('error', reject)
+  })
 }
 
 // Delete folder

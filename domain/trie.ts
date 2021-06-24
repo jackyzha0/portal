@@ -1,4 +1,4 @@
-import {mkdir, createReadStream, createWriteStream} from '../fs/io'
+import {mkdir, createReadStream, createWriteStream, pump, IStreamPumpStats} from '../fs/io'
 import {Registry} from './registry'
 
 // Possible trie node statuses
@@ -54,7 +54,13 @@ export class TrieNode {
   // opName: operation name for logging
   // op: operation to apply to each leaf node given the path
   // folderPreRun: operation to apply to each folder
-  async _treeOp<T>(opName: string, op: (pathSegments: string[]) => Promise<T> | undefined, folderPreRun?: (path: string[]) => void): Promise<STATUS> {
+  // ctx: shared context object for current working nodes
+  async _treeOp<T, Ctx=Map<string, IStreamPumpStats>>(
+    opName: string,
+    op: (pathSegments: string[], ctx: Ctx) => Promise<T> | undefined,
+    ctx: Ctx,
+    folderPreRun?: (path: string[]) => void
+  ): Promise<STATUS> {
     const path = this.getPath()
 
     // If folder, apply op to all files
@@ -65,7 +71,8 @@ export class TrieNode {
       }
 
       // Apply op to children children
-      const statusPromises: Array<Promise<STATUS>> = this.getChildren().map(async child => child._treeOp(opName, op, folderPreRun))
+      const statusPromises: Array<Promise<STATUS>> = this.getChildren()
+        .map(async child => child._treeOp(opName, op, ctx, folderPreRun))
       return Promise.all(statusPromises)
         .then(() => this.status = STATUS.synced)
         .catch((error: Error) => {
@@ -81,8 +88,9 @@ export class TrieNode {
     }
 
     // Single file, apply operation
-    const opResult = op(path)
-    // ignore on empty res
+    const opResult = op(path, ctx)
+
+    // Ignore on empty res
     if (!opResult) {
       return Promise.resolve(this.status)
     }
@@ -103,21 +111,21 @@ export class TrieNode {
   async download() {
     return this._treeOp(
       'download',
-      async pathSegments => {
+      async (pathSegments, ctx) => {
         if (this.registry.drive) {
           const joinedPath = pathSegments.join('/')
           const readStream = this.registry.drive.createReadStream(joinedPath)
           const writeStream = createWriteStream(joinedPath)
-          readStream.pipe(writeStream)
-
-          // TODO: make this async
-          await new Promise((resolve, reject) => {
-            readStream
-              .on('end', resolve)
-              .on('error', reject)
-          })
+          const statsObject = {
+            bytesPerSecond: 0,
+            totalTransferred: 0,
+            hasEnded: false
+          }
+          ctx.set(joinedPath, statsObject)
+          return pump(readStream, writeStream, statsObject, this.registry.refreshStats)
         }
       },
+      this.registry.stats,
       mkdir
     )
   }
@@ -126,21 +134,21 @@ export class TrieNode {
   async sync() {
     return this._treeOp(
       'sync',
-      async pathSegments => {
+      async (pathSegments, ctx) => {
         if (this.registry.drive) {
           const joinedPath = pathSegments.join('/')
           const readStream = createReadStream(joinedPath)
           const writeStream = this.registry.drive.createWriteStream(joinedPath)
-          readStream.pipe(writeStream)
-
-          // TODO: make this async
-          await new Promise((resolve, reject) => {
-            readStream
-              .on('end', resolve)
-              .on('error', reject)
-          })
+          const statsObject = {
+            bytesPerSecond: 0,
+            totalTransferred: 0,
+            hasEnded: false
+          }
+          ctx.set(joinedPath, statsObject)
+          return pump(readStream, writeStream, statsObject, this.registry.refreshStats)
         }
-      }
+      },
+      this.registry.stats
     )
   }
 }

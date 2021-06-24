@@ -10,7 +10,7 @@
 		"build": "pastel build",
 		"dev": "pastel dev",
 		"prepare": "husky install && pastel build",
-		"test": "xo --fix && ava",
+		"test": "xo && ava",
 		"lint": "xo --fix"
 	},
 	"files": [
@@ -22,16 +22,17 @@
 	"dependencies": {
 		"chokidar": "^3.5.1",
 		"hyper-sdk": "^3.0.7",
-		"import-jsx": "^4.0.0",
 		"ink": "^3.0.8",
 		"ink-select-input": "^4.2.0",
 		"ink-spinner": "^4.0.2",
 		"nanoid": "^3.1.23",
 		"parse-gitignore": "^1.0.1",
 		"pastel": "^1.1.1",
+		"pretty-bytes": "^5.6.0",
 		"prop-types": "^15.7.2",
 		"react": "^17.0.2",
-		"react-async-hook": "^3.6.2"
+		"react-async-hook": "^3.6.2",
+		"speedometer": "^1.1.0"
 	},
 	"devDependencies": {
 		"@types/parse-gitignore": "^1.0.0",
