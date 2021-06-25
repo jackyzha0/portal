@@ -11,6 +11,7 @@ export interface EventData {
   path: string;
   status: EventStatus;
   isDir: boolean;
+  newSize?: number;
 }
 
 // Callback that acts on event data
@@ -32,27 +33,32 @@ export function registerWatcher(
     persistent: true
   })
 
-  const notify = (path: string, status: EventStatus, isDir = false) => {
+  const notify = (path: string, status: EventStatus, isDir: boolean, newSize?: number) => {
     // ignore .
     if (path !== '.') {
       const normalizedPath = normalizeToHyper(path)
-      onChangeCallback({path: normalizedPath, status, isDir})
+      onChangeCallback({
+        path: normalizedPath,
+        status,
+        isDir,
+        newSize
+      })
     }
   }
 
   // Register events
   watcher
-    .on('add', path => {
-      notify(path, 'add')
+    .on('add', (path, stat) => {
+      notify(path, 'add', false, stat?.size)
     })
-    .on('change', path => {
-      notify(path, 'modify')
+    .on('change', (path, stat) => {
+      notify(path, 'modify', false, stat?.size)
     })
     .on('addDir', path => {
       notify(path, 'add', true)
     })
     .on('unlink', path => {
-      notify(path, 'delete')
+      notify(path, 'delete', false)
     })
     .on('unlinkDir', path => {
       notify(path, 'delete', true)

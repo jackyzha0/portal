@@ -10,6 +10,8 @@ export interface ITreeRepresentation {
   name: string;
   isDir: boolean;
   status: STATUS;
+  stats: IStreamPumpStats;
+  size: number;
 }
 
 // Wrapper around trie node to represent a folder and its contents
@@ -125,7 +127,9 @@ export class Registry {
         padding: indent,
         name: node.key,
         isDir: node.isDir,
-        status: node.status
+        status: node.status,
+        size: node.sizeBytes,
+        stats: node.stats
       })
       for (const child of node.getChildren()) {
         // Default to indent 2 spaces
@@ -142,11 +146,11 @@ export class Registry {
   }
 
   // Insert an entry into the registry
-  insert(pathSegments: string[], isDir = false): void {
+  insert(pathSegments: string[], isDir = false, newSize?: number): void {
     let cur = this.root
     for (const segment of pathSegments) {
       if (!cur.children[segment]) {
-        cur.children[segment] = new TrieNode(this, segment, true)
+        cur.children[segment] = new TrieNode(this, segment, true, newSize)
         cur.children[segment].parent = cur
       }
 
@@ -187,24 +191,28 @@ export class Registry {
     }, this.root)
   }
 
-  update(pathSegments: string[]) {
+  update(pathSegments: string[], newSize?: number) {
     this._debug(`updating ${pathSegments.join('/')}`)
     const modNode = this.find(pathSegments)
     if (modNode) {
+      if (newSize) {
+        modNode.sizeBytes = newSize
+      }
+
       modNode.traverse().forEach(node => node.status = STATUS.unsynced)
     }
   }
 
   // Parse event data emitted from fs watcher to modify trie
-  parseEvt({path: targetPath, status, isDir}: EventData) {
+  parseEvt({path: targetPath, status, isDir, newSize}: EventData) {
     this._debug(`parsing evt to ${status} ${targetPath}`)
     const pathSegments = targetPath.split('/')
     switch (status) {
       case 'add':
-        this.insert(pathSegments, isDir)
+        this.insert(pathSegments, isDir, newSize)
         break
       case 'modify':
-        this.update(pathSegments)
+        this.update(pathSegments, newSize)
         break
       case 'delete':
         this.remove(pathSegments, isDir)

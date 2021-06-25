@@ -170,14 +170,14 @@ test('getTree() - empty', t => {
 test('getTree() - heavily nested', t => {
   const r = t.context.reg
   complexTree(r)
-  t.deepEqual(r.getTree(), [
-    {padding: 0, name: 'a', isDir: true, status: STATUS.unsynced},
-    {padding: 2, name: 'b', isDir: true, status: STATUS.unsynced},
-    {padding: 4, name: 'c.txt', isDir: false, status: STATUS.unsynced},
-    {padding: 4, name: 'd.txt', isDir: false, status: STATUS.unsynced},
-    {padding: 4, name: 'e', isDir: true, status: STATUS.unsynced},
-    {padding: 6, name: 'f.txt', isDir: false, status: STATUS.unsynced},
-    {padding: 2, name: 'g.txt', isDir: false, status: STATUS.unsynced},
-    {padding: 0, name: 'h.txt', isDir: false, status: STATUS.unsynced}
+  t.deepEqual(r.getTree().map(node => node.name), [
+    'a',
+    'b',
+    'c.txt',
+    'd.txt',
+    'e',
+    'f.txt',
+    'g.txt',
+    'h.txt',
   ])
 })

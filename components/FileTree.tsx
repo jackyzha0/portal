@@ -1,5 +1,6 @@
 import React from 'react'
-import {Box, Text} from 'ink'
+import {Box, Spacer, Text} from 'ink'
+import prettyBytes from 'pretty-bytes'
 import {ITreeRepresentation} from '../domain/registry'
 import {STATUS} from '../domain/trie'
 
@@ -42,10 +43,12 @@ const FileTree = ({registry}: IFileTreeProps) => {
       {registry.length > 0 ? registry.map((file, i) => (
         <Box key={`${file.name}_${i}`}>
           <StatusIndicator status={file.status}/>
-          <Box paddingLeft={file.padding + 1}>
-            <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir}>
+          <Box paddingLeft={file.padding + 1} width="100%">
+            <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir} wrap="truncate-end">
               {file.name}
             </Text>
+            <Spacer/>
+            <Text>{file.isDir ? '' : prettyBytes(file.size)}</Text>
           </Box>
         </Box>
       )) : <Text color="yellow">No files found</Text>}

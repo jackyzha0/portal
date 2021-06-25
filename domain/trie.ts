@@ -16,15 +16,17 @@ export class TrieNode {
   isDir: boolean
   status: STATUS
   stats: IStreamPumpStats
+  sizeBytes: number
   private readonly registry: Registry
 
-  constructor(registry: Registry, key: string, isDir = false) {
+  constructor(registry: Registry, key: string, isDir = false, newSize?: number) {
     this.key = key
     this.parent = null
     this.children = {}
     this.registry = registry
     this.status = STATUS.unsynced
     this.isDir = isDir
+    this.sizeBytes = newSize ?? 0
     this.stats = {
       bytesPerSecond: 0,
       totalTransferred: 0,
