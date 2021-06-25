@@ -43,10 +43,12 @@ const FileTree = ({registry}: IFileTreeProps) => {
       {registry.length > 0 ? registry.map((file, i) => (
         <Box key={`${file.name}_${i}`}>
           <StatusIndicator status={file.status}/>
-          <Box paddingLeft={file.padding + 1} width="100%">
-            <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir} wrap="truncate-end">
-              {file.name}
-            </Text>
+          <Box width="100%" paddingLeft={file.padding + 1}>
+            <Box width="80%">
+              <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir} wrap="truncate">
+                {file.name}
+              </Text>
+            </Box>
             <Spacer/>
             <Text>{file.isDir ? '' : prettyBytes(file.size)}</Text>
           </Box>

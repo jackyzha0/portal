@@ -1,6 +1,5 @@
 import anyTest, {ExecutionContext, TestInterface} from 'ava'
 import {Registry} from '../domain/registry'
-import {STATUS} from '../domain/trie'
 
 // Helpers
 const test = anyTest as TestInterface<{reg: Registry}>
@@ -178,6 +177,6 @@ test('getTree() - heavily nested', t => {
     'e',
     'f.txt',
     'g.txt',
-    'h.txt',
+    'h.txt'
   ])
 })
