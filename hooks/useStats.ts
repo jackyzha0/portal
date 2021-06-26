@@ -1,12 +1,12 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {Registry} from '../domain/registry'
 
 const useStats = (registry: Registry) => {
   const [totalBytes, setTotalBytes] = useState(0)
   const [lastBps, setLastBps] = useState<number[]>([])
-  const appendBps = (value: number) => {
+  const appendBps = useCallback((value: number) => {
     setLastBps(previous => [...previous, value].slice(-5))
-  }
+  }, [])
 
   useEffect(() => {
     let stale = true
