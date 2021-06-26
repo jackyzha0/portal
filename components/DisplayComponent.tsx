@@ -1,4 +1,5 @@
 import React from 'react'
+import {Box} from 'ink'
 import Loader from './Loader'
 
 interface IDisplayComponentProps {
@@ -10,7 +11,7 @@ interface IDisplayComponentProps {
 const DisplayComponent = ({loading, loadingMessage, children}: IDisplayComponentProps) => {
   return loading ?
     <Loader status={loadingMessage}/> :
-    children
+    <Box flexDirection="column">{children}</Box>
 }
 
 export default DisplayComponent

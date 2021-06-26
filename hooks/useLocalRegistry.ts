@@ -31,6 +31,7 @@ const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, 
         }, ignoreGitFiles)
       return () => {
         localRegistry.removeSubscriber('eventLogPublish')
+        localRegistry.nuke()
       }
     }
   }, [eventLog])

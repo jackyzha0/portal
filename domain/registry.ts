@@ -279,4 +279,14 @@ export class Registry {
     })
     return this
   }
+
+  nuke() {
+    this._debug('nuking current registry')
+    this.drive = undefined
+    this.errorCallback = () => {}
+    this.rerender = () => {}
+    this.refreshStats = () => {}
+    this.subscribers.clear()
+    this.stats.clear()
+  }
 }

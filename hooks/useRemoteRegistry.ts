@@ -23,6 +23,9 @@ const useRemoteRegistry = (dir: string, eventLog: Hypercore<string> | undefined,
       remoteRegistry.subscribeRemote(eventLog, () => {
         setLoading(false)
       })
+      return () => {
+        remoteRegistry.nuke()
+      }
     }
   }, [eventLog, isPaused])
 

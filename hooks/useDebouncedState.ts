@@ -22,6 +22,7 @@ const useDebouncedState = (registry: Registry) => {
 
     return () => {
       clearTimeout(handler)
+      registry.onRerender(() => {})
     }
   }, [])
 
