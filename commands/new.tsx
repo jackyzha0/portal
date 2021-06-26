@@ -1,16 +1,16 @@
 import React from 'react'
 import {Box} from 'ink'
 import PropTypes from 'prop-types'
-import useHyper from '../hooks/useHyper'
 import {SessionInfo} from '../components/SessionInfo'
 import FileTree from '../components/FileTree'
-import Loader from '../components/Loader'
 import Errors from '../components/Errors'
-import CommandWrapper from '../components/CommandWrapper'
 import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
 import Hotkeys from '../components/Hotkeys'
 import Stats from '../components/Stats'
+import DisplayComponent from '../components/DisplayComponent'
+import {AppContextProvider} from '../contexts/App'
+import useHyper from '../hooks/useHyper'
 
 interface IHostProps {
   dir: string;
@@ -27,31 +27,21 @@ const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
     localRegistry,
     registryRenderableArray,
     stats
-  } = useLocalRegistry(dir, hyper?.hyperObj?.eventLog, !includeGitFiles, verbose)
-  useDriveSync(dir, localRegistry, hyper?.hyperObj?.drive)
-
-  const DisplayComponent = () => {
-    if (loading) {
-      return <Loader status={`Scanning directory... ${registryRenderableArray.length} files found`}/>
-    }
-
-    return (
-      <>
-        <FileTree registry={registryRenderableArray}/>
-        <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
-      </>
-    )
-  }
+  } = useLocalRegistry(dir, hyper.hyperObj?.eventLog, !includeGitFiles, verbose)
+  useDriveSync(dir, localRegistry, hyper.hyperObj?.drive)
 
   return (
-    <CommandWrapper error={hyper.error} loading={hyper.loading}>
+    <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
-        <DisplayComponent/>
+        <DisplayComponent loading={loading} loadingMessage={`Scanning directory... ${registryRenderableArray.length} files found`}>
+          <FileTree registry={registryRenderableArray}/>
+          <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+        </DisplayComponent>
         <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
-        <Hotkeys/>
+        <Hotkeys close={hyper.hyperObj?.close}/>
         <Errors errors={errors}/>
       </Box>
-    </CommandWrapper>
+    </AppContextProvider>
   )
 }
 

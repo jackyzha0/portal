@@ -6,13 +6,13 @@ import useHyper from '../hooks/useHyper'
 import {SessionInfo} from '../components/SessionInfo'
 import FileTree from '../components/FileTree'
 import Errors from '../components/Errors'
-import CommandWrapper from '../components/CommandWrapper'
 import {isEmpty} from '../fs/io'
-import Loader from '../components/Loader'
 import useRemoteRegistry from '../hooks/useRemoteRegistry'
 import useDriveDownload from '../hooks/useDriveDownload'
 import Hotkeys from '../components/Hotkeys'
 import Stats from '../components/Stats'
+import DisplayComponent from '../components/DisplayComponent'
+import {AppContextProvider} from '../contexts/App'
 
 interface IClientProps {
   dir: string;
@@ -33,8 +33,8 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
     remoteRegistry,
     registryRenderableArray,
     stats
-  } = useRemoteRegistry(dir, hyper?.hyperObj?.eventLog, verbose, isPaused)
-  useDriveDownload(dir, remoteRegistry, hyper?.hyperObj?.drive)
+  } = useRemoteRegistry(dir, hyper.hyperObj?.eventLog, verbose, isPaused)
+  useDriveDownload(dir, remoteRegistry, hyper.hyperObj?.drive)
 
   // Warning text for trying to sync in a non-empty directory
   if (isPaused) {
@@ -69,28 +69,18 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
     )
   }
 
-  const DisplayComponent = () => {
-    if (remoteLoading) {
-      return <Loader status="Syncing remote hyperspace..."/>
-    }
-
-    return (
-      <>
-        <FileTree registry={registryRenderableArray}/>
-        <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
-      </>
-    )
-  }
-
   return (
-    <CommandWrapper error={hyper.error} loading={hyper.loading}>
+    <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
-        <DisplayComponent/>
+        <DisplayComponent loading={remoteLoading} loadingMessage="Syncing remote hyperspace...">
+          <FileTree registry={registryRenderableArray}/>
+          <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+        </DisplayComponent>
         <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
-        <Hotkeys/>
+        <Hotkeys close={hyper.hyperObj?.close}/>
         <Errors errors={errors}/>
       </Box>
-    </CommandWrapper>
+    </AppContextProvider>
   )
 }
 

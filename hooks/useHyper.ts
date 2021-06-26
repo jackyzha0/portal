@@ -9,8 +9,21 @@ export interface IGenesisBlock {
   key: string;
 }
 
+export interface IHyperObject {
+  eventLog: Hypercore<string>;
+  drive: Hyperdrive;
+  close: () => Promise<void>;
+}
+
+export interface IHyper {
+  numConnected: number;
+  hyperObj?: IHyperObject;
+  error: string | undefined;
+  loading: boolean;
+}
+
 // Hook to initialize hyperspace related items (corestore, eventlog feed, hyperdrive)
-const useHyper = (key?: string) => {
+const useHyper = (key?: string): IHyper => {
   const [peers, setPeers] = useState<string[]>([])
 
   const asyncHyper = useAsync(async () => {
@@ -23,7 +36,8 @@ const useHyper = (key?: string) => {
     })
     const {
       Hypercore: newHypercore,
-      Hyperdrive: newHyperdrive
+      Hyperdrive: newHyperdrive,
+      close
     } = hyper
 
     let eventLog: Hypercore<string>
@@ -80,7 +94,8 @@ const useHyper = (key?: string) => {
 
     return {
       eventLog,
-      drive
+      drive,
+      close
     }
   }, [])
 
