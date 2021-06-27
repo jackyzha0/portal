@@ -1,11 +1,13 @@
 {
-	"name": "portal",
-	"version": "1.0.0",
-	"description": "A p2p folder syncing tool build on top of the hypercore protocol",
+	"name": "portal-sync",
+	"version": "0.0.0",
+	"description": "A p2p folder syncing tool build on top of the Hypercore protocol",
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
 	"license": "MIT",
-	"bin": "./build/cli.js",
+	"bin": {
+		"portal": "./build/cli.js"
+	},
 	"scripts": {
 		"build": "pastel build",
 		"dev": "pastel dev",
