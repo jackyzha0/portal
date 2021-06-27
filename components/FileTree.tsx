@@ -46,50 +46,47 @@ interface IFileTreeProps {
   full: boolean;
 }
 
+const FullTreeFile = ({file}: {file: ITreeRepresentation}) => (
+  <Box>
+    <StatusIndicator status={file.status}/>
+    <Box width="100%" paddingLeft={file.padding + 1}>
+      <Box width="80%">
+        <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir} wrap="truncate">
+          {file.name}
+        </Text>
+      </Box>
+      <Spacer/>
+      <Text>{file.isDir ? '' : prettyBytes(file.size)}</Text>
+    </Box>
+  </Box>
+)
+
+const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
+  <Box>
+    <Box width="100%" paddingLeft={file.padding}>
+      <Box width="80%">
+        <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir || !isFileQueued(file)} wrap="truncate">
+          {file.name}
+        </Text>
+      </Box>
+      <Spacer/>
+      <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred / file.size)} of ${prettyBytes(file.size)}`}</Text>
+    </Box>
+  </Box>
+)
+
 // File tree display component
 const FileTree = ({registry, full}: IFileTreeProps) => {
-  // Full file tree display
-  if (full) {
-    return (
-      <Box flexDirection="column" marginY={1}>
-        <Text bold>Files</Text>
-        {registry.length > 0 ? registry.map((file, i) => (
-          <Box key={`${file.name}_${i}`}>
-            <StatusIndicator status={file.status}/>
-            <Box width="100%" paddingLeft={file.padding + 1}>
-              <Box width="80%">
-                <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir} wrap="truncate">
-                  {file.name}
-                </Text>
-              </Box>
-              <Spacer/>
-              <Text>{file.isDir ? '' : prettyBytes(file.size)}</Text>
-            </Box>
-          </Box>
-        )) : <Text color="yellow">No files found</Text>}
-        <Legend/>
-      </Box>
-    )
-  }
-
-  // Truncated representation
-  const displayedFiles = registry.filter(file => file.status !== STATUS.synced)
+  const emptyMessage = full ?
+    <Text color="yellow">No files found</Text> :
+    <Text bold color="green">All files synced</Text>
+  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced)
   return (
     <Box flexDirection="column" marginY={1}>
       <Text bold>Files</Text>
-      {displayedFiles.length > 0 ? displayedFiles.map((file, i) => (
-        <Box key={`${file.name}_${i}`}>
-          <Box width="100%" paddingLeft={file.padding}>
-            <Box width="80%">
-              <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir || !isFileQueued(file)} wrap="truncate">
-                {file.name}
-              </Text>
-            </Box>
-            <Spacer/>
-            <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred / file.size)} of ${prettyBytes(file.size)}`}</Text>
-          </Box>
-        </Box>
-      )) : <Text bold color="green">All files synced</Text>}
+      {files.length > 0 ? files.map((file, i) => (
+        full ? <FullTreeFile key={i} file={file}/> : <TruncatedTreeFile key={i} file={file}/>
+      )) : emptyMessage}
       {full && <Legend/>}
     </Box>
   )
