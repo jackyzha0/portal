@@ -16,11 +16,11 @@ const Stats = ({totalBytes, bytesPerSecond, registry}: IStatsProps) => {
     <Box marginBottom={1} flexDirection="column">
       <Text>
         <Text bold color="blue">Discovered {registry.length} files </Text>
-        <Text>({synced}/{registry.length} synced)</Text>
+        <Text>({synced} synced)</Text>
       </Text>
       <Text>
         <Text bold>Throughput: </Text>
-        <Text>{prettyBytes(bytesPerSecond)}/s, {prettyBytes(totalBytes)} total</Text>
+        <Text>{prettyBytes(bytesPerSecond)}/s, {prettyBytes(totalBytes)} transferred</Text>
       </Text>
     </Box>
   )

@@ -32,6 +32,7 @@ export class TrieNode {
     this.isDir = isDir
     this.sizeBytes = newSize ?? 0
     this.stats = {
+      numTransfers: 0,
       bytesPerSecond: 0,
       totalTransferred: 0,
       hasEnded: false

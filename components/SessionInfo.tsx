@@ -10,6 +10,6 @@ interface ISessionInfoProps {
 export const SessionInfo = ({sessionId, numConnected}: ISessionInfoProps) => (
   <>
     <Text bold>Session ID ({numConnected} {numConnected === 1 ? 'peer' : 'peers'} connected)</Text>
-    <Text>{sessionId}</Text>
+    <Text color="green">{sessionId}</Text>
   </>
 )

@@ -73,11 +73,11 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
   return (
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
+        <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
         <DisplayComponent loading={remoteLoading} loadingMessage="Syncing remote hyperspace...">
-          {tree && <FileTree registry={registryRenderableArray}/>}
+          <FileTree registry={registryRenderableArray} full={tree}/>
           <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
         </DisplayComponent>
-        <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
         <Hotkeys close={hyper.hyperObj?.close}/>
         <Errors errors={errors}/>
       </Box>
@@ -98,7 +98,7 @@ Client.propTypes = {
   /// Verbose mode
   verbose: PropTypes.bool,
 
-  /// Show file tree
+  /// Show full folder file tree
   tree: PropTypes.bool
 }
 Client.shortFlags = {

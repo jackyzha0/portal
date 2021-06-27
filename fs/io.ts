@@ -26,6 +26,7 @@ export interface IStreamPumpStats {
   bytesPerSecond: number;
   totalTransferred: number;
   hasEnded: boolean;
+  numTransfers: number
 }
 export const pump = async (
   readStream: NodeJS.ReadableStream,
@@ -37,6 +38,7 @@ export const pump = async (
   statsObject.bytesPerSecond = 0
   statsObject.totalTransferred = 0
   statsObject.hasEnded = false
+  statsObject.numTransfers = 0
 
   // New pipe
   const speed = speedometer(1)
@@ -51,6 +53,7 @@ export const pump = async (
       .on('data', (data: Buffer) => {
         statsObject.bytesPerSecond = speed(data.length)
         statsObject.totalTransferred += data.length
+        statsObject.numTransfers++
         refreshCallback()
       })
       .on('error', reject)

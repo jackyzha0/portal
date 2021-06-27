@@ -34,11 +34,11 @@ const Host = ({dir, includeGitFiles, verbose, tree}: IHostProps) => {
   return (
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
+        <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <DisplayComponent loading={loading} loadingMessage={`Scanning directory... ${registryRenderableArray.length} files found`}>
-          {tree && <FileTree registry={registryRenderableArray}/>}
+          <FileTree registry={registryRenderableArray} full={tree}/>
           <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
         </DisplayComponent>
-        <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <Hotkeys close={hyper.hyperObj?.close}/>
         <Errors errors={errors}/>
       </Box>
@@ -56,7 +56,7 @@ Host.propTypes = {
   /// Verbose mode
   verbose: PropTypes.bool,
 
-  /// Show file tree
+  /// Show full folder file tree
   tree: PropTypes.bool
 }
 Host.shortFlags = {
