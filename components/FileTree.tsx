@@ -36,8 +36,9 @@ const Legend = () => (
 const isFileQueued = (file: ITreeRepresentation) => {
   return file.status === STATUS.waitingForRemote || (file.stats.numTransfers === 1 && !file.stats.hasEnded)
 }
-const fmtPercentage = (num: number) => {
-  return `${(num * 100).toFixed(2)}%`
+
+const fmtPercentage = (number: number) => {
+  return `${(number * 100).toFixed(2)}%`
 }
 
 interface IFileTreeProps {
@@ -47,7 +48,7 @@ interface IFileTreeProps {
 
 // File tree display component
 const FileTree = ({registry, full}: IFileTreeProps) => {
-  // full file tree display
+  // Full file tree display
   if (full) {
     return (
       <Box flexDirection="column" marginY={1}>
@@ -71,7 +72,7 @@ const FileTree = ({registry, full}: IFileTreeProps) => {
     )
   }
 
-  // truncated representation
+  // Truncated representation
   const displayedFiles = registry.filter(file => file.status !== STATUS.synced)
   return (
     <Box flexDirection="column" marginY={1}>
@@ -85,10 +86,10 @@ const FileTree = ({registry, full}: IFileTreeProps) => {
               </Text>
             </Box>
             <Spacer/>
-            <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred/file.size)} of ${prettyBytes(file.size)}`}</Text>
+            <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred / file.size)} of ${prettyBytes(file.size)}`}</Text>
           </Box>
         </Box>
-      )) : <Text color="green" bold>All files synced</Text>}
+      )) : <Text bold color="green">All files synced</Text>}
       {full && <Legend/>}
     </Box>
   )

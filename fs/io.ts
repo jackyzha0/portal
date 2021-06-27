@@ -26,7 +26,7 @@ export interface IStreamPumpStats {
   bytesPerSecond: number;
   totalTransferred: number;
   hasEnded: boolean;
-  numTransfers: number
+  numTransfers: number;
 }
 export const pump = async (
   readStream: NodeJS.ReadableStream,

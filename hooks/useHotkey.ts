@@ -1,13 +1,13 @@
 import {promisify} from 'util'
 import {useApp, useInput} from 'ink'
-import {useState} from 'react'
+import {useAppContext} from '../contexts/App'
 
 const useHotkey = (close: undefined | (() => void)) => {
   const {exit} = useApp()
-  const [quitting, setQuitting] = useState(false)
+  const {setClosed} = useAppContext()
   useInput((input, key) => {
     if (input === 'q' || key.escape) {
-      setQuitting(true)
+      setClosed()
       exit()
       if (close) {
         promisify(close)().finally(() => process.exit())
@@ -16,8 +16,6 @@ const useHotkey = (close: undefined | (() => void)) => {
       }
     }
   })
-
-  return quitting
 }
 
 export default useHotkey

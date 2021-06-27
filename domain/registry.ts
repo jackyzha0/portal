@@ -13,6 +13,8 @@ export interface ITreeRepresentation {
   size: number;
 }
 
+export const noop = () => {}
+
 // Wrapper around trie node to represent a folder and its contents
 export class Registry {
   // Remote hyperdrive to sync up to, won't sync if undefined
@@ -32,9 +34,9 @@ export class Registry {
     this.DEBUG = debug
     this.root = new TrieNode(this, '')
     this.drive = undefined
-    this.errorCallback = () => {}
-    this.rerender = () => {}
-    this.refreshStats = () => {}
+    this.errorCallback = noop
+    this.rerender = noop
+    this.refreshStats = noop
     this.subscribers = new Map()
     this.stats = new Map<string, IStreamPumpStats>()
   }
@@ -93,18 +95,6 @@ export class Registry {
   setDrive(drive: Hyperdrive) {
     this.drive = drive
     return this
-  }
-
-  // Sync all nodes to remote
-  sync() {
-    this._debug('syncing registry to remote')
-    return this.root.getChildren().map(async child => child.sync())
-  }
-
-  // Download all files to cwd
-  download() {
-    this._debug('syncing downloading files from remote')
-    return this.root.getChildren().map(async child => child.download())
   }
 
   // Get number of nodes in registry
@@ -285,9 +275,9 @@ export class Registry {
   nuke() {
     this._debug('nuking current registry')
     this.drive = undefined
-    this.errorCallback = () => {}
-    this.rerender = () => {}
-    this.refreshStats = () => {}
+    this.errorCallback = noop
+    this.rerender = noop
+    this.refreshStats = noop
     this.subscribers.clear()
     this.stats.clear()
   }

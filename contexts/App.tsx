@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useMemo} from 'react'
+import React, {createContext, useContext, useMemo, useState} from 'react'
 import {Text} from 'ink'
 import Loader from '../components/Loader'
 import Hotkeys from '../components/Hotkeys'
@@ -7,9 +7,13 @@ import {IHyper, IHyperObject} from '../hooks/useHyper'
 interface IAppContextProps {
   hyperObj?: IHyperObject;
   numConnected: number;
+  closed: boolean;
+  setClosed: () => void;
 }
 const AppContext = createContext<IAppContextProps>({
-  numConnected: 0
+  numConnected: 0,
+  closed: false,
+  setClosed: () => {}
 })
 
 export const useAppContext = () => useContext(AppContext)
@@ -18,9 +22,14 @@ interface IAppContextProviderProps {
   hyper: IHyper;
 }
 export const AppContextProvider = ({children, hyper}: IAppContextProviderProps) => {
+  const [closed, setClosed] = useState(false)
   const contextValue = useMemo(() => ({
     hyperObj: hyper.hyperObj,
-    numConnected: hyper.numConnected
+    numConnected: hyper.numConnected,
+    closed,
+    setClosed: () => {
+      setClosed(true)
+    }
   }), [hyper])
 
   if (hyper.loading) {
