@@ -5,6 +5,11 @@
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
 	"license": "MIT",
+	"homepage": "https://github.com/jackyzha0/portal#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jackyzha0/portal.git"
+	},
 	"bin": {
 		"portal": "./build/cli.js"
 	},
