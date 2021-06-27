@@ -1,7 +1,6 @@
 import {Hypercore, Hyperdrive} from 'hyper-sdk'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'
 import {IStreamPumpStats} from '../fs/io'
-import {IStatsProps} from '../components/Stats'
 import {STATUS, TrieNode} from './trie'
 
 // Interface representation of renderable version of registry
@@ -40,7 +39,7 @@ export class Registry {
     this.stats = new Map<string, IStreamPumpStats>()
   }
 
-  getStats(): IStatsProps {
+  getStats() {
     return [...this.stats.values()].reduce((total, status) => {
       total.totalBytes += status.totalTransferred
       if (!status.hasEnded) {
@@ -154,6 +153,7 @@ export class Registry {
         cur.children[segment].parent = cur
       }
 
+      cur.status = STATUS.unsynced
       cur = cur.children[segment]
     }
 

@@ -4,6 +4,8 @@ import {Registry} from './registry'
 // Possible trie node statuses
 export enum STATUS {
   unsynced,
+  syncing,
+  waitingForRemote,
   error,
   synced
 }
@@ -58,6 +60,16 @@ export class TrieNode {
     return Object.values(this.children)
   }
 
+  _updateParentStates() {
+    this.status = STATUS.synced
+    this.traverse().forEach(node => {
+      if (node.getChildren().every(child => child.status === STATUS.synced)) {
+        node.status = STATUS.synced
+      }
+    })
+    return this.status
+  }
+
   // Generic tree operation over all unsynced nodes
   // opName: operation name for logging
   // op: operation to apply to each leaf node given the path
@@ -82,7 +94,7 @@ export class TrieNode {
       const statusPromises: Array<Promise<STATUS>> = this.getChildren()
         .map(async child => child._treeOp(opName, op, ctx, folderPreRun))
       return Promise.all(statusPromises)
-        .then(() => this.status = STATUS.synced)
+        .then(() => this._updateParentStates())
         .catch((error: Error) => {
           this.registry.errorCallback(`[${opName}]: ${error.message}`)
           this.status = STATUS.error
@@ -105,7 +117,7 @@ export class TrieNode {
 
     // Resolve promise
     return opResult
-      .then(() => this.status = STATUS.synced)
+      .then(() => this._updateParentStates())
       .catch((error: Error) => {
         this.registry.errorCallback(`[${opName}]: ${error.message}`)
         // Propagate up
