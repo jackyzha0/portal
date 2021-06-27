@@ -1,11 +1,12 @@
 import {useCallback, useEffect, useState} from 'react'
 import {Registry} from '../domain/registry'
 
+const BUF_LENGTH = 5
 const useStats = (registry: Registry) => {
   const [totalBytes, setTotalBytes] = useState(0)
   const [lastBps, setLastBps] = useState<number[]>([])
   const appendBps = useCallback((value: number) => {
-    setLastBps(previous => [...previous, value].slice(-5))
+    setLastBps(previous => [...previous, value].slice(-BUF_LENGTH))
   }, [])
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const useStats = (registry: Registry) => {
   }, [])
 
   return {
-    bytesPerSecond: lastBps.reduce((total, cur) => total + cur, 0) / 5,
+    bytesPerSecond: lastBps.reduce((total, cur) => total + cur, 0) / BUF_LENGTH,
     totalBytes
   }
 }

@@ -7,7 +7,6 @@ const useDriveSync = (dir: string, registry: Registry, drive: Hyperdrive | undef
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)
-      registry.sync()
       registry.addSubscriber('driveSync', data => {
         const segments = data.path.split('/')
         const node = registry.find(segments)

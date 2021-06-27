@@ -2,8 +2,6 @@
 A two-way p2p folder syncing tool build on top of the [Hypercore protocol](https://hypercore-protocol.org/).
 
 ## TODO:
-- [ ] impl states for uploading/waiting for remote to upload
-    - [ ] add retry/backoff to remote to upload
 - [ ] unix piping
 - [ ] tests :((
     - [ ] hooks → https://github.com/testing-library/react-hooks-testing-library

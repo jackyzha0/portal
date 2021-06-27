@@ -8,7 +8,6 @@ const useDriveDownload = (dir: string, registry: Registry, drive: Hyperdrive | u
   useEffect(() => {
     if (registry && drive) {
       registry.setDrive(drive)
-      registry.download()
       registry.addSubscriber('driveDownload', data => {
         const segments = data.path.split('/')
         if (data.status === 'add' || data.status === 'modify') {

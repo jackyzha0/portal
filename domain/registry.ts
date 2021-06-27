@@ -153,7 +153,7 @@ export class Registry {
         cur.children[segment].parent = cur
       }
 
-      cur.status = STATUS.unsynced
+      cur.markUnsynced()
       cur = cur.children[segment]
     }
 
@@ -199,7 +199,9 @@ export class Registry {
         modNode.sizeBytes = newSize
       }
 
-      modNode.traverse().forEach(node => node.status = STATUS.unsynced)
+      modNode.traverse().forEach(node => {
+        node.markUnsynced()
+      })
     }
   }
 

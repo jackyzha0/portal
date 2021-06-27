@@ -1,3 +1,4 @@
+import {backOff} from 'exponential-backoff'
 import {mkdir, createReadStream, createWriteStream, pump, IStreamPumpStats} from '../fs/io'
 import {Registry} from './registry'
 
@@ -19,6 +20,7 @@ export class TrieNode {
   status: STATUS
   stats: IStreamPumpStats
   sizeBytes: number
+  error: string | undefined
   private readonly registry: Registry
 
   constructor(registry: Registry, key: string, isDir = false, newSize?: number) {
@@ -48,6 +50,12 @@ export class TrieNode {
     }
 
     return output
+  }
+
+  markUnsynced() {
+    if (this.status === STATUS.synced) {
+      this.status = this.isDir ? STATUS.syncing : STATUS.unsynced
+    }
   }
 
   // Return full path to this node
@@ -96,7 +104,7 @@ export class TrieNode {
       return Promise.all(statusPromises)
         .then(() => this._updateParentStates())
         .catch((error: Error) => {
-          this.registry.errorCallback(`[${opName}]: ${error.message}`)
+          this.error = error.message
           this.status = STATUS.error
           return this.status
         })
@@ -119,9 +127,11 @@ export class TrieNode {
     return opResult
       .then(() => this._updateParentStates())
       .catch((error: Error) => {
-        this.registry.errorCallback(`[${opName}]: ${error.message}`)
+        this.error = error.message
+        this.registry.errorCallback(error.message)
+
         // Propagate up
-        this.traverse().forEach(node => node.status = STATUS.unsynced)
+        this.traverse().forEach(node => node.status = STATUS.error)
         this.status = STATUS.error
         return this.status
       })
@@ -134,15 +144,23 @@ export class TrieNode {
       async (pathSegments, ctx) => {
         if (this.registry.drive) {
           const joinedPath = pathSegments.join('/')
-          const readStream = this.registry.drive.createReadStream(joinedPath)
-          const writeStream = createWriteStream(joinedPath)
-          const statsObject = {
-            bytesPerSecond: 0,
-            totalTransferred: 0,
-            hasEnded: false
-          }
-          ctx.set(joinedPath, statsObject)
-          return pump(readStream, writeStream, statsObject, this.registry.refreshStats)
+          const {drive} = this.registry
+          return backOff(async () => {
+            const readStream = drive.createReadStream(joinedPath)
+            const writeStream = createWriteStream(joinedPath)
+            ctx.set(joinedPath, this.stats)
+            this.status = STATUS.syncing
+            return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
+          }, {
+            startingDelay: 500,
+            retry: (error: Error, i) => {
+              // If we fail to read stream from hyperdrive, most likely file is not
+              // uploaded yet
+              this.registry._debug(`[download] retry ${joinedPath} for the ${i} time: ${error.message}`)
+              this.status = STATUS.waitingForRemote
+              return true
+            }
+          })
         }
       },
       this.registry.stats,
@@ -160,6 +178,7 @@ export class TrieNode {
           const readStream = createReadStream(joinedPath)
           const writeStream = this.registry.drive.createWriteStream(joinedPath)
           ctx.set(joinedPath, this.stats)
+          this.status = STATUS.syncing
           return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
         }
       },

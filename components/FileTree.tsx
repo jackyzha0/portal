@@ -15,9 +15,11 @@ const StatusIndicator = ({status}: IStatusIndicatorProps) => {
       return <Text color="green">█</Text>
     case STATUS.error:
       return <Text color="red">█</Text>
+    case STATUS.syncing:
+      return <Text color="yellow">█</Text>
     case STATUS.unsynced:
     default:
-      return <Text color="yellow">█</Text>
+      return <Text>█</Text>
   }
 }
 
@@ -25,8 +27,9 @@ const Legend = () => (
   <Box marginTop={1}>
     <Text bold>Legend:</Text>
     <Text color="green"> █ Synced </Text>
-    <Text color="yellow">█ Unsynced </Text>
+    <Text color="yellow">█ Syncing </Text>
     <Text color="red">█ Error </Text>
+    <Text>█ Unsynced </Text>
   </Box>
 )
 
