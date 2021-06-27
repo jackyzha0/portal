@@ -4,7 +4,7 @@ import pkg from '../package.json'
 
 const useUpdateNotify = () => {
   useEffect(() => {
-    updateNotifier({pkg}).notify()
+    updateNotifier({pkg}).notify({isGlobal: true})
   }, [])
 }
 

@@ -45,7 +45,7 @@ export const AppContextProvider = ({children, hyper}: IAppContextProviderProps) 
           <Text color="red">Error connecting to hypercore: </Text>
           <Text>{hyper.error}</Text>
         </Text>
-        <Hotkeys close={hyper.hyperObj?.close}/>
+        <Hotkeys/>
       </>
     )
   }

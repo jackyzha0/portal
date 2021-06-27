@@ -78,7 +78,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
           <FileTree registry={registryRenderableArray} full={tree}/>
           <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
         </DisplayComponent>
-        <Hotkeys close={hyper.hyperObj?.close}/>
+        <Hotkeys/>
         <Errors errors={errors}/>
       </Box>
     </AppContextProvider>

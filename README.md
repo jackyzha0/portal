@@ -1,15 +1,19 @@
+![Banner](assets/logo.png)
+---
+
 # portal
 A two-way p2p folder syncing tool build on top of the [Hypercore protocol](https://hypercore-protocol.org/).
 
-## TODO:
-- [ ] tests :((
-    - [ ] hooks → https://github.com/testing-library/react-hooks-testing-library
-    - [ ] components → https://github.com/vadimdemedes/ink-testing-library
-    - [ ] registry → regular ava
-- [ ] packaging + redistribution
-    - [ ] update notifier: https://www.npmjs.com/package/update-notifier
-- [ ] write readme
-    - [ ] demo video
+## Installation
+```shell
+$ npm install --global portal-sync
+
+# Start using portal
+$ portal new
+
+# or 
+$ portal join [sessionID]
+```
 
 ## Features
 read/write streams for files of arbitrary size

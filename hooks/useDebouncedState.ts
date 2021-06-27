@@ -11,7 +11,6 @@ const useDebouncedState = (registry: Registry) => {
 
   useEffect(() => {
     update()
-
     const handler = setTimeout(() => {
       update()
     }, 1000 / TARGET_REFRESH_RATE)
