@@ -1,6 +1,6 @@
 {
 	"name": "portal-sync",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"description": "A p2p folder syncing tool build on top of the Hypercore protocol",
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
