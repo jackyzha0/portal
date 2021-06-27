@@ -1,7 +1,7 @@
 ![Banner](assets/logo.png)
 
 # portal
-Peer-to-peer encrypted live folder syncing that respects your `.gitignore`. Not the 2007 video game.
+Zero-config peer-to-peer encrypted live folder syncing that respects your `.gitignore`. Not the 2007 video game.
 
 Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, zero-manifest, and decentralized.
 
@@ -9,7 +9,7 @@ Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with e
 <p align="center">
   <img alt="Uploading Files" src="assets/upload-demo.gif" width="45%">
 &nbsp; &nbsp; &nbsp; &nbsp;
-  <img alt="Downloading Files" src="assets/upload-demo.gif" width="45%">
+  <img alt="Downloading Files" src="assets/download-demo.gif" width="45%">
 </p>
 
 ## Installation
@@ -34,14 +34,13 @@ $ portal join [sessionID]
 
 
 ## Architecture
-![Project Architecture](assets/architecture.jpeg)
+![Project Architecture](assets/architecture.jpg)
 
-Portal relies on a publish-subscribe event model to achieve
-Trie
+### Publish-subscribe Model
+Portal relies on a publish-subscribe event model to drive its render and update cycles. File tree structure and individual file statuses are stored in a trie structure known as the Registry. On the host side, there is a local Registry that listens to file changes on the host machine and broadcasts them to an append-only [Hypercore](https://hypercore-protocol.org/protocol/#hypercore) that is used as an event log. A drive syncing hook listens for changes in the local registry and streams file changes from disk to a [Hyperdrive](https://hypercore-protocol.org/protocol/#hyperdrive). On the client side, a remote Registry listens for changes in the event log and replicates changes locally. A drive download hook listens for changes in the remote registry and streams file changes from the Hyperdrive to the local disk.
 
-## How it works
-Think about it like torrents but live
-32-byte keys
+### Connection
+Portals are identified by unique* (1/1.1579x10^77 chance of collision) 32-byte keys. When a client 'joins' a portal, `portal` looks up the session key using [Hyperswarm](https://hypercore-protocol.org/protocol/#hyperswarm) and establishes a connection to the host using UDP holepunching.
 
 ### How is this different from Dat?
 Might seem similar to another similar project built on top of the Hypercore protocol called [Dat](https://github.com/datproject/dat) but there are a few key differences.
