@@ -19,10 +19,11 @@ interface IClientProps {
   isForceOverwrite: boolean;
   sessionId: string;
   verbose: boolean;
+  tree: boolean;
 }
 
 /// Joins an existing portal using a given `sessionId`
-const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
+const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps) => {
   const {exit} = useApp()
   const [isPaused, setIsPaused] = useState(!isEmpty(dir) && !isForceOverwrite)
 
@@ -73,8 +74,8 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose}: IClientProps) => {
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
         <DisplayComponent loading={remoteLoading} loadingMessage="Syncing remote hyperspace...">
-          <FileTree registry={registryRenderableArray}/>
-          <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+          {tree && <FileTree registry={registryRenderableArray}/>}
+          <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
         </DisplayComponent>
         <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
         <Hotkeys close={hyper.hyperObj?.close}/>
@@ -95,17 +96,22 @@ Client.propTypes = {
   isForceOverwrite: PropTypes.bool,
 
   /// Verbose mode
-  verbose: PropTypes.bool
+  verbose: PropTypes.bool,
+
+  /// Show file tree
+  tree: PropTypes.bool
 }
 Client.shortFlags = {
   dir: 'd',
   isForceOverwrite: 'f',
-  verbose: 'v'
+  verbose: 'v',
+  tree: 't'
 }
 Client.defaultProps = {
   dir: '.',
   isForceOverwrite: false,
-  verbose: false
+  verbose: false,
+  tree: false
 }
 
 Client.positionalArgs = ['sessionId']

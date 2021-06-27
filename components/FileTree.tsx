@@ -36,7 +36,6 @@ interface IFileTreeProps {
 
 // File tree display component
 const FileTree = ({registry}: IFileTreeProps) => {
-  const synced = registry.filter(f => f.status === STATUS.synced).length
   return (
     <Box flexDirection="column" marginBottom={1}>
       <Text bold>Files</Text>
@@ -55,9 +54,6 @@ const FileTree = ({registry}: IFileTreeProps) => {
         </Box>
       )) : <Text color="yellow">No files found</Text>}
       <Legend/>
-      <Text bold>
-        Watching {registry.length} files ({synced}/{registry.length} synced)
-      </Text>
     </Box>
   )
 }

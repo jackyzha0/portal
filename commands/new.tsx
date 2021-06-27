@@ -16,10 +16,11 @@ interface IHostProps {
   dir: string;
   includeGitFiles: boolean;
   verbose: boolean;
+  tree: boolean;
 }
 
 /// Creates a new portal from the given directory
-const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
+const Host = ({dir, includeGitFiles, verbose, tree}: IHostProps) => {
   const hyper = useHyper()
   const {
     errors,
@@ -34,8 +35,8 @@ const Host = ({dir, includeGitFiles, verbose}: IHostProps) => {
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
         <DisplayComponent loading={loading} loadingMessage={`Scanning directory... ${registryRenderableArray.length} files found`}>
-          <FileTree registry={registryRenderableArray}/>
-          <Stats totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
+          {tree && <FileTree registry={registryRenderableArray}/>}
+          <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
         </DisplayComponent>
         <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
         <Hotkeys close={hyper.hyperObj?.close}/>
@@ -53,16 +54,21 @@ Host.propTypes = {
   includeGitFiles: PropTypes.bool,
 
   /// Verbose mode
-  verbose: PropTypes.bool
+  verbose: PropTypes.bool,
+
+  /// Show file tree
+  tree: PropTypes.bool
 }
 Host.shortFlags = {
   dir: 'd',
-  verbose: 'v'
+  verbose: 'v',
+  tree: 't'
 }
 Host.defaultProps = {
   dir: '.',
   includeGitFiles: false,
-  verbose: false
+  verbose: false,
+  tree: false
 }
 
 export default Host
