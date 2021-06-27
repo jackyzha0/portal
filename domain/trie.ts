@@ -70,8 +70,7 @@ export class TrieNode {
   }
 
   _updateParentStates() {
-    this.status = STATUS.synced
-    this.traverse().forEach(node => {
+    this.traverse().reverse().forEach(node => {
       if (node.getChildren().every(child => child.status === STATUS.synced)) {
         node.status = STATUS.synced
       }

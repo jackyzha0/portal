@@ -65,7 +65,12 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
   <Box>
     <Box width="100%" paddingLeft={file.padding}>
       <Box width="80%">
-        <Text color={file.isDir ? 'cyan' : 'white'} bold={file.isDir || !isFileQueued(file)} wrap="truncate">
+        <Text
+          color={file.isDir ? 'cyan' : 'white'}
+          bold={file.isDir}
+          dimColor={isFileQueued(file)}
+          wrap="truncate"
+        >
           {file.name}
         </Text>
       </Box>
