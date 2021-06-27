@@ -3,6 +3,7 @@ import {Text} from 'ink'
 import Loader from '../components/Loader'
 import Hotkeys from '../components/Hotkeys'
 import {IHyper, IHyperObject} from '../hooks/useHyper'
+import useUpdateNotify from '../hooks/useUpdateNotify'
 
 interface IAppContextProps {
   hyperObj?: IHyperObject;
@@ -22,6 +23,7 @@ interface IAppContextProviderProps {
   hyper: IHyper;
 }
 export const AppContextProvider = ({children, hyper}: IAppContextProviderProps) => {
+  useUpdateNotify()
   const [closed, setClosed] = useState(false)
   const contextValue = useMemo(() => ({
     hyperObj: hyper.hyperObj,
