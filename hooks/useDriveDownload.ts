@@ -13,16 +13,25 @@ const useDriveDownload = (dir: string, registry: Registry, drive: Hyperdrive | u
         if (data.status === 'add' || data.status === 'modify') {
           const node = registry.find(segments)
           if (node) {
-            node.download().finally(() => {
-              registry.rerender()
-            })
+            node
+              .download()
+              .catch((error: Error) => {
+                registry.errorCallback(`[download] ${error.message}`)
+              })
+              .finally(() => {
+                registry.rerender()
+              })
           }
         }
 
         if (data.status === 'delete') {
-          rm(segments).finally(() => {
-            registry.rerender()
-          })
+          rm(segments, data.isDir)
+            .catch((error: Error) => {
+              registry.errorCallback(`[download] ${error.message}`)
+            })
+            .finally(() => {
+              registry.rerender()
+            })
         }
       })
       return () => {

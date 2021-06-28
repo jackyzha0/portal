@@ -6,7 +6,7 @@ import speedometer from 'speedometer'
 export const createReadStream = (path: string) => fs.createReadStream(normalizeToSystem(path))
 export const createWriteStream = (path: string) => fs.createWriteStream(normalizeToSystem(path))
 
-function isError(error: any): error is NodeJS.ErrnoException {
+export function isError(error: any): error is NodeJS.ErrnoException {
   return error instanceof Error
 }
 
@@ -62,19 +62,10 @@ export const pump = async (
 }
 
 // Delete folder
-export const rm = async (pathSegments: string[]) => {
-  return new Promise<void>((resolve, reject) => {
-    fs.rm(path.join(...pathSegments), {
-      force: true,
-      recursive: true
-    }, error => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve()
-      }
-    })
-  })
+export const rm = async (pathSegments: string[], isDir: boolean) => {
+  return isDir ?
+    fs.promises.rmdir(path.join(...pathSegments), {recursive: true}) :
+    fs.promises.unlink(path.join(...pathSegments))
 }
 
 // Check if given folder is empty

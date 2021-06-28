@@ -128,7 +128,7 @@ export class TrieNode {
       .then(() => this._updateParentStates())
       .catch((error: Error) => {
         this.error = error.message
-        this.registry.errorCallback(error.message)
+        this.registry.errorCallback(`[${opName}] ${error.message}`)
 
         // Propagate up
         this.traverse().forEach(node => node.status = STATUS.error)
