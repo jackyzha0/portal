@@ -3,7 +3,7 @@
 # portal
 Zero-config peer-to-peer encrypted live folder syncing that respects your `.gitignore`. Not the 2007 video game.
 
-Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, zero-manifest, and decentralized.
+Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, secure, and decentralized.
 
 ## Demos
 <p align="center">
@@ -13,8 +13,8 @@ Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with e
 
 ## Installation
 ```shell
-# Requires node >=v10.x.x
-$ npm install --global portal-sync
+# Requires node >=v12.22.1
+$ npm i -g portal-sync
 
 # Start using portal
 $ portal new
@@ -47,4 +47,10 @@ Portals are identified by unique* 32-byte keys. When a client 'joins' a portal, 
 Might seem similar to another similar project built on top of the Hypercore protocol called [Dat](https://github.com/datproject/dat) but there are a few key differences.
 1. Dat relies on nodes to keep seeding archives and drives and aims to be a distributed filesystem whereas `portal` focuses purely on being one-to-many for file sharing/syncing.
 2. No footprint. Because `portal` is designed to be zero-config, it doesn't leave any dotfiles laying around, whereas Dat stores secrets and metadata in a `~/.dat` folder.
-3. Dat tracks version history. Although `portal` runs on the same underlying protocols, I haven't found a need to utilize version histories yet. 
+3. Dat tracks version history. Although `portal` runs on the same underlying protocols, I haven't found a need to utilize version histories yet.
+4. `portal` respects your `.gitignore` so it doesn't sync anything you don't want (like pesky `node_modules`)
+
+## Developing
+1. Clone the repository and ensure you have `node >= v12.22.1`
+2. Run `yarn` to install deps and `yarn dev` to enable hot-reload
+3. Run `yarn link` to register `portal` as a valid executable
