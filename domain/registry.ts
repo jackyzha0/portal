@@ -265,9 +265,11 @@ export class Registry {
         this.errorCallback(`[subscribe]: ${error.message}`)
       })
 
-    eventLog.on('append', async () => {
-      const data = await eventLog.head()
-      process(data)
+    eventLog.createReadStream({
+      tail: true,
+      live: true
+    }).on('data', (data: Buffer) => {
+      process(data.toString())
     })
     return this
   }
