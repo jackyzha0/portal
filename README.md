@@ -7,9 +7,8 @@ Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with e
 
 ## Demos
 <p align="center">
-  <img alt="Uploading Files" src="assets/upload-demo.gif" width="50%">
-&nbsp; &nbsp;
-  <img alt="Downloading Files" src="assets/download-demo.gif" width="50%">
+  <img alt="Uploading Files" src="assets/upload-demo.gif" width="45%">
+  <img alt="Downloading Files" src="assets/download-demo.gif" width="45%">
 </p>
 
 ## Installation
