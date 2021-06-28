@@ -1,7 +1,7 @@
 ![Banner](assets/logo.png)
 
 # portal
-Zero-config peer-to-peer encrypted live folder syncing that respects your `.gitignore`. Not the 2007 video game.
+Zero-config peer-to-peer encrypted live folder syncing tool that respects your `.gitignore`. Not the 2007 video game.
 
 Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, secure, and decentralized.
 

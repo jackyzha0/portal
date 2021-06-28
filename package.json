@@ -10,6 +10,12 @@
 		"type": "git",
 		"url": "https://github.com/jackyzha0/portal.git"
 	},
+	"keywords": [
+		"peer-to-peer",
+		"decentralized",
+		"file-sharing",
+		"hypercore"
+	],
 	"bin": {
 		"portal": "./build/cli.js"
 	},
