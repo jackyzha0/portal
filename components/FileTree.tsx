@@ -81,7 +81,7 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
 )
 
 // File tree display component
-const DISPLAY_NUM = 50
+const DISPLAY_NUM = 25
 const FileTree = ({registry, full}: IFileTreeProps) => {
   const emptyMessage = full ?
     <Text color="yellow">No files found</Text> :
@@ -90,10 +90,10 @@ const FileTree = ({registry, full}: IFileTreeProps) => {
   return (
     <Box flexDirection="column" marginY={1}>
       <Text bold>Files</Text>
-      {files.length > 0 ? files.slice(0, 50).map((file, i) => (
+      {files.length > 0 ? files.slice(0, DISPLAY_NUM).map((file, i) => (
         full ? <FullTreeFile key={i} file={file}/> : <TruncatedTreeFile key={i} file={file}/>
       )) : emptyMessage}
-      {files.length > 50 && <Text bold color="cyan">...and {files.length - DISPLAY_NUM} more collapsed</Text>}
+      {files.length > DISPLAY_NUM && <Text bold color="cyan">...and {files.length - DISPLAY_NUM} more collapsed</Text>}
       {full && <Legend/>}
     </Box>
   )

@@ -1,7 +1,7 @@
 {
 	"name": "portal-sync",
 	"version": "1.1.0",
-	"description": "A p2p folder syncing tool build on top of the Hypercore protocol",
+	"description": "Zero-config peer-to-peer encrypted live folder syncing that respects your .gitignore",
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
 	"license": "MIT",
@@ -24,7 +24,7 @@
 		"build"
 	],
 	"engines": {
-		"node": ">=10"
+		"node": ">=12.22.1"
 	},
 	"dependencies": {
 		"chokidar": "^3.5.1",
