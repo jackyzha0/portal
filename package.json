@@ -1,6 +1,6 @@
 {
 	"name": "portal-sync",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Zero-config peer-to-peer encrypted live folder syncing that respects your .gitignore",
 	"main": "index.js",
 	"author": "jackyzha0 <j.zhao2k19@gmail.com>",
