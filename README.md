@@ -23,6 +23,9 @@ $ portal new
 $ portal join [sessionID]
 ```
 
+## Troubleshooting
+- On MacOS, ensure you give your terminal full disk access permission. (System preferences > Security & privacy > Privacy > Full disk access)
+
 ## Highlights
 * **Ephemeral**: As soon as you close your `portal`, no further content can be downloaded from it. No data is stored anywhere except on the host device.
 * **Decentralized**: There is no central `portal` server that all data is routed through. `portal` only uses public servers to maintain a DHT (distributed hash table) for peer discovery.
