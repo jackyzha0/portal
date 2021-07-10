@@ -23,7 +23,7 @@ $ portal new
 $ portal join [sessionID]
 ```
 
-## Troubleshooting
+### Troubleshooting
 - On MacOS, ensure you give your terminal full disk access permission. (System preferences > Security & privacy > Privacy > Full disk access)
 
 ## Highlights
