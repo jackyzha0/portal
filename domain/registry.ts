@@ -1,4 +1,5 @@
 import {Hypercore, Hyperdrive} from 'hyper-sdk'
+import PQ from 'p-queue'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'
 import {IStreamPumpStats} from '../fs/io'
 import {STATUS, TrieNode} from './trie'
@@ -25,6 +26,7 @@ export class Registry {
   refreshStats: () => void
   errorCallback: (error: string) => void
   stats: Map<string, IStreamPumpStats>
+  q: PQ
 
   private readonly root: TrieNode
   private readonly subscribers: Map<string, EventCallback>
@@ -39,6 +41,7 @@ export class Registry {
     this.refreshStats = noop
     this.subscribers = new Map()
     this.stats = new Map<string, IStreamPumpStats>()
+    this.q = new PQ({concurrency: 4})
   }
 
   getStats() {

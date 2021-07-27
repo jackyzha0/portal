@@ -34,7 +34,7 @@ const Legend = () => (
 )
 
 const isFileQueued = (file: ITreeRepresentation) => {
-  return file.status === STATUS.waitingForRemote || (file.stats.numTransfers === 1 && !file.stats.hasEnded)
+  return file.stats.numTransfers <= 1 && !file.stats.hasEnded
 }
 
 const fmtPercentage = (number: number) => {
@@ -67,7 +67,6 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
       <Box width="80%">
         <Text
           color={file.isDir ? 'cyan' : 'white'}
-          bold={file.isDir}
           dimColor={isFileQueued(file)}
           wrap="truncate"
         >
@@ -86,10 +85,10 @@ const FileTree = ({registry, full}: IFileTreeProps) => {
   const emptyMessage = full ?
     <Text color="yellow">No files found</Text> :
     <Text bold color="green">All files synced</Text>
-  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced)
+  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced).sort((a, b) => b.size - a.size)
   return (
     <Box flexDirection="column" marginY={1}>
-      <Text bold>Files</Text>
+      <Text bold color="blue">Files</Text>
       {files.length > 0 ? files.slice(0, DISPLAY_NUM).map((file, i) => (
         full ? <FullTreeFile key={i} file={file}/> : <TruncatedTreeFile key={i} file={file}/>
       )) : emptyMessage}

@@ -42,8 +42,8 @@ export const pump = async (
 
   // New pipe
   const speed = speedometer(1)
-  readStream.pipe(writeStream)
   return new Promise<void>((resolve, reject) => {
+    readStream.pipe(writeStream)
     readStream
       .on('end', () => {
         statsObject.hasEnded = true

@@ -85,7 +85,7 @@ export class TrieNode {
   // ctx: shared context object for current working nodes
   async _treeOp<T, Ctx=Map<string, IStreamPumpStats>>(
     opName: string,
-    op: (pathSegments: string[], ctx: Ctx) => Promise<T> | undefined,
+    op: (pathSegments: string[], ctx: Ctx) => Promise<T>,
     ctx: Ctx,
     folderPreRun?: (path: string[]) => void
   ): Promise<STATUS> {
@@ -116,12 +116,7 @@ export class TrieNode {
     }
 
     // Single file, apply operation
-    const opResult = op(path, ctx)
-
-    // Ignore on empty res
-    if (!opResult) {
-      return Promise.resolve(this.status)
-    }
+    const opResult = this.registry.q.add(async () => op(path, ctx), {priority: this.sizeBytes})
 
     // Resolve promise
     return opResult
@@ -142,26 +137,28 @@ export class TrieNode {
     return this._treeOp(
       'download',
       async (pathSegments, ctx) => {
-        if (this.registry.drive) {
-          const joinedPath = pathSegments.join('/')
-          const {drive} = this.registry
-          return backOff(async () => {
-            const readStream = drive.createReadStream(joinedPath)
-            const writeStream = createWriteStream(joinedPath)
-            ctx.set(joinedPath, this.stats)
-            this.status = STATUS.syncing
-            return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
-          }, {
-            startingDelay: 500,
-            retry: (error: Error, i) => {
-              // If we fail to read stream from hyperdrive, most likely file is not
-              // uploaded yet
-              this.registry._debug(`[download] retry ${joinedPath} for the ${i} time: ${error.message}`)
-              this.status = STATUS.waitingForRemote
-              return true
-            }
-          })
+        const {drive} = this.registry
+        if (!drive) {
+          return Promise.reject(STATUS.error)
         }
+
+        const joinedPath = pathSegments.join('/')
+        return backOff(async () => {
+          const readStream = drive.createReadStream(joinedPath)
+          const writeStream = createWriteStream(joinedPath)
+          ctx.set(joinedPath, this.stats)
+          this.status = STATUS.syncing
+          return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
+        }, {
+          startingDelay: 500,
+          retry: (error: Error, i) => {
+            // If we fail to read stream from hyperdrive, most likely file is not
+            // uploaded yet
+            this.registry._debug(`[download] retry ${joinedPath} for the ${i} time: ${error.message}`)
+            this.status = STATUS.waitingForRemote
+            return true
+          }
+        })
       },
       this.registry.stats,
       mkdir
@@ -173,14 +170,17 @@ export class TrieNode {
     return this._treeOp(
       'sync',
       async (pathSegments, ctx) => {
-        if (this.registry.drive) {
-          const joinedPath = pathSegments.join('/')
-          const readStream = createReadStream(joinedPath)
-          const writeStream = this.registry.drive.createWriteStream(joinedPath)
-          ctx.set(joinedPath, this.stats)
-          this.status = STATUS.syncing
-          return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
+        const {drive} = this.registry
+        if (!drive) {
+          return Promise.reject(STATUS.error)
         }
+
+        const joinedPath = pathSegments.join('/')
+        const readStream = createReadStream(joinedPath)
+        const writeStream = drive.createWriteStream(joinedPath)
+        ctx.set(joinedPath, this.stats)
+        this.status = STATUS.syncing
+        return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
       },
       this.registry.stats
     )

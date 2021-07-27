@@ -7289,7 +7289,7 @@ p-map@^4.0.0:
   dependencies:
     aggregate-error "^3.0.0"
 
-p-queue@^6.3.0:
+p-queue@^6.3.0, p-queue@^6.6.2:
   version "6.6.2"
   resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.6.2.tgz#2068a9dcf8e67dd0ec3e7a2bcb76810faa85e426"
   integrity sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==
