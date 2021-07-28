@@ -40,7 +40,7 @@
 		"ink-select-input": "^4.2.0",
 		"ink-spinner": "^4.0.2",
 		"nanoid": "^3.1.23",
-		"p-queue": "^6.6.2",
+		"p-queue": "^7.1.0",
 		"parse-gitignore": "^1.0.1",
 		"pastel": "^1.1.1",
 		"pretty-bytes": "^5.6.0",
