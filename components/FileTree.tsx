@@ -1,9 +1,9 @@
 import React from 'react'
 import {Box, Spacer, Text} from 'ink'
 import prettyBytes from 'pretty-bytes'
+import useStdoutDimensions from 'ink-use-stdout-dimensions'
 import {ITreeRepresentation} from '../domain/registry'
 import {STATUS} from '../domain/trie'
-import useStdoutDimensions from "ink-use-stdout-dimensions";
 
 interface IStatusIndicatorProps {
   status: STATUS;
@@ -76,7 +76,7 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
 
 // File tree display component
 const FileTree = ({registry, full}: IFileTreeProps) => {
-  const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 12, 1);
+  const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 12, 1)
   const emptyMessage = full
     ? <Text color="yellow">No files found</Text>
     : <Text bold color="green">All files synced</Text>
