@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Box, Newline, Text, useApp} from 'ink'
+import {Box, Newline, Text, useApp, useStdin} from 'ink'
 import SelectInput from 'ink-select-input'
 import useHyper from '../hooks/useHyper'
 import {SessionInfo} from '../components/SessionInfo'
@@ -26,6 +26,7 @@ interface IClientProps {
 const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps) => {
   const {exit} = useApp()
   const [isPaused, setIsPaused] = useState(!isEmpty(dir) && !isForceOverwrite)
+  const {isRawModeSupported} = useStdin()
 
   const hyper = useHyper(sessionId)
   const {
@@ -44,7 +45,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
         <Text bold color="yellow">Warning: </Text>
         <Text>There are already files in this directory! Syncing could overwrite these files</Text>
         <Newline/>
-        <SelectInput
+        {isRawModeSupported && <SelectInput
           items={[
             {
               label: 'Continue',
@@ -60,7 +61,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
               exit()
               process.exit()
             }
-          }}/>
+          }}/>}
         <Newline/>
         <Text dimColor>
           <Text>Tip! To force overwrite next time: </Text>
