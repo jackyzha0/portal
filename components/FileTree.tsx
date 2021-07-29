@@ -3,6 +3,7 @@ import {Box, Spacer, Text} from 'ink'
 import prettyBytes from 'pretty-bytes'
 import {ITreeRepresentation} from '../domain/registry'
 import {STATUS} from '../domain/trie'
+import useStdoutDimensions from "ink-use-stdout-dimensions";
 
 interface IStatusIndicatorProps {
   status: STATUS;
@@ -33,9 +34,9 @@ const Legend = () => (
   </Box>
 )
 
-const isFileQueued = (file: ITreeRepresentation) => file.stats.numTransfers <= 1 && !file.stats.hasEnded
+const isFileQueued = (file: ITreeRepresentation) => file.stats.numTransfers === 0 && !file.stats.hasEnded
 
-const fmtPercentage = (number: number) => `${(number * 100).toFixed(2)}%`
+const fmtPercentage = (number: number) => `${(number * 100).toFixed(1)}%`
 
 interface IFileTreeProps {
   registry: ITreeRepresentation[];
@@ -58,30 +59,28 @@ const FullTreeFile = ({file}: {file: ITreeRepresentation}) => (
 )
 
 const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
-  <Box>
-    <Box width="100%" paddingLeft={file.padding}>
-      <Box width="80%">
-        <Text
-          color={file.isDir ? 'cyan' : 'white'}
-          dimColor={isFileQueued(file)}
-          wrap="truncate"
-        >
-          {file.name}
-        </Text>
-      </Box>
-      <Spacer/>
-      <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred / file.size)} of ${prettyBytes(file.size)}`}</Text>
+  <Box width="100%" paddingLeft={file.padding}>
+    <Box width="80%">
+      <Text
+        color={file.isDir ? 'cyan' : 'white'}
+        dimColor={isFileQueued(file)}
+        wrap="truncate"
+      >
+        {file.name}
+      </Text>
     </Box>
+    <Spacer/>
+    <Text>{file.isDir ? '' : `${fmtPercentage(file.stats.totalTransferred / file.size)} of ${prettyBytes(file.size)}`}</Text>
   </Box>
 )
 
 // File tree display component
-const DISPLAY_NUM = 25
 const FileTree = ({registry, full}: IFileTreeProps) => {
+  const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 12, 1);
   const emptyMessage = full
     ? <Text color="yellow">No files found</Text>
     : <Text bold color="green">All files synced</Text>
-  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced).sort((a, b) => b.size - a.size)
+  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced).sort((a, b) => isFileQueued(a) ? 1 : b.size - a.size)
   return (
     <Box flexDirection="column" marginY={1}>
       <Text bold color="blue">Files</Text>
