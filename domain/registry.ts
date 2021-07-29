@@ -9,6 +9,7 @@ export interface ITreeRepresentation {
   padding: number;
   name: string;
   isDir: boolean;
+  path: string;
   status: STATUS;
   stats: IStreamPumpStats;
   size: number;
@@ -118,6 +119,7 @@ export class Registry {
       output.push({
         padding: indent,
         name: node.key,
+        path: node.getPath().join('/'),
         isDir: node.isDir,
         status: node.status,
         size: node.sizeBytes,

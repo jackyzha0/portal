@@ -59,14 +59,14 @@ const FullTreeFile = ({file}: {file: ITreeRepresentation}) => (
 )
 
 const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
-  <Box width="100%" paddingLeft={file.padding}>
+  <Box width="100%">
     <Box width="80%">
       <Text
         color={file.isDir ? 'cyan' : 'white'}
         dimColor={isFileQueued(file)}
         wrap="truncate"
       >
-        {file.name}
+        {file.path}
       </Text>
     </Box>
     <Spacer/>
@@ -76,11 +76,11 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
 
 // File tree display component
 const FileTree = ({registry, full}: IFileTreeProps) => {
-  const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 12, 1)
+  const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 15, 1)
   const emptyMessage = full
     ? <Text color="yellow">No files found</Text>
     : <Text bold color="green">All files synced</Text>
-  const files = full ? registry : registry.filter(file => file.status !== STATUS.synced).sort((a, b) => isFileQueued(a) ? 1 : b.size - a.size)
+  const files = full ? registry : registry.filter(file => (file.status !== STATUS.synced) && !file.isDir).sort((a, b) => b.size - a.size)
   return (
     <Box flexDirection="column" marginY={1}>
       <Text bold color="blue">Files</Text>
