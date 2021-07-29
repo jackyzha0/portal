@@ -25,12 +25,12 @@ export function registerWatcher(
     onErrorCallback: (error: string) => void;
     onChangeCallback: EventCallback;
     onReadyCallback: () => void;
-  }
+  },
 ) {
   const {onErrorCallback, onChangeCallback, onReadyCallback} = callbacks
   const watcher = chokidar.watch(dir, {
     ignored: readGitIgnore(dir, ignoreGitFiles),
-    persistent: true
+    persistent: true,
   })
 
   const notify = (path: string, status: EventStatus, isDir: boolean, newSize?: number) => {
@@ -41,7 +41,7 @@ export function registerWatcher(
         path: normalizedPath,
         status,
         isDir,
-        newSize
+        newSize,
       })
     }
   }

@@ -33,13 +33,9 @@ const Legend = () => (
   </Box>
 )
 
-const isFileQueued = (file: ITreeRepresentation) => {
-  return file.stats.numTransfers <= 1 && !file.stats.hasEnded
-}
+const isFileQueued = (file: ITreeRepresentation) => file.stats.numTransfers <= 1 && !file.stats.hasEnded
 
-const fmtPercentage = (number: number) => {
-  return `${(number * 100).toFixed(2)}%`
-}
+const fmtPercentage = (number: number) => `${(number * 100).toFixed(2)}%`
 
 interface IFileTreeProps {
   registry: ITreeRepresentation[];
@@ -82,9 +78,9 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
 // File tree display component
 const DISPLAY_NUM = 25
 const FileTree = ({registry, full}: IFileTreeProps) => {
-  const emptyMessage = full ?
-    <Text color="yellow">No files found</Text> :
-    <Text bold color="green">All files synced</Text>
+  const emptyMessage = full
+    ? <Text color="yellow">No files found</Text>
+    : <Text bold color="green">All files synced</Text>
   const files = full ? registry : registry.filter(file => file.status !== STATUS.synced).sort((a, b) => b.size - a.size)
   return (
     <Box flexDirection="column" marginY={1}>

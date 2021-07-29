@@ -32,12 +32,12 @@ const useHyper = (key?: string): IHyper => {
     const hyper = await hyperSDK({
       persist: false,
       storage: null,
-      applicationName: 'portal'
+      applicationName: 'portal',
     })
     const {
       Hypercore: newHypercore,
       Hyperdrive: newHyperdrive,
-      close
+      close,
     } = hyper
 
     let eventLog: Hypercore<string>
@@ -45,7 +45,7 @@ const useHyper = (key?: string): IHyper => {
     if (key) {
       // Recreate hypercore
       eventLog = newHypercore(key, {
-        valueEncoding: 'json'
+        valueEncoding: 'json',
       })
 
       // Read genesis block and set drive info
@@ -61,7 +61,7 @@ const useHyper = (key?: string): IHyper => {
 
       // Create hypercore
       eventLog = newHypercore(`portal_eventLog_${id}`, {
-        valueEncoding: 'json'
+        valueEncoding: 'json',
       })
 
       // Create drive
@@ -71,31 +71,31 @@ const useHyper = (key?: string): IHyper => {
       // Fetch drive metadata and write to genesis block
       const genesis = JSON.stringify({
         status: 'genesis',
-        key: drive.key.toString('hex')
+        key: drive.key.toString('hex'),
       } as IGenesisBlock)
       await eventLog.append(genesis)
     }
 
     drive.on('peer-open', peer => {
       const peerKey = peer.remotePublicKey.toString('hex')
-      setPeers(peers => peers.includes(peerKey) ?
-        peers :
-        [...peers, peerKey]
+      setPeers(peers => peers.includes(peerKey)
+        ? peers
+        : [...peers, peerKey],
       )
     })
 
     drive.on('peer-remove', peer => {
       const peerKey = peer.remotePublicKey.toString('hex')
-      setPeers(peers => peers.includes(peerKey) ?
-        [...peers].filter(existingPeerKey => existingPeerKey !== peerKey) :
-        peers
+      setPeers(peers => peers.includes(peerKey)
+        ? [...peers].filter(existingPeerKey => existingPeerKey !== peerKey)
+        : peers,
       )
     })
 
     return {
       eventLog,
       drive,
-      close
+      close,
     }
   }, [])
 
@@ -103,7 +103,7 @@ const useHyper = (key?: string): IHyper => {
     numConnected: peers.length,
     hyperObj: asyncHyper.result,
     error: asyncHyper.error?.message,
-    loading: asyncHyper.loading
+    loading: asyncHyper.loading,
   }
 }
 

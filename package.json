@@ -53,7 +53,7 @@
 	"devDependencies": {
 		"@types/parse-gitignore": "^1.0.0",
 		"@types/react": "^17.0.11",
-		"@types/update-notifier": "^5.0.0",
+		"@types/update-notifier": "^5.1.0",
 		"ava": "^3.15.0",
 		"babel-eslint": "^10.1.0",
 		"eslint-config-xo-react": "^0.25.0",
@@ -62,7 +62,7 @@
 		"husky": "^7.0.0",
 		"ts-node": "^10.0.0",
 		"typescript": "^4.3.4",
-		"xo": "^0.40.2"
+		"xo": "^0.42.0"
 	},
 	"xo": {
 		"extends": "xo-react",

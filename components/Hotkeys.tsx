@@ -8,9 +8,9 @@ import Loader from './Loader'
 const Hotkeys = () => {
   useHotkey()
   const {closed} = useAppContext()
-  return closed ?
-    <Loader status="Cleaning up..." color="yellow"/> :
-    <Text dimColor>[esc] or [q] to quit</Text>
+  return closed
+    ? <Loader status="Cleaning up..." color="yellow"/>
+    : <Text dimColor>[esc] or [q] to quit</Text>
 }
 
 export default Hotkeys

@@ -14,7 +14,7 @@ interface IAppContextProps {
 const AppContext = createContext<IAppContextProps>({
   numConnected: 0,
   closed: false,
-  setClosed: () => {}
+  setClosed: () => {},
 })
 
 export const useAppContext = () => useContext(AppContext)
@@ -31,7 +31,7 @@ export const AppContextProvider = ({children, hyper}: IAppContextProviderProps) 
     closed,
     setClosed: () => {
       setClosed(true)
-    }
+    },
   }), [hyper])
 
   if (hyper.loading) {

@@ -32,7 +32,7 @@ export const pump = async (
   readStream: NodeJS.ReadableStream,
   writeStream: NodeJS.WritableStream,
   statsObject: IStreamPumpStats,
-  refreshCallback: () => void
+  refreshCallback: () => void,
 ) => {
   // Reset statsObj entry
   statsObject.bytesPerSecond = 0
@@ -62,21 +62,15 @@ export const pump = async (
 }
 
 // Delete folder
-export const rm = async (pathSegments: string[], isDir: boolean) => {
-  return isDir ?
-    fs.promises.rmdir(path.join(...pathSegments), {recursive: true}) :
-    fs.promises.unlink(path.join(...pathSegments))
-}
+export const rm = async (pathSegments: string[], isDir: boolean) => isDir
+  ? fs.promises.rmdir(path.join(...pathSegments), {recursive: true})
+  : fs.promises.unlink(path.join(...pathSegments))
 
 // Check if given folder is empty
 export const isEmpty = (dir: string) => fs.readdirSync(dir).length === 0
 
 // Path normalization from hyper representation to local
-export const normalizeToSystem = (pathLike: string) => {
-  return pathLike.split('/').join(path.sep)
-}
+export const normalizeToSystem = (pathLike: string) => pathLike.split('/').join(path.sep)
 
 // Path normalization from local to hyper
-export const normalizeToHyper = (pathLike: string) => {
-  return pathLike.split(path.sep).join('/')
-}
+export const normalizeToHyper = (pathLike: string) => pathLike.split(path.sep).join('/')

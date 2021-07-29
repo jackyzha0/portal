@@ -177,6 +177,6 @@ test('getTree() - heavily nested', t => {
     'e',
     'f.txt',
     'g.txt',
-    'h.txt'
+    'h.txt',
   ])
 })

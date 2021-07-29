@@ -8,10 +8,8 @@ interface IDisplayComponentProps {
   children: React.ReactNode;
 }
 
-const DisplayComponent = ({loading, loadingMessage, children}: IDisplayComponentProps) => {
-  return loading ?
-    <Loader status={loadingMessage}/> :
-    <Box flexDirection="column">{children}</Box>
-}
+const DisplayComponent = ({loading, loadingMessage, children}: IDisplayComponentProps) => loading
+  ? <Loader status={loadingMessage}/>
+  : <Box flexDirection="column">{children}</Box>
 
 export default DisplayComponent

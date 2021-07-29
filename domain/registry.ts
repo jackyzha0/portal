@@ -54,7 +54,7 @@ export class Registry {
       return total
     }, {
       totalBytes: 0,
-      bytesPerSecond: 0
+      bytesPerSecond: 0,
     })
   }
 
@@ -121,7 +121,7 @@ export class Registry {
         isDir: node.isDir,
         status: node.status,
         size: node.sizeBytes,
-        stats: node.stats
+        stats: node.stats,
       })
       for (const child of node.getChildren()) {
         // Default to indent 2 spaces
@@ -239,8 +239,8 @@ export class Registry {
         onChangeCallback: data => {
           this._onChangeCallback(data)
         },
-        onReadyCallback: onReady
-      }
+        onReadyCallback: onReady,
+      },
     )
     return this
   }
@@ -270,7 +270,7 @@ export class Registry {
 
     eventLog.createReadStream({
       tail: true,
-      live: true
+      live: true,
     }).on('data', (data: Buffer) => {
       process(data.toString())
     })

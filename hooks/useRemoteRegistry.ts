@@ -12,7 +12,7 @@ const useRemoteRegistry = (dir: string, eventLog: Hypercore<string> | undefined,
 
   // Create registry and add handlers
   const remoteRegistry: Registry = useConstant(() => new Registry(isDebug)
-    .onError(addError)
+    .onError(addError),
   )
   const registryRenderableArray = useDebouncedState(remoteRegistry)
   const stats = useStats(remoteRegistry)
@@ -34,7 +34,7 @@ const useRemoteRegistry = (dir: string, eventLog: Hypercore<string> | undefined,
     loading,
     remoteRegistry,
     registryRenderableArray,
-    stats
+    stats,
   }
 }
 

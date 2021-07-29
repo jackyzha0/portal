@@ -25,9 +25,9 @@ const useDriveSync = (dir: string, registry: Registry, drive: Hyperdrive | undef
         }
 
         if (data.status === 'delete') {
-          const promise = data.isDir ?
-            drive.rmdir(data.path) :
-            drive.unlink(data.path)
+          const promise = data.isDir
+            ? drive.rmdir(data.path)
+            : drive.unlink(data.path)
           promise.catch((error: unknown) => {
             // ignore if empty folder
             if (isError(error) && error.code !== 'ENOENT') {

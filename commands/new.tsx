@@ -27,7 +27,7 @@ const Host = ({dir, includeGitFiles, verbose, tree}: IHostProps) => {
     loading,
     localRegistry,
     registryRenderableArray,
-    stats
+    stats,
   } = useLocalRegistry(dir, hyper.hyperObj?.eventLog, !includeGitFiles, verbose)
   useDriveSync(dir, localRegistry, hyper.hyperObj?.drive)
 
@@ -57,18 +57,18 @@ Host.propTypes = {
   verbose: PropTypes.bool,
 
   /// Show full folder file tree
-  tree: PropTypes.bool
+  tree: PropTypes.bool,
 }
 Host.shortFlags = {
   dir: 'd',
   verbose: 'v',
-  tree: 't'
+  tree: 't',
 }
 Host.defaultProps = {
   dir: '.',
   includeGitFiles: false,
   verbose: false,
-  tree: false
+  tree: false,
 }
 
 export default Host

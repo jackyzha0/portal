@@ -8,7 +8,7 @@ export enum STATUS {
   syncing,
   waitingForRemote,
   error,
-  synced
+  synced,
 }
 
 // Single trienode representing a file/folder
@@ -35,7 +35,7 @@ export class TrieNode {
       numTransfers: 0,
       bytesPerSecond: 0,
       totalTransferred: 0,
-      hasEnded: false
+      hasEnded: false,
     }
   }
 
@@ -87,7 +87,7 @@ export class TrieNode {
     opName: string,
     op: (pathSegments: string[], ctx: Ctx) => Promise<T>,
     ctx: Ctx,
-    folderPreRun?: (path: string[]) => void
+    folderPreRun?: (path: string[]) => void,
   ): Promise<STATUS> {
     const path = this.getPath()
 
@@ -157,11 +157,11 @@ export class TrieNode {
             this.registry._debug(`[download] retry ${joinedPath} for the ${i} time: ${error.message}`)
             this.status = STATUS.waitingForRemote
             return true
-          }
+          },
         })
       },
       this.registry.stats,
-      mkdir
+      mkdir,
     )
   }
 
@@ -182,7 +182,7 @@ export class TrieNode {
         this.status = STATUS.syncing
         return pump(readStream, writeStream, this.stats, this.registry.refreshStats)
       },
-      this.registry.stats
+      this.registry.stats,
     )
   }
 }

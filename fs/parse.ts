@@ -25,7 +25,7 @@ const getAllGitIgnores = (dir: string): IGitIgnoreResult[] => {
         } else if (stat.isFile() && file === '.gitignore') {
           result.push({
             path: absPath,
-            prefix: searchDir
+            prefix: searchDir,
           })
         }
       }

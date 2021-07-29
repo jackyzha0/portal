@@ -33,7 +33,7 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
     loading: remoteLoading,
     remoteRegistry,
     registryRenderableArray,
-    stats
+    stats,
   } = useRemoteRegistry(dir, hyper.hyperObj?.eventLog, verbose, isPaused)
   useDriveDownload(dir, remoteRegistry, hyper.hyperObj?.drive)
 
@@ -48,11 +48,11 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
           items={[
             {
               label: 'Continue',
-              value: true
+              value: true,
             }, {
               label: 'Cancel',
-              value: false
-            }
+              value: false,
+            },
           ]} onSelect={ack => {
             if (ack.value) {
               setIsPaused(false)
@@ -99,19 +99,19 @@ Client.propTypes = {
   verbose: PropTypes.bool,
 
   /// Show full folder file tree
-  tree: PropTypes.bool
+  tree: PropTypes.bool,
 }
 Client.shortFlags = {
   dir: 'd',
   isForceOverwrite: 'f',
   verbose: 'v',
-  tree: 't'
+  tree: 't',
 }
 Client.defaultProps = {
   dir: '.',
   isForceOverwrite: false,
   verbose: false,
-  tree: false
+  tree: false,
 }
 
 Client.positionalArgs = ['sessionId']

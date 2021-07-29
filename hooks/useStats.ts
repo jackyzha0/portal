@@ -32,7 +32,7 @@ const useStats = (registry: Registry) => {
 
   return {
     bytesPerSecond: lastBps.reduce((total, cur) => total + cur, 0) / BUF_LENGTH,
-    totalBytes
+    totalBytes,
   }
 }
 

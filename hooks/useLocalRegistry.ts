@@ -12,7 +12,7 @@ const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, 
 
   // Create registry and add handlers
   const localRegistry: Registry = useConstant(() => new Registry(isDebug)
-    .onError(addError)
+    .onError(addError),
   )
   const registryRenderableArray = useDebouncedState(localRegistry)
   const stats = useStats(localRegistry)
@@ -41,7 +41,7 @@ const useLocalRegistry = (dir: string, eventLog: Hypercore<string> | undefined, 
     loading,
     localRegistry,
     registryRenderableArray,
-    stats
+    stats,
   }
 }
 
