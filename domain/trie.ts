@@ -69,6 +69,7 @@ export class TrieNode {
     return Object.values(this.children)
   }
 
+  // traverses parents and ensures each parent is up to date
   _updateParentStates() {
     this.traverse().reverse().forEach(node => {
       if (node.getChildren().every(child => child.status === STATUS.synced)) {
@@ -98,9 +99,11 @@ export class TrieNode {
         folderPreRun(path)
       }
 
-      // Apply op to children children
+      // Apply op to children
       const statusPromises: Array<Promise<STATUS>> = this.getChildren()
         .map(async child => child._treeOp(opName, op, ctx, folderPreRun))
+
+      // wait for all to finish
       return Promise.all(statusPromises)
         .then(() => this._updateParentStates())
         .catch((error: Error) => {

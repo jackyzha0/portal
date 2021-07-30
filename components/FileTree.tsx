@@ -34,15 +34,19 @@ const Legend = () => (
   </Box>
 )
 
+// Helper Functions
+// is current filed queued for upload/download
 const isFileQueued = (file: ITreeRepresentation) => file.stats.numTransfers === 0 && !file.stats.hasEnded
 
+// format number [0,1] to percent scale with 1 decimal point
 const fmtPercentage = (number: number) => `${(number * 100).toFixed(1)}%`
+
 
 interface IFileTreeProps {
   registry: ITreeRepresentation[];
   full: boolean;
 }
-
+// Full Tree display
 const FullTreeFile = ({file}: {file: ITreeRepresentation}) => (
   <Box>
     <StatusIndicator status={file.status}/>
@@ -58,6 +62,7 @@ const FullTreeFile = ({file}: {file: ITreeRepresentation}) => (
   </Box>
 )
 
+// Truncated Tree display (default)
 const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
   <Box width="100%">
     <Box width="80%">
@@ -76,10 +81,14 @@ const TruncatedTreeFile = ({file}: {file: ITreeRepresentation}) => (
 
 // File tree display component
 const FileTree = ({registry, full}: IFileTreeProps) => {
+  // number of lines to display (truncate if screen is small)
   const DISPLAY_NUM = Math.max(useStdoutDimensions()[1] - 15, 1)
+
   const emptyMessage = full
     ? <Text color="yellow">No files found</Text>
     : <Text bold color="green">All files synced</Text>
+
+  // only show non-folders and unsynced/syncing files by default
   const files = full ? registry : registry.filter(file => (file.status !== STATUS.synced) && !file.isDir).sort((a, b) => b.size - a.size)
   return (
     <Box flexDirection="column" marginY={1}>

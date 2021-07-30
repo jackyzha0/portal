@@ -8,8 +8,9 @@ interface IDisplayComponentProps {
   children: React.ReactNode;
 }
 
-const DisplayComponent = ({loading, loadingMessage, children}: IDisplayComponentProps) => loading
+// Component to wrap potentially loading components
+const LoadingWrapper = ({loading, loadingMessage, children}: IDisplayComponentProps) => loading
   ? <Loader status={loadingMessage}/>
   : <Box flexDirection="column">{children}</Box>
 
-export default DisplayComponent
+export default LoadingWrapper

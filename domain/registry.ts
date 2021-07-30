@@ -23,10 +23,15 @@ export class Registry {
   drive: Hyperdrive | undefined
 
   // Callback to rerender external tree representations on any changes that require
+  // rerender tree
   rerender: () => void
-  refreshStats: () => void
+
   errorCallback: (error: string) => void
+  // refetch upload/download stats
+  refreshStats: () => void
   stats: Map<string, IStreamPumpStats>
+
+  // task priority queue
   q: PQ
 
   private readonly root: TrieNode
@@ -42,9 +47,12 @@ export class Registry {
     this.refreshStats = noop
     this.subscribers = new Map()
     this.stats = new Map<string, IStreamPumpStats>()
+
+    // default to 4 concurrent upload/downloads
     this.q = new PQ({concurrency: 4})
   }
 
+  // fetch overall throughput stats
   getStats() {
     return [...this.stats.values()].reduce((total, status) => {
       total.totalBytes += status.totalTransferred
@@ -59,6 +67,7 @@ export class Registry {
     })
   }
 
+  // internal debug message
   _debug(message: string) {
     if (this.DEBUG) {
       const now = new Date().toISOString()
@@ -143,11 +152,13 @@ export class Registry {
   insert(pathSegments: string[], isDir = false, newSize?: number): void {
     let cur = this.root
     for (const segment of pathSegments) {
+      // doesnt exist, create intermediate node
       if (!cur.children[segment]) {
         cur.children[segment] = new TrieNode(this, segment, true, newSize)
         cur.children[segment].parent = cur
       }
 
+      // mark as unsynced and traverse another layer down
       cur.markUnsynced()
       cur = cur.children[segment]
     }
@@ -186,14 +197,18 @@ export class Registry {
     }, this.root)
   }
 
+  // Update trie node size based on path
   update(pathSegments: string[], newSize?: number) {
     this._debug(`updating ${pathSegments.join('/')}`)
     const modNode = this.find(pathSegments)
+
+    // only update if node exists
     if (modNode) {
       if (newSize) {
         modNode.sizeBytes = newSize
       }
 
+      // mark all parents as unsynced now that we've updated
       modNode.traverse().forEach(node => {
         node.markUnsynced()
       })
@@ -221,6 +236,7 @@ export class Registry {
     }
   }
 
+  // main handler to parse eventdata
   _onChangeCallback(data: EventData) {
     this.parseEvt(data)
     for (const fn of this.subscribers.values()) {
@@ -270,6 +286,7 @@ export class Registry {
         this.errorCallback(`[subscribe]: ${error.message}`)
       })
 
+    // listen for changes in eventLog
     eventLog.createReadStream({
       tail: true,
       live: true,
@@ -279,6 +296,7 @@ export class Registry {
     return this
   }
 
+  // remove all callbacks and delete everything
   nuke() {
     this._debug('nuking current registry')
     this.drive = undefined

@@ -11,7 +11,7 @@ import useRemoteRegistry from '../hooks/useRemoteRegistry'
 import useDriveDownload from '../hooks/useDriveDownload'
 import Hotkeys from '../components/Hotkeys'
 import Stats from '../components/Stats'
-import DisplayComponent from '../components/DisplayComponent'
+import LoadingWrapper from '../components/LoadingWrapper'
 import {AppContextProvider} from '../contexts/App'
 
 interface IClientProps {
@@ -75,10 +75,10 @@ const Client = ({dir, isForceOverwrite, sessionId, verbose, tree}: IClientProps)
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
         <SessionInfo numConnected={hyper.numConnected} sessionId={sessionId}/>
-        <DisplayComponent loading={remoteLoading} loadingMessage="Syncing remote hyperspace...">
+        <LoadingWrapper loading={remoteLoading} loadingMessage="Syncing remote hyperspace...">
           <FileTree registry={registryRenderableArray} full={tree}/>
           <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
-        </DisplayComponent>
+        </LoadingWrapper>
         <Hotkeys/>
         <Errors errors={errors}/>
       </Box>

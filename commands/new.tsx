@@ -8,7 +8,7 @@ import useLocalRegistry from '../hooks/useLocalRegistry'
 import useDriveSync from '../hooks/useDriveSync'
 import Hotkeys from '../components/Hotkeys'
 import Stats from '../components/Stats'
-import DisplayComponent from '../components/DisplayComponent'
+import LoadingWrapper from '../components/LoadingWrapper'
 import {AppContextProvider} from '../contexts/App'
 import useHyper from '../hooks/useHyper'
 
@@ -35,10 +35,10 @@ const Host = ({dir, includeGitFiles, verbose, tree}: IHostProps) => {
     <AppContextProvider hyper={hyper}>
       <Box flexDirection="column">
         <SessionInfo numConnected={hyper.numConnected} sessionId={hyper?.hyperObj?.eventLog?.key?.toString('hex')}/>
-        <DisplayComponent loading={loading} loadingMessage={`Scanning directory... ${registryRenderableArray.length} files found`}>
+        <LoadingWrapper loading={loading} loadingMessage={`Scanning directory... ${registryRenderableArray.length} files found`}>
           <FileTree registry={registryRenderableArray} full={tree}/>
           <Stats registry={registryRenderableArray} totalBytes={stats.totalBytes} bytesPerSecond={stats.bytesPerSecond}/>
-        </DisplayComponent>
+        </LoadingWrapper>
         <Hotkeys/>
         <Errors errors={errors}/>
       </Box>

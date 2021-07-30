@@ -12,6 +12,10 @@ Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with e
 </p>
 
 ## Installation
+### Binary
+Pre-packaged binary, no external dependencies required! You can find the binaries on the [latest release here](https://github.com/jackyzha0/portal/releases/latest).
+
+### With Node.js
 ```shell
 # Requires node >=v12.22.1
 $ npm i -g portal-sync
