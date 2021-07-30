@@ -1,9 +1,7 @@
 ![Banner](assets/logo.png)
 
 # portal
-Zero-config peer-to-peer encrypted live folder syncing tool that respects your `.gitignore`. Not the 2007 video game.
-
-Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, secure, and decentralized.
+Zero-config peer-to-peer encrypted live folder syncing tool that respects your `.gitignore`. Built on top of the [Hypercore protocol](https://hypercore-protocol.org/) with emphasis on being zero-config, secure, and decentralized.
 
 ## Demos
 <p align="center">
@@ -35,7 +33,7 @@ $ portal join [sessionID]
 * **Decentralized**: There is no central `portal` server that all data is routed through. `portal` only uses public servers to maintain a DHT (distributed hash table) for peer discovery.
 * **One-to-many**: A single host can sync data to any number of connected peers.
 * **Stream-based**: Utilizes file streaming to handle files of arbitrary size (regardless of whether they fit in memory or not)
-* **Efficient**: Changes in single files means that only one file needs to be synced. `portal` tracks which files have changed to avoid resyncing entire folders wherever possible.
+* **Efficient**: Changes in single files means that only one file needs to be synced. `portal` tracks which files have changed to avoid resyncing entire folders wherever possible. A priority queue is used to optimize concurrent operations.
 * **Secure**: Like Dat, all data is encrypted using the read key. Only those that possess your current 32-byte `portal` session ID can view the data you share.
 
 
