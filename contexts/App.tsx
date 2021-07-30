@@ -12,7 +12,7 @@ interface IAppContextProps {
   setClosed: () => void;
 }
 
-// default AppContext
+// Default AppContext
 const AppContext = createContext<IAppContextProps>({
   numConnected: 0,
   closed: false,
@@ -29,7 +29,7 @@ export const AppContextProvider = ({children, hyper}: IAppContextProviderProps) 
 
   const [closed, setClosed] = useState(false)
 
-  // assign memoized context value
+  // Assign memoized context value
   const contextValue = useMemo(() => ({
     hyperObj: hyper.hyperObj,
     numConnected: hyper.numConnected,

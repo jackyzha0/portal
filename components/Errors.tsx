@@ -11,7 +11,7 @@ const Errors = ({errors}: IErrorsProps) => {
     return null
   }
 
-  // only renders first 3 errors, truncates rest
+  // Only renders first 3 errors, truncates rest
   return (
     <Box marginTop={2} flexDirection="column">
       <Text bold color="red">Errors:</Text>
