@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import {Buffer} from 'buffer'
 import speedometer from 'speedometer'
 
 // Helper wrappers around fs package

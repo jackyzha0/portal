@@ -1,3 +1,4 @@
+import {Buffer} from 'buffer'
 import {Hypercore, Hyperdrive} from 'hyper-sdk'
 import PQ from 'p-queue'
 import {EventCallback, EventData, registerWatcher} from '../fs/watcher'

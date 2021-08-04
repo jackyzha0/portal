@@ -28,7 +28,6 @@ const useHyper = (key?: string): IHyper => {
 
   const asyncHyper = useAsync(async () => {
     // Setup hyperspace client
-    // eslint-disable-next-line @typescript-eslint/await-thenable
     const hyper = await hyperSDK({
       persist: false,
       storage: null,

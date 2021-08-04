@@ -1,3 +1,4 @@
+import process from 'process'
 import {useApp, useInput, useStdin} from 'ink'
 import {useAppContext} from '../contexts/App'
 
