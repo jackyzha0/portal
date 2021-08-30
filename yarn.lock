@@ -5188,9 +5188,9 @@ husky@^7.0.0:
   integrity sha512-8yKEWNX4z2YsofXAMT7KvA1g8p+GxtB1ffV8XtpAEGuXNAbCV5wdNKH+qTpw8SM9fh4aMPDR+yQuKfgnreyZlg==
 
 hyper-sdk@^3.0.8:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/hyper-sdk/-/hyper-sdk-3.0.8.tgz#158ebcd7e91df5762121d33cbeb3e563990f4360"
-  integrity sha512-v/BUwKNl82runxDcE6wn1/hoxwFsP7GWIxhUpHvpOSenQN/IlWZIcWEy3ldfZfcqquqy2F0gRUtAGjFGvm3vgQ==
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/hyper-sdk/-/hyper-sdk-3.0.9.tgz#4a7d0400cc9b58dd3e4c4e8fcbbade28cc65e820"
+  integrity sha512-jhfppYAW07e9KZcMCfT0c1o3WQfgemfrPecIvwGeDKy3uknjvPjFNaJBDFd43m2wV9/Js1yLTkBeKQE6sFeWkg==
   dependencies:
     "@corestore/networker" "^1.2.0"
     "@geut/hypercore-promise" "^2.1.1"
