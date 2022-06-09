@@ -41,7 +41,7 @@
 		"ink-select-input": "^4.2.0",
 		"ink-spinner": "^4.0.2",
 		"ink-use-stdout-dimensions": "^1.0.5",
-		"nanoid": "^3.1.23",
+		"nanoid": "^4.0.0",
 		"p-queue": "^6.6.2",
 		"parse-gitignore": "^1.0.1",
 		"pastel": "^1.1.1",
